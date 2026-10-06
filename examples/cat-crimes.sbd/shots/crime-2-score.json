@@ -13,7 +13,76 @@
       "type": "image",
       "asset": "cat-01-hook",
       "id": "v_b725ge"
+    },
+    {
+      "type": "canvas",
+      "name": "Reply",
+      "layers": [
+        {
+          "id": "top",
+          "asset": "cat-03-laptop",
+          "x": 0,
+          "y": 0,
+          "width": 1080,
+          "height": 960,
+          "crop": {
+            "x": 0,
+            "y": 320,
+            "width": 720,
+            "height": 640
+          },
+          "slot": {
+            "x": 0,
+            "y": 0,
+            "width": 1080,
+            "height": 960,
+            "name": "Top"
+          }
+        },
+        {
+          "id": "bottom",
+          "asset": "cat-01-hook",
+          "x": 0,
+          "y": 960,
+          "width": 1080,
+          "height": 960,
+          "crop": {
+            "x": 0,
+            "y": 320,
+            "width": 720,
+            "height": 640
+          },
+          "slot": {
+            "x": 0,
+            "y": 960,
+            "width": 1080,
+            "height": 960,
+            "name": "Bottom"
+          }
+        },
+        {
+          "kind": "text",
+          "x": 86.4,
+          "y": 864,
+          "width": 907.2,
+          "style": "boxed",
+          "box": {
+            "color": "#ffffff",
+            "padding": 16,
+            "radius": 11
+          },
+          "font": "IBM Plex Sans",
+          "font_weight": 600,
+          "font_size": 54,
+          "color": "#111111",
+          "align": "center",
+          "line_height": 1.35,
+          "text": "9/10 (he replied)",
+          "id": "score"
+        }
+      ],
+      "id": "v_yon3yr"
     }
   ],
-  "active_variant": "v_b725ge"
+  "active_variant": "v_yon3yr"
 }

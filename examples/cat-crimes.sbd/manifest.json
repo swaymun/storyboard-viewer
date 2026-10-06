@@ -1,6 +1,6 @@
 {
   "format": "sbd",
-  "format_version": "0.2.0",
+  "format_version": "0.3.0",
   "title": "Rating My Cat's 3 A.M. Crimes",
   "preset": "vertical",
   "aspect_ratio": "9:16",
@@ -129,7 +129,7 @@
     }
   ],
   "created": "2026-10-06T08:16:32.546Z",
-  "modified": "2026-10-06T19:11:40.443Z",
+  "modified": "2026-10-06T21:38:07.107Z",
   "generator": "storyboard-viewer 0.1.0",
   "description": "A fast vertical video (TikTok, Reels, Shorts): a sleepy creator rates the crimes her cat Biscuit committed overnight."
 }

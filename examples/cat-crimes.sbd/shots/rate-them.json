@@ -13,7 +13,97 @@
       "type": "image",
       "asset": "cat-01-point",
       "id": "v_57je9j"
+    },
+    {
+      "type": "canvas",
+      "name": "Three crimes",
+      "layers": [
+        {
+          "id": "top",
+          "asset": "cat-02-glass",
+          "x": 0,
+          "y": 0,
+          "width": 1080,
+          "height": 640,
+          "crop": {
+            "x": 0,
+            "y": 426.67,
+            "width": 720,
+            "height": 426.67
+          },
+          "slot": {
+            "x": 0,
+            "y": 0,
+            "width": 1080,
+            "height": 640,
+            "name": "Top"
+          }
+        },
+        {
+          "id": "middle",
+          "asset": "cat-03-laptop",
+          "x": 0,
+          "y": 640,
+          "width": 1080,
+          "height": 640,
+          "crop": {
+            "x": 0,
+            "y": 426.67,
+            "width": 720,
+            "height": 426.67
+          },
+          "slot": {
+            "x": 0,
+            "y": 640,
+            "width": 1080,
+            "height": 640,
+            "name": "Middle"
+          }
+        },
+        {
+          "id": "bottom",
+          "asset": "cat-04-stare",
+          "x": 0,
+          "y": 1280,
+          "width": 1080,
+          "height": 640,
+          "crop": {
+            "x": 0,
+            "y": 426.67,
+            "width": 720,
+            "height": 426.67
+          },
+          "slot": {
+            "x": 0,
+            "y": 1280,
+            "width": 1080,
+            "height": 640,
+            "name": "Bottom"
+          }
+        },
+        {
+          "kind": "text",
+          "x": 86.4,
+          "y": 864,
+          "width": 907.2,
+          "style": "boxed",
+          "box": {
+            "color": "#ffffff",
+            "padding": 16,
+            "radius": 11
+          },
+          "font": "IBM Plex Sans",
+          "font_weight": 600,
+          "font_size": 54,
+          "color": "#111111",
+          "align": "center",
+          "line_height": 1.35,
+          "text": "let's rate them",
+          "id": "rate-caption"
+        }
+      ],
+      "id": "v_2xjs2w"
     }
   ],
-  "active_variant": "v_57je9j"
+  "active_variant": "v_2xjs2w"
 }
