@@ -4,10 +4,21 @@
  */
 import { createHash, randomBytes } from 'node:crypto';
 import { existsSync, statSync } from 'node:fs';
-import { mkdir, open, readFile, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
+import {
+  copyFile,
+  mkdir,
+  open,
+  readFile,
+  readdir,
+  rename,
+  rm,
+  stat,
+  writeFile,
+} from 'node:fs/promises';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { classifySrc } from './media.js';
 import {
+  PROJECT_FILES,
   loadProject,
   serializeProject,
   type LoadOptions,
@@ -15,7 +26,7 @@ import {
   type SbdReader,
 } from './project.js';
 import type { SbdProject } from './types.js';
-import type { ByteSource, SbdTree } from './zip.js';
+import { packSbd, type ByteSource, type SbdTree } from './zip.js';
 import { zipReader, type ZipReader } from './zip-reader.js';
 
 export type ProjectKind = 'folder' | 'packed';
@@ -263,4 +274,89 @@ export async function sha256File(path: string): Promise<string> {
 
 export async function fileSize(path: string): Promise<number> {
   return (await stat(path)).size;
+}
+
+/** Project text files (rewritten from the model); everything else in a package is kept as is. */
+export function isProjectTextFile(path: string): boolean {
+  return (
+    path === PROJECT_FILES.manifest ||
+    path === PROJECT_FILES.script ||
+    path === PROJECT_FILES.ids ||
+    path === PROJECT_FILES.assets ||
+    path === PROJECT_FILES.timeline ||
+    /^shots\/[^/]+\.json$/.test(path)
+  );
+}
+
+/** Backup written next to a packed file before it is first replaced (`story.sbd.bak`). */
+export const backupPath = (path: string): string => `${path}.bak`;
+
+export interface PackedWriteOptions {
+  /** Extra package files to add or replace (e.g. new media). */
+  add?: Record<string, Uint8Array>;
+  /** Copy the current file to `<file>.bak` before replacing it. */
+  backup?: boolean;
+  /** Set manifest.modified when something changed (default true). */
+  touchModified?: boolean;
+}
+
+/**
+ * Saves a project into a packed `.sbd` in place: reads the current zip, keeps its media and other
+ * files, replaces the project's text files (and adds `opts.add`), re-packs (media STOREd,
+ * `mimetype` first) and replaces the file atomically (temp file in the same folder + rename), so
+ * a reader never sees a half-written file. Returns the package paths that changed. Nothing is
+ * written when nothing changed.
+ */
+export async function writeProjectToPacked(
+  file: string,
+  project: SbdProject,
+  opts: PackedWriteOptions = {},
+): Promise<WriteResult> {
+  const reader = await zipFileReader(file);
+  const tree: SbdTree = {};
+  const oldText = new Map<string, string>();
+  const dec = new TextDecoder();
+  try {
+    for (const path of await reader.list()) {
+      if (path === 'mimetype') continue;
+      const bytes = (await reader.read(path))!;
+      if (isProjectTextFile(path)) oldText.set(path, dec.decode(bytes));
+      else tree[path] = bytes;
+    }
+  } finally {
+    await reader.close();
+  }
+  let files = serializeProject(project);
+  const changed = Object.keys(files).filter((p) => oldText.get(p) !== files[p]);
+  const deleted = [...oldText.keys()].filter((p) => !(p in files));
+  const added = Object.keys(opts.add ?? {});
+  if (!changed.length && !deleted.length && !added.length) return { written: [], deleted: [] };
+  if (
+    (changed.length || deleted.length) &&
+    opts.touchModified !== false &&
+    changed.some((f) => f !== 'manifest.json')
+  ) {
+    files = serializeProject({
+      ...project,
+      manifest: { ...project.manifest, modified: new Date().toISOString() },
+    });
+    if (!changed.includes('manifest.json')) changed.push('manifest.json');
+  }
+  const enc = new TextEncoder();
+  for (const [k, v] of Object.entries(files)) tree[k] = enc.encode(v);
+  Object.assign(tree, opts.add ?? {});
+  const bytes = packSbd(tree);
+  if (opts.backup) await copyFile(file, backupPath(file));
+  await atomicWriteFile(file, bytes);
+  return { written: [...changed, ...added], deleted };
+}
+
+/** Package paths inside a packed `.sbd` (for unique media names). */
+export async function packedPaths(file: string): Promise<Set<string>> {
+  const reader = await zipFileReader(file);
+  try {
+    return new Set(await reader.list());
+  } finally {
+    await reader.close();
+  }
 }

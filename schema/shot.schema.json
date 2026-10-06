@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:sbd:schema:0.2:shot",
+  "$id": "urn:sbd:schema:0.3:shot",
   "title": "SBD shots/<id>.json",
   "description": "One shot: fields, duration and visual variants. Its script lines and position live in ids.json.",
   "type": "object",
@@ -141,13 +141,18 @@
     },
     "layer": {
       "type": "object",
-      "required": ["id", "asset"],
+      "required": ["id"],
       "properties": {
         "id": {
           "$ref": "#/$defs/id"
         },
+        "kind": {
+          "type": "string",
+          "description": "image (default), text or slot (format 0.3). Readers ignore layers of kinds they do not know."
+        },
         "asset": {
-          "$ref": "#/$defs/id"
+          "$ref": "#/$defs/id",
+          "description": "Image layers: ID of an image (or video) asset."
         },
         "name": {
           "type": "string"
@@ -163,7 +168,7 @@
         "width": {
           "type": "number",
           "exclusiveMinimum": 0,
-          "description": "Unscaled display width. Default: crop width or asset width."
+          "description": "Unscaled display width. Image: default crop width or asset width. Text: the wrap width. Slot: required."
         },
         "height": {
           "type": "number",
@@ -233,8 +238,196 @@
         "locked": {
           "type": "boolean",
           "description": "Editor hint. Default false."
+        },
+        "group": {
+          "$ref": "#/$defs/id",
+          "description": "Format 0.3: layers with the same group ID belong together (selected, moved and duplicated as one)."
+        },
+        "slot": {
+          "type": "object",
+          "description": "Format 0.3, image layers: the layout slot this image was fitted into (x, y, width, height in canvas px). The layer's own position/size/crop already place the image.",
+          "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            },
+            "width": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "height": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "fit": {
+              "$ref": "#/$defs/fit"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "fit": {
+          "$ref": "#/$defs/fit",
+          "description": "Slot layers: how an image dropped into the slot is fitted. Default cover."
+        },
+        "text": {
+          "type": "string",
+          "description": "Text layers: the text (\\n starts a new line; long lines wrap at width)."
+        },
+        "font": {
+          "type": "string",
+          "description": "Text layers: font family name (e.g. Montserrat, IBM Plex Sans, Courier Prime). Default IBM Plex Sans."
+        },
+        "font_asset": {
+          "$ref": "#/$defs/id",
+          "description": "Text layers: a font asset to use instead of font."
+        },
+        "font_size": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Text layers: canvas px. Default 64."
+        },
+        "font_weight": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Text layers: 100–900. Default 400."
+        },
+        "italic": {
+          "type": "boolean"
+        },
+        "uppercase": {
+          "type": "boolean",
+          "description": "Text layers: draw in capitals."
+        },
+        "color": {
+          "type": "string",
+          "description": "Text layers: CSS color. Default #ffffff."
+        },
+        "align": {
+          "enum": ["left", "center", "right"],
+          "description": "Text layers. Default center."
+        },
+        "line_height": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Text layers: multiple of font_size. Default 1.2."
+        },
+        "stroke": {
+          "type": "object",
+          "description": "Text layers: outline.",
+          "required": ["color", "width"],
+          "properties": {
+            "color": {
+              "type": "string"
+            },
+            "width": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "shadow": {
+          "type": "object",
+          "description": "Text layers: drop shadow.",
+          "required": ["color"],
+          "properties": {
+            "color": {
+              "type": "string"
+            },
+            "blur": {
+              "type": "number",
+              "minimum": 0
+            },
+            "offset_x": {
+              "type": "number"
+            },
+            "offset_y": {
+              "type": "number"
+            }
+          }
+        },
+        "box": {
+          "type": "object",
+          "description": "Text layers: a box behind each line (boxed captions).",
+          "required": ["color"],
+          "properties": {
+            "color": {
+              "type": "string"
+            },
+            "padding": {
+              "type": "number",
+              "minimum": 0
+            },
+            "radius": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "style": {
+          "type": "string",
+          "description": "Text layers: the caption style it was made from (bold, boxed, lower-third, title…); informational."
         }
-      }
+      },
+      "description": "A canvas layer. kind omitted or \"image\": an image/video asset. Format 0.3 adds \"text\" (on-screen text) and \"slot\" (an empty, named placeholder from a layout; not drawn in finished frames).",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "text"
+              }
+            },
+            "required": ["kind"]
+          },
+          "then": {
+            "required": ["text"]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "slot"
+              }
+            },
+            "required": ["kind"]
+          },
+          "then": {
+            "required": ["width", "height"]
+          }
+        },
+        {
+          "if": {
+            "anyOf": [
+              {
+                "not": {
+                  "required": ["kind"]
+                }
+              },
+              {
+                "properties": {
+                  "kind": {
+                    "const": "image"
+                  }
+                },
+                "required": ["kind"]
+              }
+            ]
+          },
+          "then": {
+            "required": ["asset"]
+          }
+        }
+      ]
+    },
+    "fit": {
+      "enum": ["cover", "contain"]
     }
   }
 }

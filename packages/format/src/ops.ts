@@ -43,6 +43,7 @@ import {
   type CueTarget,
   type FieldValue,
   type Layer,
+  layerKind,
   type Manifest,
   type SbdProject,
   type Shot,
@@ -374,14 +375,14 @@ export function addVariant(
       lids.add(l.id);
     }
   } else fail('Variant "type" must be "image" or "canvas"');
-  const assetsUsed = v.type === 'image' ? [v.asset] : v.layers.map((l) => l.asset);
-  for (const a of assetsUsed)
-    if (!p.assets.assets.some((x) => x.id === a)) fail(`Unknown asset "${a}"`);
+  if (v.type === 'image' && !p.assets.assets.some((x) => x.id === v.asset))
+    fail(`Unknown asset "${v.asset}"`);
+  if (v.type === 'canvas') for (const l of v.layers) checkLayer(p, l);
   const index = opts.index ?? variants.length;
   variants.splice(index, 0, v);
   const shot: Shot = { ...old, variants };
   if (opts.activate || !shot.active_variant) shot.active_variant = id;
-  return { project: { ...p, shots: { ...p.shots, [shotId]: shot } }, id };
+  return { project: withLayerVersion({ ...p, shots: { ...p.shots, [shotId]: shot } }, v), id };
 }
 
 export function updateVariant(
@@ -400,7 +401,11 @@ export function updateVariant(
   });
   if (!(old.variants ?? []).some((v) => v.id === variantId))
     fail(`Shot "${shotId}" has no variant "${variantId}"`);
-  return { ...p, shots: { ...p.shots, [shotId]: { ...old, variants } } };
+  const next = { ...p, shots: { ...p.shots, [shotId]: { ...old, variants } } };
+  return withLayerVersion(
+    next,
+    variants.find((v) => v.id === variantId)!,
+  );
 }
 
 export function removeVariant(p: SbdProject, shotId: string, variantId: string): SbdProject {
@@ -464,7 +469,8 @@ export function assetReferences(p: SbdProject, id: string): string[] {
       if (v.type === 'canvas') {
         if (v.preview === id) refs.push(`shot ${sid} variant ${v.id} preview`);
         for (const l of v.layers)
-          if (l.asset === id) refs.push(`shot ${sid} variant ${v.id} layer ${l.id}`);
+          if (l.asset === id || l.font_asset === id)
+            refs.push(`shot ${sid} variant ${v.id} layer ${l.id}`);
       }
     }
   }
@@ -487,7 +493,7 @@ export function removeAsset(p: SbdProject, id: string, opts: { force?: boolean }
       !(shot.variants ?? []).some((v) =>
         v.type === 'image'
           ? v.asset === id
-          : v.preview === id || v.layers.some((l) => l.asset === id),
+          : v.preview === id || v.layers.some((l) => l.asset === id || l.font_asset === id),
       )
     ) {
       shots[sid] = shot;
@@ -497,7 +503,26 @@ export function removeAsset(p: SbdProject, id: string, opts: { force?: boolean }
       .filter((v) => !(v.type === 'image' && v.asset === id))
       .map((v) => {
         if (v.type !== 'canvas') return v;
-        const nv = { ...v, layers: v.layers.filter((l) => l.asset !== id) };
+        const nv = {
+          ...v,
+          layers: v.layers
+            .filter((l) => l.asset !== id || l.slot)
+            .map((l): Layer => {
+              if (l.asset === id && l.slot) {
+                // a picture in a layout slot: the slot stays, empty
+                const f = l.slot;
+                const slot: Layer = { id: l.id, kind: 'slot', x: f.x, y: f.y, width: f.width };
+                slot.height = f.height;
+                if (f.name) slot.name = f.name;
+                if (f.fit) slot.fit = f.fit;
+                if (l.group) slot.group = l.group;
+                return slot;
+              }
+              if (l.font_asset !== id) return l;
+              const { font_asset: _f, ...rest } = l;
+              return rest as Layer;
+            }),
+        };
         if (nv.preview === id) delete nv.preview;
         return nv;
       });
@@ -1203,7 +1228,7 @@ export function moveVariant(
 // ---------------------------------------------------------------------------
 // Canvas layers (convenience wrappers around updateVariant)
 
-function getCanvas(p: SbdProject, shotId: string, variantId: string): CanvasVariant {
+export function getCanvas(p: SbdProject, shotId: string, variantId: string): CanvasVariant {
   const v = (getShot(p, shotId).variants ?? []).find((x) => x.id === variantId);
   if (!v) fail(`Shot "${shotId}" has no variant "${variantId}"`);
   if (v!.type !== 'canvas') fail(`Variant "${variantId}" is not a canvas variant`);
@@ -1211,6 +1236,41 @@ function getCanvas(p: SbdProject, shotId: string, variantId: string): CanvasVari
 }
 
 export type LayerInput = WithOptionalId<Layer>;
+
+/** Checks what a layer of its kind needs (asset for images, text for text, size for slots). */
+function checkLayer(p: SbdProject, l: Partial<Layer>): void {
+  const kind = layerKind(l);
+  if (kind === 'image') {
+    if (!l.asset) fail('An image layer needs "asset" (an image or video asset ID)');
+    const a = p.assets.assets.find((x) => x.id === l.asset);
+    if (!a) fail(`Unknown asset "${l.asset}"`);
+    if (a!.kind !== 'image' && a!.kind !== 'video')
+      fail(`Asset "${a!.id}" is ${a!.kind}; layers need an image or video`);
+  } else if (kind === 'text') {
+    if (typeof l.text !== 'string') fail('A text layer needs "text"');
+    if (l.font_asset && !p.assets.assets.some((x) => x.id === l.font_asset))
+      fail(`Unknown font asset "${l.font_asset}"`);
+  } else if (kind === 'slot') {
+    if (!(Number(l.width) > 0) || !(Number(l.height) > 0))
+      fail('A slot layer needs "width" and "height" (canvas px)');
+  }
+}
+
+/** True when a variant uses something from format 0.3 (text/slot layers, groups, slots). */
+function usesLayerFeatures(v: Variant): boolean {
+  return (
+    v.type === 'canvas' &&
+    (v.layers ?? []).some((l) => (l.kind && l.kind !== 'image') || l.group || l.slot)
+  );
+}
+
+/** Text and slot layers, groups and filled slots need format 0.3: bump an older version. */
+export function withLayerVersion(p: SbdProject, v: Variant): SbdProject {
+  if (!usesLayerFeatures(v)) return p;
+  const [maj, min] = (p.manifest.format_version ?? '0.1.0').split('.').map(Number);
+  if ((maj ?? 0) > 0 || (min ?? 0) >= 3) return p;
+  return { ...p, manifest: { ...p.manifest, format_version: '0.3.0' } };
+}
 
 /** Adds a layer on top (or at `index`, 0 = bottom). */
 export function addLayer(
@@ -1221,7 +1281,7 @@ export function addLayer(
   opts: { index?: number } = {},
 ): { project: SbdProject; id: string } {
   const v = getCanvas(p, shotId, variantId);
-  if (!p.assets.assets.some((a) => a.id === input.asset)) fail(`Unknown asset "${input.asset}"`);
+  checkLayer(p, input as Partial<Layer>);
   const taken = new Set(v.layers.map((l) => l.id));
   const id = input.id ?? newId('ly', taken);
   checkNewId(id, taken, 'Layer');
@@ -1230,23 +1290,50 @@ export function addLayer(
   return { project: updateVariant(p, shotId, variantId, { layers }), id };
 }
 
+export type LayerPatch = { [K in keyof Layer]?: Layer[K] | null };
+
+function patchLayer(l: Layer, patch: LayerPatch): Layer {
+  const next = { ...l, ...clone(patch), id: l.id } as Layer;
+  for (const [k, val] of Object.entries(patch)) if (val === null) delete next[k];
+  return next;
+}
+
 /** Patches one layer; `null` values delete a property (e.g. `crop: null`). */
 export function updateLayer(
   p: SbdProject,
   shotId: string,
   variantId: string,
   layerId: string,
-  patch: { [K in keyof Layer]?: Layer[K] | null },
+  patch: LayerPatch,
+): SbdProject {
+  return updateLayers(p, shotId, variantId, { [layerId]: patch });
+}
+
+/** Patches several layers at once (one undo step): `{ layerId: patch }`. */
+export function updateLayers(
+  p: SbdProject,
+  shotId: string,
+  variantId: string,
+  patches: Record<string, LayerPatch>,
 ): SbdProject {
   const v = getCanvas(p, shotId, variantId);
-  if (!v.layers.some((l) => l.id === layerId)) fail(`Unknown layer "${layerId}"`);
-  if (patch.id !== undefined && patch.id !== layerId) fail('Layer IDs cannot be changed');
-  if (patch.asset && !p.assets.assets.some((a) => a.id === patch.asset))
-    fail(`Unknown asset "${String(patch.asset)}"`);
+  for (const [id, patch] of Object.entries(patches)) {
+    if (!v.layers.some((l) => l.id === id)) fail(`Unknown layer "${id}"`);
+    if (patch.id !== undefined && patch.id !== id) fail('Layer IDs cannot be changed');
+  }
   const layers = v.layers.map((l) => {
-    if (l.id !== layerId) return l;
-    const next = { ...l, ...clone(patch), id: l.id } as Layer;
-    for (const [k, val] of Object.entries(patch)) if (val === null) delete next[k];
+    const patch = patches[l.id];
+    if (!patch) return l;
+    const next = patchLayer(l, patch);
+    if (
+      patch.asset !== undefined ||
+      patch.kind !== undefined ||
+      patch.text !== undefined ||
+      patch.font_asset !== undefined ||
+      patch.width !== undefined ||
+      patch.height !== undefined
+    )
+      checkLayer(p, next);
     return next;
   });
   return updateVariant(p, shotId, variantId, { layers });
@@ -1258,10 +1345,31 @@ export function removeLayer(
   variantId: string,
   layerId: string,
 ): SbdProject {
+  return removeLayers(p, shotId, variantId, [layerId]);
+}
+
+/** Removes several layers (one undo step). A group left with one member is dissolved. */
+export function removeLayers(
+  p: SbdProject,
+  shotId: string,
+  variantId: string,
+  layerIds: readonly string[],
+): SbdProject {
   const v = getCanvas(p, shotId, variantId);
-  if (!v.layers.some((l) => l.id === layerId)) fail(`Unknown layer "${layerId}"`);
-  return updateVariant(p, shotId, variantId, {
-    layers: v.layers.filter((l) => l.id !== layerId),
+  const drop = new Set(layerIds);
+  for (const id of drop) if (!v.layers.some((l) => l.id === id)) fail(`Unknown layer "${id}"`);
+  const layers = dissolveSingletons(v.layers.filter((l) => !drop.has(l.id)));
+  return updateVariant(p, shotId, variantId, { layers });
+}
+
+/** Groups with a single member left are not groups any more. */
+function dissolveSingletons(layers: Layer[]): Layer[] {
+  const count = new Map<string, number>();
+  for (const l of layers) if (l.group) count.set(l.group, (count.get(l.group) ?? 0) + 1);
+  return layers.map((l) => {
+    if (!l.group || (count.get(l.group) ?? 0) > 1) return l;
+    const { group: _g, ...rest } = l;
+    return rest as Layer;
   });
 }
 
@@ -1282,6 +1390,26 @@ export function moveLayer(
   return updateVariant(p, shotId, variantId, { layers });
 }
 
+/**
+ * Moves several layers as one block (keeping their order) so the block starts at `index` of
+ * the list without them (0 = bottom). Used for groups and multi-selections.
+ */
+export function moveLayers(
+  p: SbdProject,
+  shotId: string,
+  variantId: string,
+  layerIds: readonly string[],
+  index: number,
+): SbdProject {
+  const v = getCanvas(p, shotId, variantId);
+  const set = new Set(layerIds);
+  for (const id of set) if (!v.layers.some((l) => l.id === id)) fail(`Unknown layer "${id}"`);
+  const block = v.layers.filter((l) => set.has(l.id));
+  const rest = v.layers.filter((l) => !set.has(l.id));
+  rest.splice(Math.max(0, Math.min(index, rest.length)), 0, ...block);
+  return updateVariant(p, shotId, variantId, { layers: rest });
+}
+
 export function duplicateLayer(
   p: SbdProject,
   shotId: string,
@@ -1289,14 +1417,104 @@ export function duplicateLayer(
   layerId: string,
   offset = 24,
 ): { project: SbdProject; id: string } {
+  const r = duplicateLayers(p, shotId, variantId, [layerId], offset);
+  return { project: r.project, id: r.ids[0]! };
+}
+
+/**
+ * Copies layers (offset by `offset` canvas px) right above the topmost of them, in their order.
+ * Copies of a group get a new group ID. Returns the new IDs in the order of `layerIds`.
+ */
+export function duplicateLayers(
+  p: SbdProject,
+  shotId: string,
+  variantId: string,
+  layerIds: readonly string[],
+  offset = 24,
+): { project: SbdProject; ids: string[] } {
   const v = getCanvas(p, shotId, variantId);
-  const i = v.layers.findIndex((l) => l.id === layerId);
-  if (i < 0) fail(`Unknown layer "${layerId}"`);
-  const src = v.layers[i]!;
-  const { id: _old, ...rest } = clone(src);
-  const input: LayerInput = { ...rest, x: (src.x ?? 0) + offset, y: (src.y ?? 0) + offset };
-  if (src.name) input.name = `${src.name} copy`;
-  return addLayer(p, shotId, variantId, input, { index: i + 1 });
+  const set = new Set(layerIds);
+  for (const id of set) if (!v.layers.some((l) => l.id === id)) fail(`Unknown layer "${id}"`);
+  const taken = new Set(v.layers.map((l) => l.id));
+  const groups = new Map<string, string>();
+  const groupIds = new Set(v.layers.map((l) => l.group).filter((g): g is string => !!g));
+  const copies: Layer[] = [];
+  const idFor = new Map<string, string>();
+  let top = -1;
+  v.layers.forEach((src, i) => {
+    if (!set.has(src.id)) return;
+    top = i;
+    const id = newId('ly', taken);
+    taken.add(id);
+    idFor.set(src.id, id);
+    const copy: Layer = { ...clone(src), id, x: (src.x ?? 0) + offset, y: (src.y ?? 0) + offset };
+    if (src.slot) copy.slot = { ...src.slot, x: src.slot.x + offset, y: src.slot.y + offset };
+    if (src.name) copy.name = `${src.name} copy`;
+    if (src.group) {
+      let g = groups.get(src.group);
+      if (!g) {
+        g = newId('g', groupIds);
+        groupIds.add(g);
+        groups.set(src.group, g);
+      }
+      copy.group = g;
+    }
+    copies.push(copy);
+  });
+  const layers = [...v.layers];
+  layers.splice(top + 1, 0, ...dissolveSingletons(copies));
+  return {
+    project: updateVariant(p, shotId, variantId, { layers }),
+    ids: layerIds.map((id) => idFor.get(id)!),
+  };
+}
+
+/**
+ * Groups layers (at least two): they get one new group ID and move next to each other in the
+ * z-order, at the position of the topmost one. Members of other groups join the new one.
+ */
+export function groupLayers(
+  p: SbdProject,
+  shotId: string,
+  variantId: string,
+  layerIds: readonly string[],
+  groupId?: string,
+): { project: SbdProject; id: string } {
+  const v = getCanvas(p, shotId, variantId);
+  const set = new Set(layerIds);
+  if (set.size < 2) fail('Select at least two layers to group');
+  for (const id of set) if (!v.layers.some((l) => l.id === id)) fail(`Unknown layer "${id}"`);
+  const taken = new Set(v.layers.map((l) => l.group).filter((g): g is string => !!g));
+  const id = groupId ?? newId('g', taken);
+  if (!isValidId(id)) fail(`Invalid group ID "${id}"`);
+  const block = v.layers.filter((l) => set.has(l.id)).map((l) => ({ ...l, group: id }));
+  const topIndex = Math.max(...v.layers.map((l, i) => (set.has(l.id) ? i : -1)));
+  const below = v.layers.slice(0, topIndex + 1).filter((l) => !set.has(l.id));
+  const above = v.layers.slice(topIndex + 1);
+  const layers = dissolveSingletons([...below, ...block, ...above]);
+  return { project: updateVariant(p, shotId, variantId, { layers }), id };
+}
+
+/** Ungroups: removes `group` from these layers (or every member of these group IDs). */
+export function ungroupLayers(
+  p: SbdProject,
+  shotId: string,
+  variantId: string,
+  ids: readonly string[],
+): SbdProject {
+  const v = getCanvas(p, shotId, variantId);
+  const set = new Set(ids);
+  const groups = new Set(v.layers.filter((l) => set.has(l.id) && l.group).map((l) => l.group!));
+  for (const id of set) if (v.layers.some((l) => l.group === id)) groups.add(id);
+  if (!groups.size) return p;
+  const layers = dissolveSingletons(
+    v.layers.map((l) => {
+      if (!l.group || !groups.has(l.group)) return l;
+      const { group: _g, ...rest } = l;
+      return rest as Layer;
+    }),
+  );
+  return updateVariant(p, shotId, variantId, { layers });
 }
 
 // ---------------------------------------------------------------------------

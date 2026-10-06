@@ -11,7 +11,7 @@ import type { LineIdEntry } from './reanchor.js';
 export type { LineIdEntry };
 
 /** Current spec version written by this package. */
-export const FORMAT_VERSION = '0.2.0';
+export const FORMAT_VERSION = '0.3.0';
 
 export type AssetKind = 'image' | 'audio' | 'video' | 'font';
 export const ASSET_KINDS: readonly AssetKind[] = ['image', 'audio', 'video', 'font'];
@@ -105,10 +105,71 @@ export interface LayerFilter extends Extra {
   value?: number;
 }
 
-/** A canvas layer. Attribute semantics match Konva.Image (x/y = origin, rotation in degrees). */
+/** What a layer draws (format 0.3). Omitted = `image` (every 0.1/0.2 layer). */
+export type LayerKind = 'image' | 'text' | 'slot';
+export const LAYER_KINDS: readonly LayerKind[] = ['image', 'text', 'slot'];
+
+/** How an image sits in a slot: `cover` fills it (cropping), `contain` shows all of it. */
+export type SlotFit = 'cover' | 'contain';
+
+/**
+ * Format 0.3: the slot an image layer fills (the frame it was fitted into). The layer's own
+ * `x/y/width/height/crop` already place the picture, so readers that ignore `slot` still draw it
+ * right; editors use it to re-fit (Fit / Fill) and to turn the layer back into an empty slot.
+ */
+export interface SlotFrame extends Extra {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fit?: SlotFit;
+  /** The slot's label ("Top", "B-roll"). */
+  name?: string;
+}
+
+export interface TextStroke extends Extra {
+  color: string;
+  /** Canvas px. */
+  width: number;
+}
+
+export interface TextShadow extends Extra {
+  color: string;
+  /** Canvas px. */
+  blur?: number;
+  offset_x?: number;
+  offset_y?: number;
+}
+
+export interface TextBox extends Extra {
+  /** CSS color behind the text (each line gets its own box). */
+  color: string;
+  /** Canvas px around the text. Default: 0.3 × font size. */
+  padding?: number;
+  /** Canvas px. Default: 0.2 × font size. */
+  radius?: number;
+}
+
+export type TextAlign = 'left' | 'center' | 'right';
+
+/**
+ * A canvas layer. Attribute semantics match Konva (x/y = origin, rotation in degrees).
+ *
+ * - **image** (default; `kind` omitted): `asset` is an image or video; `crop`, `filters`, and
+ *   (0.3) `slot` when it was fitted into a layout slot.
+ * - **text** (0.3): `text` drawn in a box `width` wide (lines wrap; the height follows the
+ *   text), with `font`/`font_asset`, `font_size`, `font_weight`, `color`, `align`, `stroke`,
+ *   `shadow`, `box`. `style` names the caption style it was made from (informational).
+ * - **slot** (0.3): an empty, named placeholder (`width` × `height`) from a layout. Editors show it;
+ *   renderers of the finished frame (cards, animatic, PDF, video) draw nothing.
+ *
+ * `group` (0.3): layers with the same group ID move, select and duplicate together.
+ */
 export interface Layer extends Extra {
   id: string;
-  asset: string;
+  kind?: LayerKind;
+  /** Image layers: the image (or video) asset. */
+  asset?: string;
   name?: string;
   x?: number;
   y?: number;
@@ -122,6 +183,28 @@ export interface Layer extends Extra {
   filters?: LayerFilter[];
   visible?: boolean;
   locked?: boolean;
+  group?: string;
+  slot?: SlotFrame;
+  fit?: SlotFit;
+  text?: string;
+  font?: string;
+  font_asset?: string;
+  font_size?: number;
+  font_weight?: number;
+  italic?: boolean;
+  uppercase?: boolean;
+  color?: string;
+  align?: TextAlign;
+  line_height?: number;
+  stroke?: TextStroke;
+  shadow?: TextShadow;
+  box?: TextBox;
+  style?: string;
+}
+
+/** The kind of a layer (`image` when omitted). */
+export function layerKind(l: Pick<Layer, 'kind'>): LayerKind | (string & {}) {
+  return l.kind ?? 'image';
 }
 
 export interface ImageVariant extends Extra {

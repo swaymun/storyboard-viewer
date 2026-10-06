@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:sbd:schema:0.2:ids",
+  "$id": "urn:sbd:schema:0.3:ids",
   "title": "SBD ids.json",
   "description": "Stable line IDs for script.fountain and the ordered list of shots with the lines (or, since 0.2, the character ranges) each shot covers. The order of `shots` is the story order.",
   "type": "object",

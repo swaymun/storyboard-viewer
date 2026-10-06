@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:sbd:schema:0.2:timeline",
+  "$id": "urn:sbd:schema:0.3:timeline",
   "title": "SBD timeline.json",
   "description": "Media cues: which (part of which) audio/video asset plays against which line, shot, range or the whole story.",
   "type": "object",

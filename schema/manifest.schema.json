@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:sbd:schema:0.2:manifest",
+  "$id": "urn:sbd:schema:0.3:manifest",
   "title": "SBD manifest.json",
   "description": "Project metadata, preset, frame settings, asset categories and shot field definitions. Readers must ignore unknown properties.",
   "type": "object",

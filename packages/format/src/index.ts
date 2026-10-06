@@ -18,3 +18,4 @@ export * from './zip.js';
 export * from './zip-reader.js';
 export * from './reorder.js';
 export * from './spans.js';
+export * from './layouts.js';

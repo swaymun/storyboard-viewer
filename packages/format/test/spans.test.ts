@@ -109,7 +109,7 @@ describe('sub-line shots (format 0.2)', () => {
     expect(ref(p, 'cops')).toMatchObject({ start: { offset: 19 }, end: { offset: 27 } });
     expect(errors(p)).toEqual([]);
     expect(warnings(p)).toEqual([]); // sharing a line without overlap is fine
-    expect(p.manifest.format_version).toBe('0.2.0');
+    expect(p.manifest.format_version).toBe('0.3.0'); // created at the current version
   });
 
   it('a span can cross lines and whole-line shots stay as they were', () => {
@@ -135,7 +135,7 @@ describe('sub-line shots (format 0.2)', () => {
     const w = idOf(fresh, 'I was running');
     const q = addShot(fresh, { id: 'w', lines: [w] }).project;
     expect(ref(q, 'w')).toEqual({ id: 'w', lines: [w] });
-    expect(q.manifest.format_version).toBe('0.2.0'); // new projects are 0.2
+    expect(q.manifest.format_version).toBe('0.3.0'); // new projects are 0.3
   });
 
   it('making a shot inside another one keeps the part before; no overlaps', () => {

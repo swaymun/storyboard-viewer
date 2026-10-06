@@ -8,6 +8,7 @@ import { classifySrc, playabilityWarning } from './media.js';
 import { SCHEMAS, type SchemaName } from './schemas.gen.js';
 import {
   KNOWN_FILTERS,
+  layerKind,
   isGlobalTarget,
   isLineTarget,
   isRangeTarget,
@@ -428,23 +429,56 @@ export function validateProject(p: SbdProject, opts: ValidateOptions = {}): Issu
               `${lp}/id`,
             );
           layerIds.add(l.id);
-          const a = assets.get(l.asset);
-          if (!a)
+          const kind = layerKind(l);
+          if (kind === 'image') {
+            const a = l.asset ? assets.get(l.asset) : undefined;
+            if (!a)
+              add(
+                'error',
+                'missing-asset',
+                l.asset
+                  ? `shot "${id}" layer "${l.id}" references unknown asset "${l.asset}"`
+                  : `shot "${id}" layer "${l.id}" has no asset`,
+                file,
+                `${lp}/asset`,
+              );
+            else if (a.kind !== 'image' && a.kind !== 'video')
+              add(
+                'error',
+                'wrong-kind',
+                `shot "${id}" layer "${l.id}": asset "${a.id}" is ${a.kind}, expected image or video`,
+                file,
+                `${lp}/asset`,
+              );
+          } else if (kind === 'text') {
+            if (l.font_asset) {
+              const f = assets.get(l.font_asset);
+              if (!f)
+                add(
+                  'error',
+                  'missing-asset',
+                  `shot "${id}" layer "${l.id}" uses unknown font asset "${l.font_asset}"`,
+                  file,
+                  `${lp}/font_asset`,
+                );
+              else if (f.kind !== 'font')
+                add(
+                  'error',
+                  'wrong-kind',
+                  `shot "${id}" layer "${l.id}": font_asset "${f.id}" is ${f.kind}, expected font`,
+                  file,
+                  `${lp}/font_asset`,
+                );
+            }
+          } else if (kind !== 'slot') {
             add(
-              'error',
-              'missing-asset',
-              `shot "${id}" layer "${l.id}" references unknown asset "${l.asset}"`,
+              'warning',
+              'unknown-layer-kind',
+              `layer "${l.id}": unknown kind "${kind}" will be ignored`,
               file,
-              `${lp}/asset`,
+              `${lp}/kind`,
             );
-          else if (a.kind !== 'image' && a.kind !== 'video')
-            add(
-              'error',
-              'wrong-kind',
-              `shot "${id}" layer "${l.id}": asset "${a.id}" is ${a.kind}, expected image or video`,
-              file,
-              `${lp}/asset`,
-            );
+          }
           l.filters?.forEach((f, k) => {
             if (!(KNOWN_FILTERS as readonly string[]).includes(f.type))
               add(
