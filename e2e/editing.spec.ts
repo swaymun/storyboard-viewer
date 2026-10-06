@@ -141,12 +141,15 @@ test('canvas: drag, transform values and nudging persist', async ({ page }) => {
       .layers.find((l: { id: string }) => l.id === 'maya');
   const before = maya();
   const asset = disk('assets.json').assets.find((a: { id: string }) => a.id === 'maya');
-  // canvas → screen: the stage shows the frame with a 36 px margin
-  const stage = page.locator('.stage .konvajs-content');
+  // canvas → screen: the stage reports where the frame sits and its zoom
+  const stage = page.locator('.stage');
   const box = (await stage.boundingBox())!;
-  const scale = (box.width - 72) / 1280;
-  const cx = box.x + 36 + (before.x + (asset.width * before.scale_x) / 2) * scale;
-  const cy = box.y + 36 + (before.y + (asset.height * before.scale_y) / 2) * scale;
+  const view = await stage.evaluate((e) => ({ ...(e as HTMLElement).dataset }));
+  const scale = Number(view['zoom']);
+  const cx =
+    box.x + Number(view['originX']) + (before.x + (asset.width * before.scale_x) / 2) * scale;
+  const cy =
+    box.y + Number(view['originY']) + (before.y + (asset.height * before.scale_y) / 2) * scale;
   await page.mouse.move(cx, cy);
   await page.mouse.down();
   await page.mouse.move(cx - 60, cy + 20, { steps: 6 });

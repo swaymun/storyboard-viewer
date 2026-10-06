@@ -7,13 +7,22 @@
     label,
     id,
     disabled = false,
+    onchange,
   }: {
     value: T;
     options: ReadonlyArray<{ value: T; label: string }>;
     label: string;
     id?: string;
     disabled?: boolean;
+    /** Called with the new value when the user picks one. */
+    onchange?: (value: T) => void;
   } = $props();
+
+  function choose(v: T) {
+    if (v === value) return;
+    value = v;
+    onchange?.(v);
+  }
 
   let el = $state<HTMLDivElement>();
 
@@ -28,7 +37,7 @@
     if (!d) return;
     e.preventDefault();
     const next = options[(i + d + options.length) % options.length]!;
-    value = next.value;
+    choose(next.value);
     el?.querySelectorAll<HTMLElement>('[role="radio"]')[options.indexOf(next)]?.focus();
   }
 </script>
@@ -42,7 +51,7 @@
       tabindex={o.value === value ? 0 : -1}
       data-value={o.value}
       {disabled}
-      onclick={() => (value = o.value)}
+      onclick={() => choose(o.value)}
       {onkeydown}>{o.label}</button
     >
   {/each}

@@ -201,6 +201,15 @@
           }),
         );
       }
+      // text layers redraw once their fonts are in
+      waits.push(
+        (async () => {
+          for (let i = 0; i < 100; i++) {
+            if (!el.querySelector('canvas.text-canvas:not([data-fonts="loaded"])')) return;
+            await new Promise((r) => setTimeout(r, 50));
+          }
+        })(),
+      );
       await Promise.race([Promise.all(waits), new Promise((r) => setTimeout(r, 15000))]);
       if (document.fonts?.ready) await document.fonts.ready;
       if (!cancelled) ready = true;

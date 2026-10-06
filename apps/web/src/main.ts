@@ -7,6 +7,11 @@ import { app } from './lib/state.svelte';
 import '@fontsource/ibm-plex-sans/latin-400.css';
 import '@fontsource/ibm-plex-sans/latin-500.css';
 import '@fontsource/ibm-plex-sans/latin-600.css';
+import '@fontsource/ibm-plex-sans/latin-700.css';
+// text layers (captions): Montserrat as the display face
+import '@fontsource/montserrat/latin-400.css';
+import '@fontsource/montserrat/latin-600.css';
+import '@fontsource/montserrat/latin-800.css';
 import '@fontsource/ibm-plex-mono/latin-400.css';
 import '@fontsource/ibm-plex-mono/latin-500.css';
 import '@fontsource/courier-prime/latin-400.css';
@@ -34,7 +39,7 @@ const launchQueue = (
 ).launchQueue;
 launchQueue?.setConsumer(async (params) => {
   const handle = params.files[0];
-  if (handle) await app.openFile(await handle.getFile());
+  if (handle) await app.openFile(await handle.getFile(), handle);
 });
 
 // Read-only handle for tests, debugging and computer-use agents (state, not an API contract).

@@ -1,6 +1,6 @@
 import {
   KNOWN_FILTERS,
-  aspectValue,
+  canvasSizeOf,
   type CanvasVariant,
   type LayerFilter,
   type Manifest,
@@ -38,12 +38,7 @@ export function canvasSize(
   v: CanvasVariant,
   m: Manifest | undefined,
 ): { width: number; height: number } {
-  if (v.width && v.height) return { width: v.width, height: v.height };
-  if (m?.canvas) return m.canvas;
-  const a = aspectValue(m?.aspect_ratio);
-  return a >= 1
-    ? { width: 1920, height: Math.round(1920 / a) }
-    : { width: Math.round(1920 * a), height: 1920 };
+  return canvasSizeOf(v, m);
 }
 
 export function frameAspect(m: Manifest | undefined): string {

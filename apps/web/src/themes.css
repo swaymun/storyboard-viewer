@@ -15,7 +15,8 @@
  *   shots       --shot-1 … --shot-6 annotation hues (highlights mix them with the paper)
  *   media       --stage (behind pictures) --overlay-bg/--overlay-fg (labels over pictures)
  *   canvas      --canvas-mask --canvas-frame --canvas-handle --canvas-handle-fill
- *               --canvas-guide --canvas-snap
+ *               --canvas-guide --canvas-snap --canvas-zone(-line) (platform safe zones)
+ *               --canvas-slot(-fg) (empty layout slots) --canvas-label-fg (text on snap labels)
  *   elevation   --shadow-color --backdrop
  *
  * `test/themes.test.ts` checks the contrast pairs above for every theme.
@@ -125,6 +126,11 @@
   --canvas-handle-fill: #ffffff;
   --canvas-guide: rgb(120 200 255 / 0.75);
   --canvas-snap: #ff4fa3;
+  --canvas-zone: rgb(255 77 109 / 0.16);
+  --canvas-zone-line: rgb(255 120 140 / 0.75);
+  --canvas-slot: rgb(140 140 150 / 0.28);
+  --canvas-slot-fg: rgb(255 255 255 / 0.9);
+  --canvas-label-fg: #ffffff;
   --shadow-color: rgb(40 32 20 / 0.16);
   --backdrop: rgb(28 27 24 / 0.38);
 }
@@ -175,6 +181,11 @@
   --canvas-handle-fill: #f6f0e8;
   --canvas-guide: rgb(242 166 90 / 0.8);
   --canvas-snap: #ff4fa3;
+  --canvas-zone: rgb(255 77 109 / 0.16);
+  --canvas-zone-line: rgb(255 120 140 / 0.75);
+  --canvas-slot: rgb(140 140 150 / 0.28);
+  --canvas-slot-fg: rgb(255 255 255 / 0.9);
+  --canvas-label-fg: #ffffff;
   --shadow-color: rgb(0 0 0 / 0.5);
   --backdrop: rgb(0 0 0 / 0.55);
 }
@@ -225,6 +236,11 @@
   --canvas-handle-fill: #141414;
   --canvas-guide: rgb(111 163 255 / 0.8);
   --canvas-snap: #ff4fa3;
+  --canvas-zone: rgb(255 77 109 / 0.16);
+  --canvas-zone-line: rgb(255 120 140 / 0.75);
+  --canvas-slot: rgb(140 140 150 / 0.28);
+  --canvas-slot-fg: rgb(255 255 255 / 0.9);
+  --canvas-label-fg: #ffffff;
   --shadow-color: rgb(0 0 0 / 0.5);
   --backdrop: rgb(0 0 0 / 0.55);
 }
@@ -275,6 +291,11 @@
   --canvas-handle-fill: #ffffff;
   --canvas-guide: rgb(46 106 216 / 0.8);
   --canvas-snap: #ff4fa3;
+  --canvas-zone: rgb(255 77 109 / 0.16);
+  --canvas-zone-line: rgb(255 120 140 / 0.75);
+  --canvas-slot: rgb(140 140 150 / 0.28);
+  --canvas-slot-fg: rgb(255 255 255 / 0.9);
+  --canvas-label-fg: #ffffff;
   --shadow-color: rgb(0 0 0 / 0.14);
   --backdrop: rgb(0 0 0 / 0.35);
 }
@@ -325,6 +346,11 @@
   --canvas-handle-fill: #f8f7f3;
   --canvas-guide: rgb(174 228 206 / 0.8);
   --canvas-snap: #c94349;
+  --canvas-zone: rgb(255 77 109 / 0.16);
+  --canvas-zone-line: rgb(255 120 140 / 0.75);
+  --canvas-slot: rgb(140 140 150 / 0.28);
+  --canvas-slot-fg: rgb(255 255 255 / 0.9);
+  --canvas-label-fg: #ffffff;
   --shadow-color: rgb(0 0 0 / 0.45);
   --backdrop: rgb(10 14 13 / 0.6);
 }
@@ -375,6 +401,11 @@
   --canvas-handle-fill: #ffffff;
   --canvas-guide: rgb(122 174 143 / 0.85);
   --canvas-snap: #c94349;
+  --canvas-zone: rgb(255 77 109 / 0.16);
+  --canvas-zone-line: rgb(255 120 140 / 0.75);
+  --canvas-slot: rgb(140 140 150 / 0.28);
+  --canvas-slot-fg: rgb(255 255 255 / 0.9);
+  --canvas-label-fg: #ffffff;
   --shadow-color: rgb(34 50 46 / 0.14);
   --backdrop: rgb(34 50 46 / 0.35);
 }
@@ -425,6 +456,11 @@
   --canvas-handle-fill: #2a1b3d;
   --canvas-guide: rgb(212 175 55 / 0.8);
   --canvas-snap: #f287a1;
+  --canvas-zone: rgb(255 77 109 / 0.16);
+  --canvas-zone-line: rgb(255 120 140 / 0.75);
+  --canvas-slot: rgb(140 140 150 / 0.28);
+  --canvas-slot-fg: rgb(255 255 255 / 0.9);
+  --canvas-label-fg: #ffffff;
   --shadow-color: rgb(0 0 0 / 0.5);
   --backdrop: rgb(12 6 18 / 0.6);
 }
@@ -475,6 +511,11 @@
   --canvas-handle-fill: #ffffff;
   --canvas-guide: rgb(212 175 55 / 0.85);
   --canvas-snap: #b83e5a;
+  --canvas-zone: rgb(255 77 109 / 0.16);
+  --canvas-zone-line: rgb(255 120 140 / 0.75);
+  --canvas-slot: rgb(140 140 150 / 0.28);
+  --canvas-slot-fg: rgb(255 255 255 / 0.9);
+  --canvas-label-fg: #ffffff;
   --shadow-color: rgb(42 27 61 / 0.14);
   --backdrop: rgb(42 27 61 / 0.35);
 }

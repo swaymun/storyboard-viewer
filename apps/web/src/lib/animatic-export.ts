@@ -8,6 +8,7 @@ import {
   activeVariant,
   aspectValue,
   buildAnimatic,
+  layerKind,
   locate,
   resolveLines,
   stripEmphasis,
@@ -17,6 +18,7 @@ import {
   type SbdProject,
   type Shot,
 } from '@storyboard-viewer/format';
+import { drawText, loadTextFonts } from './text-render';
 import { canvasSize, cssFilter } from './visual';
 
 export interface AnimaticExportOptions {
@@ -188,6 +190,7 @@ async function renderCanvasVariant(
   project: SbdProject,
   assets: Map<string, Asset>,
   visual: (asset: Asset) => Promise<Visual | null>,
+  fontUrl: (src: string) => string | null,
 ): Promise<OffscreenCanvas> {
   const size = canvasSize(v, project.manifest);
   const c = new OffscreenCanvas(Math.round(size.width), Math.round(size.height));
@@ -196,8 +199,21 @@ async function renderCanvasVariant(
     ctx.fillStyle = v.background;
     ctx.fillRect(0, 0, c.width, c.height);
   }
+  await loadTextFonts(v.layers, assets, fontUrl);
   for (const l of v.layers) {
     if (l.visible === false) continue;
+    const kind = layerKind(l);
+    if (kind === 'text') {
+      ctx.save();
+      ctx.translate(l.x ?? 0, l.y ?? 0);
+      ctx.rotate(((l.rotation ?? 0) * Math.PI) / 180);
+      ctx.scale(l.scale_x ?? 1, l.scale_y ?? 1);
+      ctx.globalAlpha = l.opacity ?? 1;
+      drawText(ctx, l);
+      ctx.restore();
+      continue;
+    }
+    if (kind !== 'image' || !l.asset) continue; // empty layout slots are not part of the frame
     const asset = assets.get(l.asset);
     const el = asset ? await visual(asset) : null;
     if (!asset || !el) continue;
@@ -366,7 +382,7 @@ export async function exportAnimatic(
         else stills.set(shot.id, el);
         if (!el) warnings.push(`Shot ${shot.title ?? shot.id}: image not available`);
       } else if (v?.type === 'canvas') {
-        stills.set(shot.id, await renderCanvasVariant(v, project, assets, visual));
+        stills.set(shot.id, await renderCanvasVariant(v, project, assets, visual, url));
       } else stills.set(shot.id, null);
     }
 
