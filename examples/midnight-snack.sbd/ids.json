@@ -1,0 +1,207 @@
+{
+  "script_hash": "04c8b1e350a76f",
+  "shots": [
+    {
+      "id": "sneak",
+      "lines": [
+        "l_nj53v29a",
+        "l_2sroj99k"
+      ]
+    },
+    {
+      "id": "door",
+      "lines": [
+        "l_wjjmj48p",
+        "l_yg0wfhr4"
+      ]
+    },
+    {
+      "id": "judgment",
+      "lines": [
+        "l_sqwpsq9d",
+        "l_3cuyb4ow"
+      ]
+    },
+    {
+      "id": "cheesecake",
+      "lines": [
+        "l_k1a9ln8c",
+        "l_yze9hsnk"
+      ]
+    },
+    {
+      "id": "busted",
+      "lines": [
+        "l_5szcwkvi",
+        "l_d61s5iro",
+        "l_bos0t84s"
+      ]
+    },
+    {
+      "id": "lockdown",
+      "lines": [
+        "l_uv2iquy9",
+        "l_e5e71pq2",
+        "l_fqi7fpjq"
+      ]
+    },
+    {
+      "id": "peas",
+      "lines": [
+        "l_bk1u38ll",
+        "l_hz0p54zl",
+        "l_j8apbzw9"
+      ]
+    },
+    {
+      "id": "truce",
+      "lines": [
+        "l_5y60riji",
+        "l_yj610045",
+        "l_pf28pjc1"
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_nj53v29a",
+      "ordinal": 0,
+      "hash": "0af558a5a72fda",
+      "text": "INT. APARTMENT KITCHEN - NIGHT",
+      "type": "scene_heading"
+    },
+    {
+      "id": "l_2sroj99k",
+      "ordinal": 1,
+      "hash": "0b3a5b11d70f22",
+      "text": "The kitchen is dark. Only the fridge glows. THEO tiptoes in, socks on tile.",
+      "type": "action"
+    },
+    {
+      "id": "l_wjjmj48p",
+      "ordinal": 2,
+      "hash": "0a0b0e927c403a",
+      "text": "Theo eases the door open. Two cartoon eyes blink awake on the fridge's screen.",
+      "type": "action"
+    },
+    {
+      "id": "l_yg0wfhr4",
+      "ordinal": 3,
+      "hash": "0e6914a86e7977",
+      "text": "Good evening, Theo. It is two fourteen a.m.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_sqwpsq9d",
+      "ordinal": 4,
+      "hash": "1a3a90e08930f9",
+      "text": "Your goal this month is \"eat more vegetables.\"",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_3cuyb4ow",
+      "ordinal": 5,
+      "hash": "175b3fe14c5459",
+      "text": "Shall I read it back to you?",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_k1a9ln8c",
+      "ordinal": 6,
+      "hash": "0646926377a5dc",
+      "text": "I'm just getting water.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_yze9hsnk",
+      "ordinal": 7,
+      "hash": "15d3847722e1a3",
+      "text": "The water is in the door. Your hand is on the cheesecake.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_5szcwkvi",
+      "ordinal": 8,
+      "hash": "066ffe16e7a923",
+      "text": "The ceiling light snaps on. NINA stands in the doorway, arms crossed.",
+      "type": "action"
+    },
+    {
+      "id": "l_d61s5iro",
+      "ordinal": 9,
+      "hash": "1fb09103e14c7c",
+      "text": "Theo.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_bos0t84s",
+      "ordinal": 10,
+      "hash": "0f80a1342dee91",
+      "text": "It started it.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_uv2iquy9",
+      "ordinal": 11,
+      "hash": "09888ed40b6ab9",
+      "text": "Fridge. Lock the cheesecake.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_e5e71pq2",
+      "ordinal": 12,
+      "hash": "0b6cfc7f674faf",
+      "text": "Cheesecake secured.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_fqi7fpjq",
+      "ordinal": 13,
+      "hash": "08388480c01d37",
+      "text": "Also, Nina, your ice cream is behind the frozen peas.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_bk1u38ll",
+      "ordinal": 14,
+      "hash": "064f823e9c3a37",
+      "text": "Nina freezes. Theo turns, very slowly.",
+      "type": "action"
+    },
+    {
+      "id": "l_hz0p54zl",
+      "ordinal": 15,
+      "hash": "11b7785b9091cc",
+      "text": "Behind... the peas?",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_j8apbzw9",
+      "ordinal": 16,
+      "hash": "144e3bb93df2b2",
+      "text": "SMASH CUT TO:",
+      "type": "transition"
+    },
+    {
+      "id": "l_5y60riji",
+      "ordinal": 17,
+      "hash": "1a46a6142af599",
+      "text": "Nina and Theo sit on the floor by the open fridge, sharing the cheesecake and the ice cream.",
+      "type": "action"
+    },
+    {
+      "id": "l_yj610045",
+      "ordinal": 18,
+      "hash": "122ecdaa2a5cc2",
+      "text": "I will be informing the scale.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_pf28pjc1",
+      "ordinal": 19,
+      "hash": "1bccbc36bb7f20",
+      "text": "FADE OUT.",
+      "type": "transition"
+    }
+  ]
+}

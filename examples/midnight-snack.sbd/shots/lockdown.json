@@ -1,0 +1,22 @@
+{
+  "id": "lockdown",
+  "title": "Lockdown",
+  "fields": {
+    "camera": "Medium wide",
+    "angle": "Slightly low",
+    "movement": "Static",
+    "lens": "35mm",
+    "transition": "Cut",
+    "sound": "Lock clunk",
+    "notes": "Nina plays it like a general. Theo hides behind her."
+  },
+  "variants": [
+    {
+      "id": "board",
+      "name": "Board",
+      "type": "image",
+      "asset": "fridge-06-command"
+    }
+  ],
+  "active_variant": "board"
+}

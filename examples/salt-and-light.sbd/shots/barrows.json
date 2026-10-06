@@ -1,0 +1,18 @@
+{
+  "id": "barrows",
+  "title": "Harvest (B-roll)",
+  "fields": {
+    "source": "B-roll",
+    "notes": "No narration. Let the wheelbarrows squeak."
+  },
+  "duration": 4,
+  "variants": [
+    {
+      "id": "wide",
+      "name": "Wide",
+      "type": "image",
+      "asset": "salt-04-barrows"
+    }
+  ],
+  "active_variant": "wide"
+}

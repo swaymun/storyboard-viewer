@@ -1,0 +1,11 @@
+node_modules
+dist
+dev-dist
+coverage
+pnpm-lock.yaml
+*.fountain
+packages/format/src/schemas.gen.ts
+examples/
+packages/cli/web
+test-results
+.wrangler

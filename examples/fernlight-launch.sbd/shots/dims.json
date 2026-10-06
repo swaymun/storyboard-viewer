@@ -1,0 +1,86 @@
+{
+  "id": "dims",
+  "title": "Dims with your day",
+  "fields": {
+    "on_screen_text": "Bright at 9. Gentle at 9.",
+    "motion": "Three lamps side by side; each dims in sequence, left to right.",
+    "easing": "Linear",
+    "transition": "Cut",
+    "brand_notes": "Demonstrates the brightness curve."
+  },
+  "duration": 3.5,
+  "variants": [
+    {
+      "id": "three-states",
+      "name": "Three states",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-dawn",
+          "asset": "fern-bg-dawn",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080,
+          "filters": [
+            {
+              "type": "brightness",
+              "value": 0.8
+            }
+          ]
+        },
+        {
+          "id": "ly-2-lamp",
+          "asset": "fern-lamp",
+          "x": 250,
+          "y": 260,
+          "width": 464,
+          "height": 640,
+          "filters": [
+            {
+              "type": "brightness",
+              "value": 1.15
+            }
+          ]
+        },
+        {
+          "id": "ly-3-lamp",
+          "asset": "fern-lamp",
+          "x": 728,
+          "y": 260,
+          "width": 464,
+          "height": 640,
+          "filters": [
+            {
+              "type": "brightness",
+              "value": 0.8
+            },
+            {
+              "type": "sepia",
+              "value": 0.3
+            }
+          ]
+        },
+        {
+          "id": "ly-4-lamp",
+          "asset": "fern-lamp",
+          "x": 1206,
+          "y": 260,
+          "width": 464,
+          "height": 640,
+          "filters": [
+            {
+              "type": "brightness",
+              "value": 0.5
+            },
+            {
+              "type": "sepia",
+              "value": 0.6
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "active_variant": "three-states"
+}

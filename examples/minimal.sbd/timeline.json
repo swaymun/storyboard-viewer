@@ -1,0 +1,76 @@
+{
+  "tracks": [
+    {
+      "id": "dialogue",
+      "label": "Dialogue"
+    },
+    {
+      "id": "music",
+      "label": "Music",
+      "gain": 0.8
+    },
+    {
+      "id": "sfx",
+      "label": "SFX"
+    }
+  ],
+  "cues": [
+    {
+      "id": "vo-1",
+      "asset": "dialogue",
+      "in": 0,
+      "out": 2.2,
+      "target": {
+        "line": "l_vc0cyd78"
+      },
+      "track": "dialogue",
+      "label": "Every night…"
+    },
+    {
+      "id": "maya-1",
+      "asset": "dialogue",
+      "in": 2.4,
+      "out": 4.1,
+      "target": {
+        "line": "l_03jouxlm"
+      },
+      "track": "dialogue",
+      "label": "Okay, Grandpa…"
+    },
+    {
+      "id": "vo-2",
+      "asset": "dialogue",
+      "in": 4.5,
+      "out": 6.7,
+      "target": {
+        "line": "l_puu20i34"
+      },
+      "track": "dialogue",
+      "label": "Some things…"
+    },
+    {
+      "id": "strike",
+      "asset": "match-strike",
+      "target": {
+        "line": "l_p2pzs4kf"
+      },
+      "offset": 0.3,
+      "track": "sfx",
+      "gain": 0.9
+    },
+    {
+      "id": "theme",
+      "asset": "music",
+      "target": {
+        "global": {
+          "start": 0
+        }
+      },
+      "track": "music",
+      "gain": 0.35,
+      "loop": true,
+      "fade_in": 1,
+      "fade_out": 2
+    }
+  ]
+}

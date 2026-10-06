@@ -1,0 +1,21 @@
+{
+  "id": "cta",
+  "title": "Call to action",
+  "fields": {
+    "beat": "Call to action",
+    "on_screen_text": "part 2?? (if I survive)",
+    "camera": "Selfie",
+    "transition": "None",
+    "sound": "Beat out",
+    "notes": "Loop point: last frame should cut cleanly back to the hook."
+  },
+  "variants": [
+    {
+      "id": "edge-of-the-bed",
+      "name": "Edge of the bed",
+      "type": "image",
+      "asset": "cat-06-edge"
+    }
+  ],
+  "active_variant": "edge-of-the-bed"
+}

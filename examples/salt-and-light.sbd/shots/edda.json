@@ -1,0 +1,19 @@
+{
+  "id": "edda",
+  "title": "Interview: Edda",
+  "fields": {
+    "source": "Interview",
+    "lower_third": "Edda Marsh - salt farmer, third generation",
+    "timecode": "01:04:12:08",
+    "notes": "Two-camera interview. Use the wide for the second line."
+  },
+  "variants": [
+    {
+      "id": "interview-a-cam",
+      "name": "Interview A-cam",
+      "type": "image",
+      "asset": "salt-03-edda"
+    }
+  ],
+  "active_variant": "interview-a-cam"
+}

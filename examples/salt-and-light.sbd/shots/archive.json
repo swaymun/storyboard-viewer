@@ -1,0 +1,18 @@
+{
+  "id": "archive",
+  "title": "1954",
+  "fields": {
+    "source": "Archival",
+    "on_screen_text": "Brannock Bay, 1954",
+    "notes": "Slow Ken Burns push on the archival print."
+  },
+  "variants": [
+    {
+      "id": "archival-print",
+      "name": "Archival print",
+      "type": "image",
+      "asset": "salt-05-archival"
+    }
+  ],
+  "active_variant": "archival-print"
+}

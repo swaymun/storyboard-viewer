@@ -1,0 +1,21 @@
+{
+  "id": "hook",
+  "title": "Hook",
+  "fields": {
+    "beat": "Hook",
+    "on_screen_text": "my cat committed 3 crimes tonight",
+    "camera": "Selfie",
+    "transition": "Jump cut",
+    "sound": "Beat drops on cut",
+    "notes": "Under 2 seconds. Eyes to lens."
+  },
+  "variants": [
+    {
+      "id": "deadpan",
+      "name": "Deadpan",
+      "type": "image",
+      "asset": "cat-01-hook"
+    }
+  ],
+  "active_variant": "deadpan"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "crime-2",
+  "title": "Crime #2",
+  "fields": {
+    "beat": "Value",
+    "on_screen_text": "CRIME #2: emailed my boss",
+    "camera": "Close-up",
+    "transition": "Zoom",
+    "sound": "Keyboard mash"
+  },
+  "variants": [
+    {
+      "id": "laptop",
+      "name": "Laptop",
+      "type": "image",
+      "asset": "cat-03-laptop"
+    }
+  ],
+  "active_variant": "laptop"
+}

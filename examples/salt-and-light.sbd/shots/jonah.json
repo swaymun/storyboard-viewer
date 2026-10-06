@@ -1,0 +1,19 @@
+{
+  "id": "jonah",
+  "title": "Interview: Jonah",
+  "fields": {
+    "source": "Interview",
+    "lower_third": "Jonah Pell - apprentice, 19",
+    "timecode": "02:11:40:16",
+    "notes": "He laughs after the second line. Keep it."
+  },
+  "variants": [
+    {
+      "id": "interview",
+      "name": "Interview",
+      "type": "image",
+      "asset": "salt-06-jonah"
+    }
+  ],
+  "active_variant": "interview"
+}

@@ -1,0 +1,46 @@
+{
+  "id": "flop",
+  "title": "The flop",
+  "fields": {
+    "camera": "Wide",
+    "action": "Pip runs; the kite flips, nose-dives and flops. Pip sits down hard.",
+    "frames": 84,
+    "fx": "Dust puff on impact",
+    "transition": "Cut"
+  },
+  "variants": [
+    {
+      "id": "layout",
+      "name": "Layout",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-hill",
+          "asset": "pip-bg-hill",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "ly-2-kite",
+          "asset": "pip-kite",
+          "x": 1400,
+          "y": 960,
+          "width": 203,
+          "height": 220,
+          "rotation": 160
+        },
+        {
+          "id": "ly-3-sad",
+          "asset": "pip-sad",
+          "x": 620,
+          "y": 620,
+          "width": 361,
+          "height": 380
+        }
+      ]
+    }
+  ],
+  "active_variant": "layout"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "crime-1",
+  "title": "Crime #1",
+  "fields": {
+    "beat": "Setup",
+    "on_screen_text": "CRIME #1: the gravity experiment (6/10)",
+    "camera": "POV",
+    "transition": "Whip pan",
+    "sound": "Glass bonk"
+  },
+  "variants": [
+    {
+      "id": "pov",
+      "name": "POV",
+      "type": "image",
+      "asset": "cat-02-glass"
+    }
+  ],
+  "active_variant": "pov"
+}

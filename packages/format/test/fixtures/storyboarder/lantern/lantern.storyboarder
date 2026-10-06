@@ -1,0 +1,70 @@
+{
+  "version": "3.0.0",
+  "aspectRatio": 1.7777777777777777,
+  "fps": 24,
+  "defaultBoardTiming": 2000,
+  "boards": [
+    {
+      "uid": "A1B2C",
+      "url": "board-1-A1B2C.png",
+      "newShot": false,
+      "lastEdited": 1700000000000,
+      "layers": {
+        "reference": {
+          "url": "board-1-A1B2C-reference.png",
+          "opacity": 0.5
+        },
+        "fill": {
+          "url": "board-1-A1B2C-fill.png"
+        },
+        "ink": {
+          "url": "board-1-A1B2C-ink.png",
+          "opacity": 1
+        },
+        "notes": {
+          "url": "board-1-A1B2C-notes.png"
+        }
+      },
+      "number": 1,
+      "shot": "1A",
+      "time": 0,
+      "duration": 1500,
+      "action": "A lantern sways on a hook.\nWind rattles the shutters.",
+      "notes": "Low angle, warm key light."
+    },
+    {
+      "uid": "D3E4F",
+      "url": "board-2-D3E4F.png",
+      "newShot": false,
+      "lastEdited": 1700000000000,
+      "layers": {},
+      "number": 2,
+      "shot": "2A",
+      "time": 1500,
+      "duration": 3000,
+      "dialogue": "MAYA (V.O.): We should go before the storm.",
+      "audio": {
+        "filename": "D3E4F-audio-1700000000000.wav"
+      }
+    },
+    {
+      "uid": "G5H6I",
+      "url": "board-3-G5H6I.png",
+      "newShot": true,
+      "lastEdited": 1700000000000,
+      "layers": {
+        "pencil": {
+          "url": "board-3-G5H6I-pencil.png"
+        }
+      },
+      "number": 3,
+      "shot": "3A",
+      "time": 4500,
+      "dialogue": "Hello? Is anyone there?",
+      "audio": {
+        "filename": "G5H6I-audio-1700000000001.wav",
+        "duration": 2600
+      }
+    }
+  ]
+}

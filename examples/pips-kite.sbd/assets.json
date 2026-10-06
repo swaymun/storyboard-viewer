@@ -1,0 +1,249 @@
+{
+  "assets": [
+    {
+      "name": "Bg hill",
+      "kind": "image",
+      "src": "media/bg-hill.webp",
+      "mime": "image/webp",
+      "size": 107092,
+      "sha256": "8bec0ef61a429faba779960461d2acc3c9ac07abf5d47332e4741796d42b91f5",
+      "width": 1280,
+      "height": 720,
+      "id": "pip-bg-hill",
+      "category": "background",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Kite",
+      "kind": "image",
+      "src": "media/kite.webp",
+      "mime": "image/webp",
+      "size": 94438,
+      "sha256": "7e389779a0ca0988fc13901ec678f8df17f0e75cd9337daae483ae4eb4770d70",
+      "width": 944,
+      "height": 1024,
+      "id": "pip-kite",
+      "category": "prop",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Stand",
+      "kind": "image",
+      "src": "media/stand.webp",
+      "mime": "image/webp",
+      "size": 106596,
+      "sha256": "0d2e1bc4b2b11486e007c5520e4de6997bbd0532af7bfb4f9fe3446a005db3d1",
+      "width": 819,
+      "height": 1024,
+      "id": "pip-stand",
+      "category": "character",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Sad",
+      "kind": "image",
+      "src": "media/sad.webp",
+      "mime": "image/webp",
+      "size": 117154,
+      "sha256": "b102f96ed08082a6359315f3884c8172a032d27de6e3b38ec9deeab14550d09c",
+      "width": 973,
+      "height": 1024,
+      "id": "pip-sad",
+      "category": "character",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Moss",
+      "kind": "image",
+      "src": "media/moss.webp",
+      "mime": "image/webp",
+      "size": 125114,
+      "sha256": "7b96f3338f827cdd61d0b8319b446873d18c77c7764daa54195e95bb5ffde73c",
+      "width": 717,
+      "height": 1024,
+      "id": "pip-moss",
+      "category": "character",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Jump",
+      "kind": "image",
+      "src": "media/jump.webp",
+      "mime": "image/webp",
+      "size": 128704,
+      "sha256": "961326b249a7703d4ca2f01a7dd3bb36e0e3c6e39410e23148e571ba7992f708",
+      "width": 1024,
+      "height": 1009,
+      "id": "pip-jump",
+      "category": "character",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Key final",
+      "kind": "image",
+      "src": "media/key-final.webp",
+      "mime": "image/webp",
+      "size": 108436,
+      "sha256": "a65b77d2e4de6fe264d4968b4638b6b5cefac81ab844d18543314fdd68cf7883",
+      "width": 1280,
+      "height": 720,
+      "id": "pip-key-final",
+      "category": "keyframe",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Bg night",
+      "kind": "image",
+      "src": "media/bg-night.webp",
+      "mime": "image/webp",
+      "size": 102348,
+      "sha256": "708316a64f0594ca0bf8d722d81066153d0c30c0d7488e8e0c77cd7214a55ee3",
+      "width": 1280,
+      "height": 720,
+      "id": "pip-bg-night",
+      "category": "background",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "PIP - ready",
+      "kind": "audio",
+      "src": "media/pip-ready.mp3",
+      "mime": "audio/mpeg",
+      "size": 20105,
+      "sha256": "cab114d1f0b13de92f1fa96cf87a0d8b30310d3eadecec9c8fe425f680792f4e",
+      "duration": 2.444,
+      "id": "01-pip-ready",
+      "category": "dialogue",
+      "tags": [
+        "pip"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice af_sky."
+    },
+    {
+      "name": "MOSS - flop",
+      "kind": "audio",
+      "src": "media/moss-flop.mp3",
+      "mime": "audio/mpeg",
+      "size": 21358,
+      "sha256": "ff3ecaccb78b109d92c935c75ae44e7cc3c01026352addbc3375c56d65d8f305",
+      "duration": 2.604,
+      "id": "02-moss-flop",
+      "category": "dialogue",
+      "tags": [
+        "moss"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice bm_fable."
+    },
+    {
+      "name": "MOSS - moss",
+      "kind": "audio",
+      "src": "media/moss-moss.mp3",
+      "mime": "audio/mpeg",
+      "size": 24702,
+      "sha256": "b251d7312e9339937d94b9321b11792e17ccd38b8f0e4e795f1ff8ff30f3e336",
+      "duration": 3.009,
+      "id": "03-moss-moss",
+      "category": "dialogue",
+      "tags": [
+        "moss"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice bm_fable."
+    },
+    {
+      "name": "MOSS - moss",
+      "kind": "audio",
+      "src": "media/moss-moss-2.mp3",
+      "mime": "audio/mpeg",
+      "size": 15925,
+      "sha256": "2d2c32486c4e3f83bfbcef38baa1f93ce03edcc8618795157f4a567af57bda79",
+      "duration": 1.928,
+      "id": "04-moss-moss",
+      "category": "dialogue",
+      "tags": [
+        "moss"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice bm_fable."
+    },
+    {
+      "name": "PIP - liftoff",
+      "kind": "audio",
+      "src": "media/pip-liftoff.mp3",
+      "mime": "audio/mpeg",
+      "size": 10074,
+      "sha256": "41cdbb92165d4c5ec971d9313a180bf7314843175f9025a582c0794002268369",
+      "duration": 1.193,
+      "id": "05-pip-liftoff",
+      "category": "dialogue",
+      "tags": [
+        "pip"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice af_sky."
+    },
+    {
+      "name": "PIP - stars",
+      "kind": "audio",
+      "src": "media/pip-stars.mp3",
+      "mime": "audio/mpeg",
+      "size": 8402,
+      "sha256": "97813a5324129d2403289c9fec51e2e4ed265aa11d934cdbc783f32e481434d5",
+      "duration": 0.99,
+      "id": "06-pip-stars",
+      "category": "dialogue",
+      "tags": [
+        "pip"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice af_sky."
+    },
+    {
+      "name": "MOSS - stars",
+      "kind": "audio",
+      "src": "media/moss-stars.mp3",
+      "mime": "audio/mpeg",
+      "size": 23239,
+      "sha256": "a3ba7d7c64827ed1597905b1c48912d6dcd75e6dbae79a8c0be6e8b83b89653c",
+      "duration": 2.823,
+      "id": "07-moss-stars",
+      "category": "dialogue",
+      "tags": [
+        "moss"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice bm_fable."
+    },
+    {
+      "name": "Wind",
+      "kind": "audio",
+      "src": "media/wind.mp3",
+      "mime": "audio/mpeg",
+      "size": 61274,
+      "sha256": "b1e193e7bc864bc8a3b9ba43fa29f5e8868c5643945088dff1e148378b02ad5b",
+      "duration": 7.6,
+      "id": "sfx-wind",
+      "category": "sfx",
+      "notes": "Synthesized locally (numpy) for this sample."
+    },
+    {
+      "name": "Thud",
+      "kind": "audio",
+      "src": "media/thud.mp3",
+      "mime": "audio/mpeg",
+      "size": 4640,
+      "sha256": "e151a62ba37be71333497f93b710e3f0585a73a0aca6d87a629819e50509c60c",
+      "duration": 0.5,
+      "id": "sfx-thud",
+      "category": "sfx",
+      "notes": "Synthesized locally (numpy) for this sample."
+    },
+    {
+      "name": "Music box waltz (synth)",
+      "kind": "audio",
+      "src": "media/music-box-waltz-synth.mp3",
+      "mime": "audio/mpeg",
+      "size": 131701,
+      "sha256": "13b8d9aa4be342e7fd4b11fb2722abe9e87eec72aa1cb010990dfdd19e7f9ae6",
+      "duration": 10.909,
+      "id": "music-music-box",
+      "category": "music",
+      "notes": "Synthesized locally (numpy) for this sample. Free to reuse."
+    }
+  ]
+}

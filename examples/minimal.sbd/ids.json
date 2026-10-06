@@ -1,0 +1,115 @@
+{
+  "script_hash": "04c913088d6142",
+  "shots": [
+    {
+      "id": "opening",
+      "lines": [
+        "l_962r8qxf",
+        "l_5cr9a6ek",
+        "l_vc0cyd78"
+      ]
+    },
+    {
+      "id": "climb",
+      "lines": [
+        "l_wfbkr68z",
+        "l_gr979dy8"
+      ]
+    },
+    {
+      "id": "match",
+      "lines": [
+        "l_qlh593mg",
+        "l_03jouxlm",
+        "l_p2pzs4kf"
+      ]
+    },
+    {
+      "id": "lamp",
+      "lines": [
+        "l_cej4nz09",
+        "l_puu20i34",
+        "l_e8a637zx"
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_962r8qxf",
+      "ordinal": 0,
+      "hash": "029799f2c4741d",
+      "text": "EXT. LIGHTHOUSE - DUSK",
+      "type": "scene_heading"
+    },
+    {
+      "id": "l_5cr9a6ek",
+      "ordinal": 1,
+      "hash": "1c830bcdd32975",
+      "text": "Waves crash against black rocks. At the top of the tower, the lamp is dark.",
+      "type": "action"
+    },
+    {
+      "id": "l_vc0cyd78",
+      "ordinal": 2,
+      "hash": "1a1a5f3fa448be",
+      "text": "Every night for forty years, my grandfather lit the lamp.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_wfbkr68z",
+      "ordinal": 3,
+      "hash": "1a6d083e34f788",
+      "text": "INT. LANTERN ROOM - NIGHT",
+      "type": "scene_heading"
+    },
+    {
+      "id": "l_gr979dy8",
+      "ordinal": 4,
+      "hash": "1bfa3c49b2e8b7",
+      "text": "Maya, 30s, climbs the last step, out of breath. She holds a matchbox.",
+      "type": "action"
+    },
+    {
+      "id": "l_qlh593mg",
+      "ordinal": 5,
+      "hash": "123826ff74d0c6",
+      "text": "(whispering)",
+      "type": "parenthetical"
+    },
+    {
+      "id": "l_03jouxlm",
+      "ordinal": 6,
+      "hash": "17a7db620e3ba9",
+      "text": "Okay, Grandpa. Show me how.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_p2pzs4kf",
+      "ordinal": 7,
+      "hash": "1de0edd7e7cd91",
+      "text": "She strikes a match. The flame flickers.",
+      "type": "action"
+    },
+    {
+      "id": "l_cej4nz09",
+      "ordinal": 8,
+      "hash": "139a18884cdeb8",
+      "text": "The lamp ROARS to life. Light sweeps across the sea.",
+      "type": "action"
+    },
+    {
+      "id": "l_puu20i34",
+      "ordinal": 9,
+      "hash": "004746e1abd68a",
+      "text": "Some things are worth keeping.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_e8a637zx",
+      "ordinal": 10,
+      "hash": "1bccbc36bb7f20",
+      "text": "FADE OUT.",
+      "type": "transition"
+    }
+  ]
+}

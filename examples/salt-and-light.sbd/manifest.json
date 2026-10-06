@@ -1,0 +1,111 @@
+{
+  "format": "sbd",
+  "format_version": "0.1.0",
+  "title": "Salt & Light",
+  "preset": "documentary",
+  "aspect_ratio": "16:9",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+  "fps": 25,
+  "default_shot_duration": 3,
+  "categories": [
+    {
+      "id": "interview",
+      "label": "Interview",
+      "kinds": [
+        "video",
+        "image"
+      ]
+    },
+    {
+      "id": "b_roll",
+      "label": "B-roll",
+      "kinds": [
+        "video",
+        "image"
+      ]
+    },
+    {
+      "id": "archival",
+      "label": "Archival",
+      "kinds": [
+        "video",
+        "image",
+        "audio"
+      ]
+    },
+    {
+      "id": "graphics",
+      "label": "Graphics",
+      "kinds": [
+        "image"
+      ]
+    },
+    {
+      "id": "location",
+      "label": "Location",
+      "kinds": [
+        "image"
+      ]
+    },
+    {
+      "id": "voiceover",
+      "label": "Voice-over",
+      "kinds": [
+        "audio"
+      ]
+    },
+    {
+      "id": "music",
+      "label": "Music",
+      "kinds": [
+        "audio"
+      ]
+    },
+    {
+      "id": "sfx",
+      "label": "Sound effect",
+      "kinds": [
+        "audio"
+      ]
+    }
+  ],
+  "shot_fields": [
+    {
+      "id": "source",
+      "label": "Source",
+      "type": "select",
+      "options": [
+        "Interview",
+        "B-roll",
+        "Archival",
+        "Graphics",
+        "Reconstruction"
+      ]
+    },
+    {
+      "id": "lower_third",
+      "label": "Lower third"
+    },
+    {
+      "id": "on_screen_text",
+      "label": "On-screen text"
+    },
+    {
+      "id": "timecode",
+      "label": "Source timecode",
+      "placeholder": "01:02:03:04"
+    },
+    {
+      "id": "notes",
+      "label": "Notes",
+      "type": "longtext"
+    }
+  ],
+  "created": "2026-10-06T08:16:32.121Z",
+  "modified": "2026-10-06T08:16:32.398Z",
+  "generator": "storyboard-viewer 0.1.0",
+  "description": "A short documentary about the last salt farmers of Brannock Bay, a fictional coastal village."
+}

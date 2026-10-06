@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sbd:schema:0.2:ids",
+  "title": "SBD ids.json",
+  "description": "Stable line IDs for script.fountain and the ordered list of shots with the lines (or, since 0.2, the character ranges) each shot covers. The order of `shots` is the story order.",
+  "type": "object",
+  "required": ["lines", "shots"],
+  "properties": {
+    "script_hash": {
+      "type": ["string", "null"],
+      "description": "Hash of script.fountain when ids.json was last written (cyrb53, 14 hex chars). A mismatch means the script was edited by hand and line IDs must be re-anchored."
+    },
+    "lines": {
+      "type": "array",
+      "description": "One entry per anchorable script line, ordered by ordinal.",
+      "items": {
+        "$ref": "#/$defs/lineIdEntry"
+      }
+    },
+    "shots": {
+      "type": "array",
+      "description": "Shots in story order.",
+      "items": {
+        "type": "object",
+        "required": ["id", "lines"],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/id"
+            },
+            "description": "Line IDs covered (fully or, for the first and last line with start/end, partly) by the shot, in script order. May be empty."
+          },
+          "start": {
+            "$ref": "#/$defs/spanPoint",
+            "description": "Format 0.2: the shot starts at this character of its first line (default: the start of the line). `line` must be the first entry of `lines`."
+          },
+          "end": {
+            "$ref": "#/$defs/spanPoint",
+            "description": "Format 0.2: the shot ends before this character of its last line (exclusive; default: the end of the line). `line` must be the last entry of `lines`."
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+    },
+    "lineIdEntry": {
+      "type": "object",
+      "required": ["id", "ordinal", "hash", "text"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index among anchorable lines."
+        },
+        "hash": {
+          "type": "string",
+          "description": "cyrb53 of the normalized text."
+        },
+        "text": {
+          "type": "string",
+          "description": "Line text (markers removed)."
+        },
+        "type": {
+          "type": "string",
+          "description": "Fountain element type: scene_heading, action, parenthetical, dialogue, transition, centered, lyrics."
+        }
+      }
+    },
+    "spanPoint": {
+      "type": "object",
+      "required": ["line", "offset"],
+      "properties": {
+        "line": {
+          "$ref": "#/$defs/id"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Character offset in the line's text (UTF-16 code units; markers and inline notes not counted)."
+        }
+      }
+    }
+  }
+}

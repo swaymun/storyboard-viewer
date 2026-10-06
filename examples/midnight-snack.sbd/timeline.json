@@ -1,0 +1,218 @@
+{
+  "tracks": [],
+  "cues": [
+    {
+      "offset": 0,
+      "gain": 0.5,
+      "track": "sfx",
+      "label": "Hum",
+      "asset": "sfx-fridge-hum",
+      "target": {
+        "shot": "sneak"
+      },
+      "id": "c_xwv9nu"
+    },
+    {
+      "in": 0.25,
+      "out": 3.207,
+      "track": "dialogue",
+      "label": "Good evening, Theo. It is two fourteen…",
+      "asset": "fridge-take",
+      "target": {
+        "line": "l_yg0wfhr4"
+      },
+      "id": "c_8qsjx0"
+    },
+    {
+      "offset": 0.2,
+      "gain": 0.8,
+      "track": "sfx",
+      "label": "Door pop",
+      "asset": "sfx-door-pop",
+      "target": {
+        "shot": "door"
+      },
+      "id": "c_pja4xh"
+    },
+    {
+      "in": 3.737,
+      "out": 6.781,
+      "track": "dialogue",
+      "label": "Your goal this month is \"eat more vege…",
+      "asset": "fridge-take",
+      "target": {
+        "line": "l_sqwpsq9d"
+      },
+      "id": "c_tux633"
+    },
+    {
+      "in": 7.311,
+      "out": 9.023,
+      "track": "dialogue",
+      "label": "Shall I read it back to you?",
+      "asset": "fridge-take",
+      "target": {
+        "line": "l_3cuyb4ow"
+      },
+      "id": "c_jy0mu6"
+    },
+    {
+      "offset": 0.1,
+      "gain": 0.6,
+      "track": "sfx",
+      "label": "Blip",
+      "asset": "sfx-blip",
+      "target": {
+        "shot": "judgment"
+      },
+      "id": "c_ootwur"
+    },
+    {
+      "in": 0.25,
+      "out": 1.558,
+      "track": "dialogue",
+      "label": "I'm just getting water.",
+      "asset": "theo-take",
+      "target": {
+        "line": "l_k1a9ln8c"
+      },
+      "id": "c_plfkqg"
+    },
+    {
+      "in": 9.553,
+      "out": 13.35,
+      "track": "dialogue",
+      "label": "The water is in the door. Your hand is…",
+      "asset": "fridge-take",
+      "target": {
+        "line": "l_yze9hsnk"
+      },
+      "id": "c_ctrrvn"
+    },
+    {
+      "in": 0.25,
+      "out": 0.599,
+      "track": "dialogue",
+      "label": "Theo.",
+      "asset": "nina-take",
+      "target": {
+        "line": "l_d61s5iro"
+      },
+      "id": "c_h4xzb4"
+    },
+    {
+      "in": 2.088,
+      "out": 3.179,
+      "track": "dialogue",
+      "label": "It started it.",
+      "asset": "theo-take",
+      "target": {
+        "line": "l_bos0t84s"
+      },
+      "id": "c_hcpcfa"
+    },
+    {
+      "offset": 0,
+      "gain": 0.9,
+      "track": "sfx",
+      "label": "Switch",
+      "asset": "sfx-switch",
+      "target": {
+        "shot": "busted"
+      },
+      "id": "c_cgkemn"
+    },
+    {
+      "in": 1.129,
+      "out": 2.955,
+      "track": "dialogue",
+      "label": "Fridge. Lock the cheesecake.",
+      "asset": "nina-take",
+      "target": {
+        "line": "l_uv2iquy9"
+      },
+      "id": "c_ozgqhv"
+    },
+    {
+      "in": 13.88,
+      "out": 15.46,
+      "track": "dialogue",
+      "label": "Cheesecake secured.",
+      "asset": "fridge-take",
+      "target": {
+        "line": "l_e5e71pq2"
+      },
+      "id": "c_1uy7if"
+    },
+    {
+      "in": 15.99,
+      "out": 19.425,
+      "track": "dialogue",
+      "label": "Also, Nina, your ice cream is behind t…",
+      "asset": "fridge-take",
+      "target": {
+        "line": "l_fqi7fpjq"
+      },
+      "id": "c_dum69z"
+    },
+    {
+      "offset": 1.6,
+      "gain": 0.8,
+      "track": "sfx",
+      "label": "Lock",
+      "asset": "sfx-lock",
+      "target": {
+        "shot": "lockdown"
+      },
+      "id": "c_hg7x9t"
+    },
+    {
+      "in": 3.709,
+      "out": 5.029,
+      "track": "dialogue",
+      "label": "Behind... the peas?",
+      "asset": "theo-take",
+      "target": {
+        "line": "l_hz0p54zl"
+      },
+      "id": "c_kc3lt0"
+    },
+    {
+      "offset": 2.2,
+      "gain": 0.7,
+      "track": "sfx",
+      "label": "Comedy sting",
+      "asset": "sfx-comedy-sting",
+      "target": {
+        "shot": "peas"
+      },
+      "id": "c_9rqgy7"
+    },
+    {
+      "in": 19.955,
+      "out": 21.983,
+      "track": "dialogue",
+      "label": "I will be informing the scale.",
+      "asset": "fridge-take",
+      "target": {
+        "line": "l_yj610045"
+      },
+      "id": "c_draqw7"
+    },
+    {
+      "gain": 0.22,
+      "track": "music",
+      "loop": true,
+      "fade_in": 1,
+      "fade_out": 2,
+      "label": "Sneaky pizzicato (synth loop)",
+      "asset": "music-sneaky-pizzicato",
+      "target": {
+        "global": {
+          "start": 0
+        }
+      },
+      "id": "c_l8urfs"
+    }
+  ]
+}

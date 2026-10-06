@@ -1,0 +1,119 @@
+{
+  "tracks": [],
+  "cues": [
+    {
+      "in": 0.25,
+      "out": 2.219,
+      "track": "dialogue",
+      "label": "Every day has a shape.",
+      "asset": "voice-full",
+      "target": {
+        "line": "l_gmil84zn"
+      },
+      "id": "c_wp7ef1"
+    },
+    {
+      "in": 2.749,
+      "out": 4.878,
+      "track": "dialogue",
+      "label": "A morning that rises with you.",
+      "asset": "voice-full",
+      "target": {
+        "line": "l_enxedti3"
+      },
+      "id": "c_e19vhn"
+    },
+    {
+      "offset": 0,
+      "gain": 0.6,
+      "track": "sfx",
+      "label": "Whoosh",
+      "asset": "sfx-whoosh",
+      "target": {
+        "shot": "rise"
+      },
+      "id": "c_efhslw"
+    },
+    {
+      "offset": 0.1,
+      "gain": 0.5,
+      "track": "sfx",
+      "label": "Shimmer",
+      "asset": "sfx-shimmer",
+      "target": {
+        "shot": "reveal"
+      },
+      "id": "c_pjdry8"
+    },
+    {
+      "in": 5.408,
+      "out": 8.671,
+      "track": "dialogue",
+      "label": "Halo follows the sun, from first light…",
+      "asset": "voice-full",
+      "target": {
+        "line": "l_osgepdl5"
+      },
+      "id": "c_5fqqie"
+    },
+    {
+      "in": 9.201,
+      "out": 11.831,
+      "track": "dialogue",
+      "label": "Bright when you need it. Gentle when y…",
+      "asset": "voice-full",
+      "target": {
+        "line": "l_0wr6wpwi"
+      },
+      "id": "c_mzpsa9"
+    },
+    {
+      "in": 12.361,
+      "out": 14.453,
+      "track": "dialogue",
+      "label": "Light that keeps time with you.",
+      "asset": "voice-full",
+      "target": {
+        "line": "l_k5ez7377"
+      },
+      "id": "c_a3akqe"
+    },
+    {
+      "in": 14.983,
+      "out": 15.927,
+      "track": "dialogue",
+      "label": "Fernlight Halo.",
+      "asset": "voice-full",
+      "target": {
+        "line": "l_a5u2wap6"
+      },
+      "id": "c_17t2tt"
+    },
+    {
+      "offset": 0,
+      "gain": 0.6,
+      "track": "sfx",
+      "label": "Shimmer",
+      "asset": "sfx-shimmer",
+      "target": {
+        "shot": "logo"
+      },
+      "id": "c_2qgghm"
+    },
+    {
+      "gain": 0.45,
+      "track": "music",
+      "loop": false,
+      "fade_in": 1,
+      "fade_out": 2,
+      "label": "Sunrise bed (synth pad + pluck)",
+      "asset": "music-sunrise-bed",
+      "target": {
+        "global": {
+          "start": 0
+        }
+      },
+      "id": "c_200u8w"
+    }
+  ]
+}

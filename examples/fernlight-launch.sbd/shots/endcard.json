@@ -1,0 +1,45 @@
+{
+  "id": "endcard",
+  "title": "End card",
+  "fields": {
+    "on_screen_text": "Halo - available this spring",
+    "motion": "Hold. Music resolves.",
+    "easing": "Ease out",
+    "transition": "Fade out"
+  },
+  "duration": 3,
+  "variants": [
+    {
+      "id": "end-card",
+      "name": "End card",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-day",
+          "asset": "fern-bg-day",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "ly-2-lamp",
+          "asset": "fern-lamp",
+          "x": 220,
+          "y": 160,
+          "width": 595,
+          "height": 820
+        },
+        {
+          "id": "ly-3-logo",
+          "asset": "fern-logo",
+          "x": 1040,
+          "y": 300,
+          "width": 567,
+          "height": 480
+        }
+      ]
+    }
+  ],
+  "active_variant": "end-card"
+}

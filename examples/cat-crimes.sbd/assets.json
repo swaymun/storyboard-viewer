@@ -1,0 +1,257 @@
+{
+  "assets": [
+    {
+      "name": "Hook",
+      "kind": "image",
+      "src": "media/hook.webp",
+      "mime": "image/webp",
+      "size": 38998,
+      "sha256": "48ffaf38e4ce17b7344c72a7dafc0e390eac2566cd0c858b52d66b74d4f29c77",
+      "width": 720,
+      "height": 1280,
+      "id": "cat-01-hook",
+      "category": "talent",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Point",
+      "kind": "image",
+      "src": "media/point.webp",
+      "mime": "image/webp",
+      "size": 47250,
+      "sha256": "f1fe96a153512d1a808d382b0e73ec02699fe4232fa2f66e01b4f677a4decfc1",
+      "width": 720,
+      "height": 1280,
+      "id": "cat-01-point",
+      "category": "talent",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Glass",
+      "kind": "image",
+      "src": "media/glass.webp",
+      "mime": "image/webp",
+      "size": 58320,
+      "sha256": "34e3ab3650f1df44cd4464fe01f98c5398dfaba0703deb7dbbe3dad91d622781",
+      "width": 720,
+      "height": 1280,
+      "id": "cat-02-glass",
+      "category": "footage",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Laptop",
+      "kind": "image",
+      "src": "media/laptop.webp",
+      "mime": "image/webp",
+      "size": 52044,
+      "sha256": "87be137ac7c004981a224103bf408495d66c7972a59d7069b2f1e409d1ae0597",
+      "width": 720,
+      "height": 1280,
+      "id": "cat-03-laptop",
+      "category": "footage",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Stare",
+      "kind": "image",
+      "src": "media/stare.webp",
+      "mime": "image/webp",
+      "size": 22208,
+      "sha256": "340e14a4e6adc042252501aaabfe7c0ea1a940d2f6ef7d28627c57c597fda562",
+      "width": 720,
+      "height": 1280,
+      "id": "cat-04-stare",
+      "category": "footage",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Pillow",
+      "kind": "image",
+      "src": "media/pillow.webp",
+      "mime": "image/webp",
+      "size": 59754,
+      "sha256": "9762c0abdedaf2496bc0a175f6c982f91bcffa8e930dc17b1c62c6e2736332d4",
+      "width": 720,
+      "height": 1280,
+      "id": "cat-05-pillow",
+      "category": "footage",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Edge",
+      "kind": "image",
+      "src": "media/edge.webp",
+      "mime": "image/webp",
+      "size": 79474,
+      "sha256": "b4968ea9e789ef26851e36cec8de690af6808ca325bb85a0e32e23bc1698c2ad",
+      "width": 720,
+      "height": 1280,
+      "id": "cat-06-edge",
+      "category": "talent",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "JUNE - hook",
+      "kind": "audio",
+      "src": "media/june-hook.mp3",
+      "mime": "audio/mpeg",
+      "size": 22821,
+      "sha256": "51179d6d3da94b5cc586fff8f59c834f6ea0d5a912e1ac192c6d029231dbcb14",
+      "duration": 2.77,
+      "id": "01-june-hook",
+      "category": "voiceover",
+      "tags": [
+        "june"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice af_heart."
+    },
+    {
+      "name": "JUNE - crime-1",
+      "kind": "audio",
+      "src": "media/june-crime-1.mp3",
+      "mime": "audio/mpeg",
+      "size": 32225,
+      "sha256": "22e6172cbedb55b75f09f74c4b78e248c973419df399a3566992552ea4427cb1",
+      "duration": 3.956,
+      "id": "02-june-crime-1",
+      "category": "voiceover",
+      "tags": [
+        "june"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice af_heart."
+    },
+    {
+      "name": "JUNE - crime-2",
+      "kind": "audio",
+      "src": "media/june-crime-2.mp3",
+      "mime": "audio/mpeg",
+      "size": 28673,
+      "sha256": "d6535bb5a9739ec782223bf415307ea6fe05bb12d4c474c95bdbbefed8984f1e",
+      "duration": 3.524,
+      "id": "03-june-crime-2",
+      "category": "voiceover",
+      "tags": [
+        "june"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice af_heart."
+    },
+    {
+      "name": "JUNE - crime-3",
+      "kind": "audio",
+      "src": "media/june-crime-3.mp3",
+      "mime": "audio/mpeg",
+      "size": 27210,
+      "sha256": "703edab6c2a5546144f74a29b48be5a55db77dd88fa429017e3af3c5259c9e9f",
+      "duration": 3.334,
+      "id": "04-june-crime-3",
+      "category": "voiceover",
+      "tags": [
+        "june"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice af_heart."
+    },
+    {
+      "name": "JUNE - twist",
+      "kind": "audio",
+      "src": "media/june-twist.mp3",
+      "mime": "audio/mpeg",
+      "size": 14880,
+      "sha256": "234d328508d6e942d9b2bf007fca97ad0f5753795f445654e5c514ff821bc7ce",
+      "duration": 1.8,
+      "id": "05-june-twist",
+      "category": "voiceover",
+      "tags": [
+        "june"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice af_heart."
+    },
+    {
+      "name": "JUNE - cta",
+      "kind": "audio",
+      "src": "media/june-cta.mp3",
+      "mime": "audio/mpeg",
+      "size": 17179,
+      "sha256": "8bfadae8d152d87706a751904a7fde1772ac0cb9abd5f70740f527aebc31e8f7",
+      "duration": 2.078,
+      "id": "06-june-cta",
+      "category": "voiceover",
+      "tags": [
+        "june"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice af_heart."
+    },
+    {
+      "name": "Whoosh",
+      "kind": "audio",
+      "src": "media/whoosh.mp3",
+      "mime": "audio/mpeg",
+      "size": 6103,
+      "sha256": "3af8407ffb07859eee32f5cbf4e1fe6a57dea75398ccf938861ce178554f8565",
+      "duration": 0.7,
+      "id": "sfx-whoosh",
+      "category": "sfx",
+      "notes": "Synthesized locally (numpy) for this sample."
+    },
+    {
+      "name": "Bonk",
+      "kind": "audio",
+      "src": "media/bonk.mp3",
+      "mime": "audio/mpeg",
+      "size": 4640,
+      "sha256": "171971d1c13f2d5afe8c8370fb7757f939c1a07fdd3170303f4124d6142c8bfb",
+      "duration": 0.5,
+      "id": "sfx-bonk",
+      "category": "sfx",
+      "notes": "Synthesized locally (numpy) for this sample."
+    },
+    {
+      "name": "Keys",
+      "kind": "audio",
+      "src": "media/keys.mp3",
+      "mime": "audio/mpeg",
+      "size": 10074,
+      "sha256": "5c369403b110cd248b31f664f6b1405b946308f09a11d3c5a5bb0651cd8865a2",
+      "duration": 1.2,
+      "id": "sfx-keys",
+      "category": "sfx",
+      "notes": "Synthesized locally (numpy) for this sample."
+    },
+    {
+      "name": "Horror sting",
+      "kind": "audio",
+      "src": "media/horror-sting.mp3",
+      "mime": "audio/mpeg",
+      "size": 18224,
+      "sha256": "d5dc26bc44e62b0d88ce465431e31430ddfa0f302b8e7501500735b2e7f186cd",
+      "duration": 2.2,
+      "id": "sfx-horror-sting",
+      "category": "sfx",
+      "notes": "Synthesized locally (numpy) for this sample."
+    },
+    {
+      "name": "Scratch",
+      "kind": "audio",
+      "src": "media/scratch.mp3",
+      "mime": "audio/mpeg",
+      "size": 5267,
+      "sha256": "08103f4b1a7e676e59d6569329583ffb294eae30ab6ab5bb5856216c3951ff3f",
+      "duration": 0.6,
+      "id": "sfx-scratch",
+      "category": "sfx",
+      "notes": "Synthesized locally (numpy) for this sample."
+    },
+    {
+      "name": "Bouncy beat (synth loop)",
+      "kind": "audio",
+      "src": "media/bouncy-beat-synth-loop.mp3",
+      "mime": "audio/mpeg",
+      "size": 95338,
+      "sha256": "ae7211241827a8116c1ef01efd2cafeef38b36a2dcbb4ef476dfabca325f3c32",
+      "duration": 7.869,
+      "id": "music-bouncy-beat",
+      "category": "music",
+      "notes": "Synthesized locally (numpy) for this sample. Free to reuse."
+    }
+  ]
+}

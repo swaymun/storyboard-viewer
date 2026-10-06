@@ -1,0 +1,26 @@
+{
+  "id": "lamp",
+  "title": "Light returns",
+  "fields": {
+    "camera": "Wide",
+    "movement": "Dolly",
+    "transition": "Fade out",
+    "notes": "Push in slowly as the beam sweeps."
+  },
+  "duration": 7,
+  "variants": [
+    {
+      "id": "still",
+      "type": "image",
+      "name": "Still",
+      "asset": "lamp"
+    },
+    {
+      "id": "clip",
+      "type": "image",
+      "name": "Animatic clip",
+      "asset": "lamp-sweep"
+    }
+  ],
+  "active_variant": "still"
+}

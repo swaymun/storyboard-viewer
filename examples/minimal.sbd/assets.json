@@ -1,0 +1,153 @@
+{
+  "assets": [
+    {
+      "id": "opening-color",
+      "name": "Opening (color)",
+      "kind": "image",
+      "category": "location",
+      "tags": [
+        "exterior",
+        "dusk"
+      ],
+      "src": "media/opening-color.png",
+      "mime": "image/png",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "id": "opening-sketch",
+      "name": "Opening (sketch)",
+      "kind": "image",
+      "category": "location",
+      "tags": [
+        "exterior",
+        "sketch"
+      ],
+      "src": "media/opening-sketch.png",
+      "mime": "image/png",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "id": "lantern-room",
+      "name": "Lantern room",
+      "kind": "image",
+      "category": "location",
+      "tags": [
+        "interior",
+        "night"
+      ],
+      "src": "media/lantern-room.png",
+      "mime": "image/png",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "kind": "image",
+      "category": "character",
+      "tags": [
+        "maya",
+        "cutout"
+      ],
+      "src": "media/maya.png",
+      "mime": "image/png",
+      "width": 220,
+      "height": 320
+    },
+    {
+      "id": "matchbox",
+      "name": "Matchbox",
+      "kind": "image",
+      "category": "prop",
+      "tags": [
+        "match"
+      ],
+      "src": "media/matchbox.png",
+      "mime": "image/png",
+      "width": 120,
+      "height": 80
+    },
+    {
+      "id": "match",
+      "name": "Match close-up",
+      "kind": "image",
+      "category": "prop",
+      "tags": [
+        "match",
+        "close-up"
+      ],
+      "src": "media/match.png",
+      "mime": "image/png",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "id": "lamp",
+      "name": "The lamp, lit",
+      "kind": "image",
+      "category": "location",
+      "tags": [
+        "exterior",
+        "night"
+      ],
+      "src": "media/lamp.png",
+      "mime": "image/png",
+      "width": 640,
+      "height": 360
+    },
+    {
+      "id": "dialogue",
+      "name": "Dialogue (all lines, one take)",
+      "kind": "audio",
+      "category": "dialogue",
+      "tags": [
+        "maya",
+        "placeholder"
+      ],
+      "src": "media/dialogue.wav",
+      "mime": "audio/wav",
+      "duration": 7
+    },
+    {
+      "id": "music",
+      "name": "Night theme (loop)",
+      "kind": "audio",
+      "category": "music",
+      "tags": [
+        "loop"
+      ],
+      "src": "media/music.wav",
+      "mime": "audio/wav",
+      "duration": 8
+    },
+    {
+      "id": "match-strike",
+      "name": "Match strike",
+      "kind": "audio",
+      "category": "sfx",
+      "tags": [
+        "match"
+      ],
+      "src": "media/match-strike.wav",
+      "mime": "audio/wav",
+      "duration": 0.8
+    },
+    {
+      "id": "lamp-sweep",
+      "name": "Lamp sweep (animatic clip)",
+      "kind": "video",
+      "category": "footage",
+      "tags": [
+        "night"
+      ],
+      "src": "media/lamp-sweep.mp4",
+      "mime": "video/mp4",
+      "duration": 3,
+      "width": 640,
+      "height": 360,
+      "poster": "media/lamp.png"
+    }
+  ]
+}

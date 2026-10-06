@@ -1,0 +1,480 @@
+/*
+ * Themes. Every color in the app is a custom property defined here; components never hard-code
+ * colors. A theme is selected with `data-theme` on <html> (see src/lib/theme.svelte.ts; "System"
+ * resolves to the chosen light/dark pair before the first paint, see index.html).
+ *
+ * Token groups
+ *   chrome      --bg --surface --surface-2 --surface-3 --border --border-strong
+ *   text        --fg --fg-2 --fg-muted (all WCAG AA on bg/surface/surface-2)
+ *               --fg-faint (icons, disabled, decoration only: >= 3:1)
+ *   accent      --accent (fills) --accent-fg (text on accent) --accent-text (accent as text)
+ *               --accent-soft (selected backgrounds) --focus
+ *   status      --danger --warn --ok
+ *   script      --paper --paper-fg and --sx-* (scene heading, character, parenthetical, dialogue,
+ *               transition, note, section, centered) for the screenplay syntax colors
+ *   shots       --shot-1 … --shot-6 annotation hues (highlights mix them with the paper)
+ *   media       --stage (behind pictures) --overlay-bg/--overlay-fg (labels over pictures)
+ *   canvas      --canvas-mask --canvas-frame --canvas-handle --canvas-handle-fill
+ *               --canvas-guide --canvas-snap
+ *   elevation   --shadow-color --backdrop
+ *
+ * `test/themes.test.ts` checks the contrast pairs above for every theme.
+ *
+ * The Maomao and Jinshi themes are adapted from "Apothecary Diary" for VS Code by
+ * Matheus Montemurro (https://github.com/montemurro19/apothecary-diary-theme), MIT License:
+ *
+ *   Copyright (c) 2025 Matheus Montemurro
+ *   Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ *   and associated documentation files (the "Software"), to deal in the Software without
+ *   restriction, including without limitation the rights to use, copy, modify, merge, publish,
+ *   distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+ *   Software is furnished to do so, subject to the following conditions: The above copyright
+ *   notice and this permission notice shall be included in all copies or substantial portions of
+ *   the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ *   PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ *   LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ *   OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ *   DEALINGS IN THE SOFTWARE.
+ *
+ * Their colors come from the themes' `colors` (backgrounds, foreground, buttons, cursor) and the
+ * screenplay colors from their `tokenColors`: scene headings = keywords, character names =
+ * functions, parentheticals = comments, transitions = control keywords, notes = strings,
+ * sections = constants. Light variants are darkened where needed to reach AA contrast.
+ */
+
+:root {
+  /* Theme-independent: type, rhythm, print (print sheets are always black on white). */
+  --font-sans:
+    'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-script: 'Courier Prime', 'Courier New', Courier, monospace;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --radius-sm: 2px;
+  --radius: 3px;
+  --radius-lg: 5px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --ease: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --print-desk: #e9ebef;
+  --print-paper: #ffffff;
+  --print-ink: #111111;
+  --print-ink-2: #333333;
+  --print-ink-3: #444444;
+  --print-muted: #555555;
+  --print-faint: #777777;
+  --print-faintest: #999999;
+  --print-rule: #cccccc;
+  --print-rule-soft: #dddddd;
+  --print-frame: #222222;
+  --print-frame-bg: #f1f1f1;
+  --print-accent: #8a5a00;
+  --print-shadow: rgb(0 0 0 / 0.15);
+  --print-fade: #000000;
+}
+
+/* ---------------------------------------------------------------- Paper (light) */
+:root,
+[data-theme='paper'] {
+  color-scheme: light;
+  --bg: #ebe7de;
+  --surface: #f7f5ef;
+  --surface-2: #efebe2;
+  --surface-3: #e5e0d4;
+  --border: #ddd7ca;
+  --border-strong: #c4bdae;
+  --fg: #1c1b18;
+  --fg-2: #3a3833;
+  --fg-muted: #615d55;
+  --fg-faint: #8f897e;
+  --accent: #2f5d8a;
+  --accent-fg: #ffffff;
+  --accent-text: #2a5580;
+  --accent-soft: #dde5ee;
+  --focus: #2b67b8;
+  --danger: #a8281f;
+  --warn: #7f5300;
+  --ok: #2c6638;
+  --paper: #fcfbf7;
+  --paper-fg: #1c1b18;
+  --sx-scene: #1c1b18;
+  --sx-character: #2a5580;
+  --sx-paren: #5e5a52;
+  --sx-dialogue: #1c1b18;
+  --sx-transition: #7a4520;
+  --sx-note: #5b6b3e;
+  --sx-section: #7f5300;
+  --sx-centered: #3a3833;
+  --shot-1: #c4553b;
+  --shot-2: #b0820e;
+  --shot-3: #3b8566;
+  --shot-4: #3a6bab;
+  --shot-5: #7a58a3;
+  --shot-6: #ab4d77;
+  --stage: #191814;
+  --overlay-bg: rgb(20 19 16 / 0.62);
+  --overlay-fg: #ffffff;
+  --canvas-mask: rgb(20 19 16 / 0.62);
+  --canvas-frame: rgb(255 255 255 / 0.4);
+  --canvas-handle: #2f5d8a;
+  --canvas-handle-fill: #ffffff;
+  --canvas-guide: rgb(120 200 255 / 0.75);
+  --canvas-snap: #ff4fa3;
+  --shadow-color: rgb(40 32 20 / 0.16);
+  --backdrop: rgb(28 27 24 / 0.38);
+}
+
+/* ---------------------------------------------------------------- Darkroom (dark) */
+[data-theme='darkroom'] {
+  color-scheme: dark;
+  --bg: #0f0d0c;
+  --surface: #171413;
+  --surface-2: #1f1b19;
+  --surface-3: #2a2522;
+  --border: #2a2421;
+  --border-strong: #3b3430;
+  --fg: #efe8de;
+  --fg-2: #d3cabe;
+  --fg-muted: #a39789;
+  --fg-faint: #6f655c;
+  --accent: #e0512b;
+  --accent-fg: #140805;
+  --accent-text: #f27a52;
+  --accent-soft: #351a12;
+  --focus: #f2a65a;
+  --danger: #ff7363;
+  --warn: #e8b04a;
+  --ok: #93c48d;
+  --paper: #161312;
+  --paper-fg: #efe8de;
+  --sx-scene: #f27a52;
+  --sx-character: #e9d5b3;
+  --sx-paren: #a89b8e;
+  --sx-dialogue: #efe8de;
+  --sx-transition: #cfa877;
+  --sx-note: #a3b388;
+  --sx-section: #c79a6a;
+  --sx-centered: #d3cabe;
+  --shot-1: #e0512b;
+  --shot-2: #d7a13a;
+  --shot-3: #6fae8c;
+  --shot-4: #6e95cf;
+  --shot-5: #ad86cc;
+  --shot-6: #d06f93;
+  --stage: #070606;
+  --overlay-bg: rgb(0 0 0 / 0.6);
+  --overlay-fg: #f6f0e8;
+  --canvas-mask: rgb(8 6 5 / 0.66);
+  --canvas-frame: rgb(255 240 225 / 0.35);
+  --canvas-handle: #e0512b;
+  --canvas-handle-fill: #f6f0e8;
+  --canvas-guide: rgb(242 166 90 / 0.8);
+  --canvas-snap: #ff4fa3;
+  --shadow-color: rgb(0 0 0 / 0.5);
+  --backdrop: rgb(0 0 0 / 0.55);
+}
+
+/* ---------------------------------------------------------------- Neutral Pro (dark) */
+[data-theme='neutral'] {
+  color-scheme: dark;
+  --bg: #1a1a1b;
+  --surface: #222223;
+  --surface-2: #2a2a2c;
+  --surface-3: #333336;
+  --border: #303032;
+  --border-strong: #424245;
+  --fg: #ececec;
+  --fg-2: #cbcbcb;
+  --fg-muted: #a0a0a0;
+  --fg-faint: #6e6e70;
+  --accent: #e4e4e4;
+  --accent-fg: #141414;
+  --accent-text: #f2f2f2;
+  --accent-soft: #38383b;
+  --focus: #6fa3ff;
+  --danger: #ff7b6e;
+  --warn: #e3b456;
+  --ok: #8cc79a;
+  --paper: #1e1e1f;
+  --paper-fg: #ececec;
+  --sx-scene: #ffffff;
+  --sx-character: #d4d4d4;
+  --sx-paren: #a0a0a0;
+  --sx-dialogue: #ececec;
+  --sx-transition: #b8b8b8;
+  --sx-note: #9eab9e;
+  --sx-section: #b0a48e;
+  --sx-centered: #cbcbcb;
+  --shot-1: #bf8a78;
+  --shot-2: #bba776;
+  --shot-3: #84b597;
+  --shot-4: #7d9cbf;
+  --shot-5: #a28cbf;
+  --shot-6: #bf89a8;
+  --stage: #0b0b0b;
+  --overlay-bg: rgb(0 0 0 / 0.6);
+  --overlay-fg: #ffffff;
+  --canvas-mask: rgb(10 10 10 / 0.66);
+  --canvas-frame: rgb(255 255 255 / 0.35);
+  --canvas-handle: #e4e4e4;
+  --canvas-handle-fill: #141414;
+  --canvas-guide: rgb(111 163 255 / 0.8);
+  --canvas-snap: #ff4fa3;
+  --shadow-color: rgb(0 0 0 / 0.5);
+  --backdrop: rgb(0 0 0 / 0.55);
+}
+
+/* ---------------------------------------------------------------- Neutral Pro Light */
+[data-theme='neutral-light'] {
+  color-scheme: light;
+  --bg: #e9e9ea;
+  --surface: #f7f7f7;
+  --surface-2: #eeeeef;
+  --surface-3: #e3e3e5;
+  --border: #dadadc;
+  --border-strong: #c2c2c5;
+  --fg: #161617;
+  --fg-2: #353537;
+  --fg-muted: #5f5f63;
+  --fg-faint: #8e8e92;
+  --accent: #2b2b2d;
+  --accent-fg: #ffffff;
+  --accent-text: #2b2b2d;
+  --accent-soft: #dcdcdf;
+  --focus: #2e6ad8;
+  --danger: #b0261c;
+  --warn: #7b5300;
+  --ok: #2b6a3c;
+  --paper: #fcfcfc;
+  --paper-fg: #161617;
+  --sx-scene: #000000;
+  --sx-character: #2f2f31;
+  --sx-paren: #5f5f63;
+  --sx-dialogue: #161617;
+  --sx-transition: #4d4d50;
+  --sx-note: #4f6150;
+  --sx-section: #6b5b3c;
+  --sx-centered: #353537;
+  --shot-1: #a8705e;
+  --shot-2: #9a8650;
+  --shot-3: #5b8c6e;
+  --shot-4: #5a7aa0;
+  --shot-5: #7f6a9f;
+  --shot-6: #9f6886;
+  --stage: #141415;
+  --overlay-bg: rgb(0 0 0 / 0.58);
+  --overlay-fg: #ffffff;
+  --canvas-mask: rgb(12 12 12 / 0.62);
+  --canvas-frame: rgb(255 255 255 / 0.4);
+  --canvas-handle: #2b2b2d;
+  --canvas-handle-fill: #ffffff;
+  --canvas-guide: rgb(46 106 216 / 0.8);
+  --canvas-snap: #ff4fa3;
+  --shadow-color: rgb(0 0 0 / 0.14);
+  --backdrop: rgb(0 0 0 / 0.35);
+}
+
+/* ---------------------------------------------------------------- Maomao Dark (Apothecary Diary) */
+[data-theme='maomao-dark'] {
+  color-scheme: dark;
+  --bg: #1a2323;
+  --surface: #22322e;
+  --surface-2: #283a35;
+  --surface-3: #30453f;
+  --border: #33443f;
+  --border-strong: #454e4e;
+  --fg: #f8f7f3;
+  --fg-2: #dcdfd8;
+  --fg-muted: #a9b8b1;
+  --fg-faint: #6f807a;
+  --accent: #7aae8f;
+  --accent-fg: #1a2323;
+  --accent-text: #aee4ce;
+  --accent-soft: #2f4a40;
+  --focus: #aee4ce;
+  --danger: #ff7b80;
+  --warn: #f4e5b0;
+  --ok: #acdfb2;
+  --paper: #1e2b28;
+  --paper-fg: #f8f7f3;
+  --sx-scene: #8cbccf;
+  --sx-character: #aee4ce;
+  --sx-paren: #8fbfa2;
+  --sx-dialogue: #f8f7f3;
+  --sx-transition: #f07a7f;
+  --sx-note: #f4e5b0;
+  --sx-section: #f2856b;
+  --sx-centered: #acdfb2;
+  --shot-1: #c94349;
+  --shot-2: #e3c76f;
+  --shot-3: #7aae8f;
+  --shot-4: #8cbccf;
+  --shot-5: #c792ea;
+  --shot-6: #f2856b;
+  --stage: #0f1514;
+  --overlay-bg: rgb(16 22 21 / 0.66);
+  --overlay-fg: #f8f7f3;
+  --canvas-mask: rgb(14 20 19 / 0.66);
+  --canvas-frame: rgb(248 247 243 / 0.35);
+  --canvas-handle: #7aae8f;
+  --canvas-handle-fill: #f8f7f3;
+  --canvas-guide: rgb(174 228 206 / 0.8);
+  --canvas-snap: #c94349;
+  --shadow-color: rgb(0 0 0 / 0.45);
+  --backdrop: rgb(10 14 13 / 0.6);
+}
+
+/* ---------------------------------------------------------------- Maomao Light (Apothecary Diary) */
+[data-theme='maomao-light'] {
+  color-scheme: light;
+  --bg: #f0efeb;
+  --surface: #f8f7f3;
+  --surface-2: #efeee8;
+  --surface-3: #e5e4dc;
+  --border: #dddad0;
+  --border-strong: #c6c8bf;
+  --fg: #22322e;
+  --fg-2: #33443f;
+  --fg-muted: #586863;
+  --fg-faint: #8e9c97;
+  --accent: #3f7a59;
+  --accent-fg: #ffffff;
+  --accent-text: #1a5d4a;
+  --accent-soft: #dcebe2;
+  --focus: #1a5d4a;
+  --danger: #b0353b;
+  --warn: #8a5f10;
+  --ok: #1a5d4a;
+  --paper: #fdfcf9;
+  --paper-fg: #22322e;
+  --sx-scene: #3f6a88;
+  --sx-character: #1a5d4a;
+  --sx-paren: #4c7a5e;
+  --sx-dialogue: #22322e;
+  --sx-transition: #b0353b;
+  --sx-note: #86621f;
+  --sx-section: #a24f2b;
+  --sx-centered: #1a5d4a;
+  --shot-1: #c94349;
+  --shot-2: #b8820a;
+  --shot-3: #4f9a70;
+  --shot-4: #4a7a9b;
+  --shot-5: #8a5aa0;
+  --shot-6: #b85c32;
+  --stage: #1a2323;
+  --overlay-bg: rgb(26 35 35 / 0.62);
+  --overlay-fg: #f8f7f3;
+  --canvas-mask: rgb(26 35 35 / 0.62);
+  --canvas-frame: rgb(248 247 243 / 0.4);
+  --canvas-handle: #3f7a59;
+  --canvas-handle-fill: #ffffff;
+  --canvas-guide: rgb(122 174 143 / 0.85);
+  --canvas-snap: #c94349;
+  --shadow-color: rgb(34 50 46 / 0.14);
+  --backdrop: rgb(34 50 46 / 0.35);
+}
+
+/* ---------------------------------------------------------------- Jinshi Dark (Apothecary Diary) */
+[data-theme='jinshi-dark'] {
+  color-scheme: dark;
+  --bg: #1f1129;
+  --surface: #2a1b3d;
+  --surface-2: #312244;
+  --surface-3: #3a2b4f;
+  --border: #3c2d50;
+  --border-strong: #5a4a6b;
+  --fg: #f4f1f8;
+  --fg-2: #ddd5e8;
+  --fg-muted: #b3a5c6;
+  --fg-faint: #7b6a8f;
+  --accent: #8b5fbf;
+  --accent-fg: #ffffff;
+  --accent-text: #d4af37;
+  --accent-soft: #3f2a5c;
+  --focus: #d4af37;
+  --danger: #ff8a92;
+  --warn: #f4d03f;
+  --ok: #98c379;
+  --paper: #251733;
+  --paper-fg: #f4f1f8;
+  --sx-scene: #c4a3df;
+  --sx-character: #64c3cf;
+  --sx-paren: #a98ad3;
+  --sx-dialogue: #f4f1f8;
+  --sx-transition: #d4af37;
+  --sx-note: #f4d03f;
+  --sx-section: #d19a66;
+  --sx-centered: #98c379;
+  --shot-1: #d4af37;
+  --shot-2: #56b6c2;
+  --shot-3: #98c379;
+  --shot-4: #c678dd;
+  --shot-5: #f287a1;
+  --shot-6: #d19a66;
+  --stage: #120a19;
+  --overlay-bg: rgb(18 10 25 / 0.66);
+  --overlay-fg: #f4f1f8;
+  --canvas-mask: rgb(18 10 25 / 0.66);
+  --canvas-frame: rgb(244 241 248 / 0.35);
+  --canvas-handle: #d4af37;
+  --canvas-handle-fill: #2a1b3d;
+  --canvas-guide: rgb(212 175 55 / 0.8);
+  --canvas-snap: #f287a1;
+  --shadow-color: rgb(0 0 0 / 0.5);
+  --backdrop: rgb(12 6 18 / 0.6);
+}
+
+/* ---------------------------------------------------------------- Jinshi Light (Apothecary Diary) */
+[data-theme='jinshi-light'] {
+  color-scheme: light;
+  --bg: #f3eefa;
+  --surface: #fdfcff;
+  --surface-2: #f8f4ff;
+  --surface-3: #eee6f8;
+  --border: #e8dcf0;
+  --border-strong: #cdbcdb;
+  --fg: #2a1b3d;
+  --fg-2: #3d2c55;
+  --fg-muted: #64557a;
+  --fg-faint: #9a8aab;
+  --accent: #7a4fb0;
+  --accent-fg: #ffffff;
+  --accent-text: #6a4c93;
+  --accent-soft: #ece2f8;
+  --focus: #6a4c93;
+  --danger: #b0384f;
+  --warn: #7f6a1c;
+  --ok: #4a7a2d;
+  --paper: #fffeff;
+  --paper-fg: #2a1b3d;
+  --sx-scene: #6a4c93;
+  --sx-character: #3f6f70;
+  --sx-paren: #7d55ad;
+  --sx-dialogue: #2a1b3d;
+  --sx-transition: #b0384f;
+  --sx-note: #7f6a1c;
+  --sx-section: #a65a24;
+  --sx-centered: #4f7d31;
+  --shot-1: #c4971e;
+  --shot-2: #4a7b7c;
+  --shot-3: #5a8b3a;
+  --shot-4: #8b5fbf;
+  --shot-5: #b83e5a;
+  --shot-6: #b8652a;
+  --stage: #1f1129;
+  --overlay-bg: rgb(31 17 41 / 0.62);
+  --overlay-fg: #fdfcff;
+  --canvas-mask: rgb(31 17 41 / 0.62);
+  --canvas-frame: rgb(253 252 255 / 0.4);
+  --canvas-handle: #7a4fb0;
+  --canvas-handle-fill: #ffffff;
+  --canvas-guide: rgb(212 175 55 / 0.85);
+  --canvas-snap: #b83e5a;
+  --shadow-color: rgb(42 27 61 / 0.14);
+  --backdrop: rgb(42 27 61 / 0.35);
+}

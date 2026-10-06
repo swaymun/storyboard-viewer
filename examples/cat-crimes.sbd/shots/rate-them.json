@@ -1,0 +1,19 @@
+{
+  "id": "rate-them",
+  "title": "Let's rate them",
+  "fields": {
+    "beat": "Setup",
+    "on_screen_text": "let's rate them",
+    "camera": "Selfie",
+    "transition": "Jump cut"
+  },
+  "variants": [
+    {
+      "name": "Outraged",
+      "type": "image",
+      "asset": "cat-01-point",
+      "id": "v_57je9j"
+    }
+  ],
+  "active_variant": "v_57je9j"
+}

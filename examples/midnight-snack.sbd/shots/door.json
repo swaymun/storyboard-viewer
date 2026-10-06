@@ -1,0 +1,22 @@
+{
+  "id": "door",
+  "title": "It's awake",
+  "fields": {
+    "camera": "Medium",
+    "angle": "Eye level",
+    "movement": "Dolly",
+    "lens": "35mm",
+    "transition": "Cut",
+    "sound": "Door seal pop",
+    "notes": "Slow push in as the eyes open."
+  },
+  "variants": [
+    {
+      "id": "board",
+      "name": "Board",
+      "type": "image",
+      "asset": "fridge-02-open"
+    }
+  ],
+  "active_variant": "board"
+}

@@ -1,0 +1,51 @@
+{
+  "id": "ready",
+  "title": "Wind speed: perfect",
+  "fields": {
+    "camera": "Medium",
+    "action": "Pip plants its feet, holds the kite up proudly. Visor eyes squint into the wind.",
+    "frames": 72,
+    "transition": "Cut"
+  },
+  "variants": [
+    {
+      "id": "layout",
+      "name": "Layout",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-hill",
+          "asset": "pip-bg-hill",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080,
+          "crop": {
+            "x": 160,
+            "y": 140,
+            "width": 800,
+            "height": 450
+          }
+        },
+        {
+          "id": "ly-2-kite",
+          "asset": "pip-kite",
+          "x": 1040,
+          "y": 160,
+          "width": 479,
+          "height": 520,
+          "rotation": 8
+        },
+        {
+          "id": "ly-3-stand",
+          "asset": "pip-stand",
+          "x": 560,
+          "y": 260,
+          "width": 656,
+          "height": 820
+        }
+      ]
+    }
+  ],
+  "active_variant": "layout"
+}

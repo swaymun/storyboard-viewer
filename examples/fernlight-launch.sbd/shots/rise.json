@@ -1,0 +1,45 @@
+{
+  "id": "rise",
+  "title": "The lamp swings in",
+  "fields": {
+    "motion": "Lamp rotates in from the right edge, settling at 0 degrees; sun continues to rise.",
+    "easing": "Spring",
+    "transition": "Cut"
+  },
+  "duration": 3,
+  "variants": [
+    {
+      "id": "layout",
+      "name": "Layout",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-dawn",
+          "asset": "fern-bg-dawn",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "ly-2-sun",
+          "asset": "fern-sun",
+          "x": 520,
+          "y": 300,
+          "width": 270,
+          "height": 260
+        },
+        {
+          "id": "ly-3-lamp",
+          "asset": "fern-lamp",
+          "x": 1180,
+          "y": 80,
+          "width": 595,
+          "height": 820,
+          "rotation": 14
+        }
+      ]
+    }
+  ],
+  "active_variant": "layout"
+}

@@ -1,0 +1,141 @@
+{
+  "script_hash": "02dd636fac7db0",
+  "shots": [
+    {
+      "id": "uphill",
+      "lines": [
+        "l_1a6q1uc9",
+        "l_99qolrpc"
+      ]
+    },
+    {
+      "id": "ready",
+      "lines": [
+        "l_924tmo67"
+      ]
+    },
+    {
+      "id": "flop",
+      "lines": [
+        "l_p1bjk8b9",
+        "l_iuacwwbz"
+      ]
+    },
+    {
+      "id": "moss",
+      "lines": [
+        "l_crm96yd7",
+        "l_a0y9bntx"
+      ]
+    },
+    {
+      "id": "liftoff",
+      "lines": [
+        "l_o6poa2k1",
+        "l_lfqdxqny"
+      ]
+    },
+    {
+      "id": "stars",
+      "lines": [
+        "l_1eapzf5k",
+        "l_5pgtts0r",
+        "l_pyww0q0e",
+        "l_1yjpiqr5"
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_1a6q1uc9",
+      "ordinal": 0,
+      "hash": "1b6905df16d817",
+      "text": "EXT. WINDY HILL - SUNSET",
+      "type": "scene_heading"
+    },
+    {
+      "id": "l_99qolrpc",
+      "ordinal": 1,
+      "hash": "0c3c891140f812",
+      "text": "Pip, a very small robot, drags a patched newspaper kite up the hill.",
+      "type": "action"
+    },
+    {
+      "id": "l_924tmo67",
+      "ordinal": 2,
+      "hash": "0db2d958f18436",
+      "text": "Today's the day. Wind speed: perfect.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_p1bjk8b9",
+      "ordinal": 3,
+      "hash": "0dcb11fce7ec5c",
+      "text": "Pip runs. The kite flips, nose-dives, and flops onto the grass.",
+      "type": "action"
+    },
+    {
+      "id": "l_iuacwwbz",
+      "ordinal": 4,
+      "hash": "104eb8eb738de5",
+      "text": "Hoo. You're holding it upside down.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_crm96yd7",
+      "ordinal": 5,
+      "hash": "0419d2e21c1c3f",
+      "text": "Wind doesn't care about perfect.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_a0y9bntx",
+      "ordinal": 6,
+      "hash": "18fa30781ed094",
+      "text": "Let it go a little.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_o6poa2k1",
+      "ordinal": 7,
+      "hash": "0ff1597207eab0",
+      "text": "Pip loosens the string. The kite catches the wind and climbs.",
+      "type": "action"
+    },
+    {
+      "id": "l_lfqdxqny",
+      "ordinal": 8,
+      "hash": "1bca06d30f05e4",
+      "text": "Whoa. Whoa! WHOA!",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_1eapzf5k",
+      "ordinal": 9,
+      "hash": "191cba267dd1eb",
+      "text": "EXT. WINDY HILL - NIGHT",
+      "type": "scene_heading"
+    },
+    {
+      "id": "l_5pgtts0r",
+      "ordinal": 10,
+      "hash": "02995527af419e",
+      "text": "Pip and Moss sit together. High above, the kite dances among the stars.",
+      "type": "action"
+    },
+    {
+      "id": "l_pyww0q0e",
+      "ordinal": 11,
+      "hash": "1a18d4fbc62e0d",
+      "text": "It's flying!",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_1yjpiqr5",
+      "ordinal": 12,
+      "hash": "19a3837ad1aaa0",
+      "text": "No, little one. It's *dancing*.",
+      "type": "dialogue"
+    }
+  ]
+}

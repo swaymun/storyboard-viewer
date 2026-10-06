@@ -1,0 +1,20 @@
+{
+  "id": "crime-3",
+  "title": "Crime #3",
+  "fields": {
+    "beat": "Value",
+    "on_screen_text": "CRIME #3: The Stare (11/10)",
+    "camera": "Wide",
+    "transition": "Cut",
+    "sound": "Horror sting"
+  },
+  "variants": [
+    {
+      "id": "hallway",
+      "name": "Hallway",
+      "type": "image",
+      "asset": "cat-04-stare"
+    }
+  ],
+  "active_variant": "hallway"
+}

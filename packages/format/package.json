@@ -1,0 +1,41 @@
+{
+  "name": "@storyboard-viewer/format",
+  "version": "0.4.1",
+  "description": "The .sbd (Storyboard Document) format: types, JSON Schema validation, project model and edit operations, Fountain parsing, line-ID re-anchoring, zip pack/unpack.",
+  "license": "MIT",
+  "homepage": "https://github.com/swaymun/storyboard-viewer#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swaymun/storyboard-viewer.git",
+    "directory": "packages/format"
+  },
+  "bugs": {
+    "url": "https://github.com/swaymun/storyboard-viewer/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./node": {
+      "source": "./src/node.ts",
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
+    "fflate": "^0.8.3"
+  }
+}

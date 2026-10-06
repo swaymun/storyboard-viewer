@@ -1,0 +1,203 @@
+{
+  "assets": [
+    {
+      "name": "Aerial",
+      "kind": "image",
+      "src": "media/aerial.webp",
+      "mime": "image/webp",
+      "size": 95740,
+      "sha256": "cb91e814b5252062695034ddc09ae132de7b3fbb118f481bd89ff2c86065ac9d",
+      "width": 1280,
+      "height": 720,
+      "id": "salt-01-aerial",
+      "category": "b_roll",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Ground",
+      "kind": "image",
+      "src": "media/ground.webp",
+      "mime": "image/webp",
+      "size": 61532,
+      "sha256": "194841314e8b7717b0c16aaa79214f7735de4a8c4c2008656e5a8e84d754396b",
+      "width": 1280,
+      "height": 720,
+      "id": "salt-01-ground",
+      "category": "b_roll",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Rake",
+      "kind": "image",
+      "src": "media/rake.webp",
+      "mime": "image/webp",
+      "size": 95172,
+      "sha256": "a8b2c53fe40e76971b80264ceafeffae015026296d41e4edaa8295e2549fa09e",
+      "width": 1280,
+      "height": 720,
+      "id": "salt-02-rake",
+      "category": "b_roll",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Edda",
+      "kind": "image",
+      "src": "media/edda.webp",
+      "mime": "image/webp",
+      "size": 70680,
+      "sha256": "65693041cdd4a58f24ce25e66170fed297a455f6a10b52214a780d77730e192d",
+      "width": 1280,
+      "height": 720,
+      "id": "salt-03-edda",
+      "category": "interview",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Barrows",
+      "kind": "image",
+      "src": "media/barrows.webp",
+      "mime": "image/webp",
+      "size": 119082,
+      "sha256": "4fd0c6506a2496daebbbab98641c679092d2cb60a86362ab5a388fed170ec734",
+      "width": 1280,
+      "height": 720,
+      "id": "salt-04-barrows",
+      "category": "b_roll",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Archival",
+      "kind": "image",
+      "src": "media/archival.webp",
+      "mime": "image/webp",
+      "size": 103178,
+      "sha256": "2db6954566662746576b34b5313be36e105384b6da813fd825becb4740b102ed",
+      "width": 1280,
+      "height": 720,
+      "id": "salt-05-archival",
+      "category": "archival",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Jonah",
+      "kind": "image",
+      "src": "media/jonah.webp",
+      "mime": "image/webp",
+      "size": 89820,
+      "sha256": "69de717cc32e9350b09fc2e6f61f2c85833ec3c7aed4a9a8c103e95c7c12f7cd",
+      "width": 1280,
+      "height": 720,
+      "id": "salt-06-jonah",
+      "category": "interview",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Sunset",
+      "kind": "image",
+      "src": "media/sunset.webp",
+      "mime": "image/webp",
+      "size": 111344,
+      "sha256": "6ba4db15de6327bf845b0d1e9b15a046199147421acd91c7b0599d3659ceba2b",
+      "width": 1280,
+      "height": 720,
+      "id": "salt-07-sunset",
+      "category": "b_roll",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Bluehour",
+      "kind": "image",
+      "src": "media/bluehour.webp",
+      "mime": "image/webp",
+      "size": 70144,
+      "sha256": "e1e3306983daf0b1497bedfe0e00361983c5cc37b2a81660ee30c20f3b01de45",
+      "width": 1280,
+      "height": 720,
+      "id": "salt-07-bluehour",
+      "category": "b_roll",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Title",
+      "kind": "image",
+      "src": "media/title.webp",
+      "mime": "image/webp",
+      "size": 118566,
+      "sha256": "e61744b6c354be14e7d421b08fb12b4821919aa5572593ad4253f7a74fadc35c",
+      "width": 1280,
+      "height": 720,
+      "id": "salt-08-title",
+      "category": "graphics",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "NARRATOR - full voice-over (one take)",
+      "kind": "audio",
+      "src": "media/narrator-full-voice-over-one-take.mp3",
+      "mime": "audio/mpeg",
+      "size": 199409,
+      "sha256": "a6c51e108be372ede3fa2df29b029a8cd4829354b99c111c32fd6d68454b90aa",
+      "duration": 24.848,
+      "id": "narrator-full",
+      "category": "voiceover",
+      "tags": [
+        "narrator"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice bm_george."
+    },
+    {
+      "name": "EDDA - all lines (one take)",
+      "kind": "audio",
+      "src": "media/edda-all-lines-one-take.mp3",
+      "mime": "audio/mpeg",
+      "size": 71305,
+      "sha256": "1f88e2c36917f37759450dc8954e40d54e56dee15a21b732efe0ce5cc5390c17",
+      "duration": 8.851,
+      "id": "edda-take",
+      "category": "voiceover",
+      "tags": [
+        "edda"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice bf_isabella."
+    },
+    {
+      "name": "JONAH - all lines (one take)",
+      "kind": "audio",
+      "src": "media/jonah-all-lines-one-take.mp3",
+      "mime": "audio/mpeg",
+      "size": 56049,
+      "sha256": "040fc5968533d19eae91779fc3c9d9b4afcaa8f099c357f2aeffadf765cfc4b2",
+      "duration": 6.929,
+      "id": "jonah-take",
+      "category": "voiceover",
+      "tags": [
+        "jonah"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice am_liam."
+    },
+    {
+      "name": "Waves",
+      "kind": "audio",
+      "src": "media/waves.mp3",
+      "mime": "audio/mpeg",
+      "size": 77365,
+      "sha256": "5a30778ae841365dbb04d02acfd2a784ee7e33fa8d78e493c16210b61b9656ed",
+      "duration": 9.6,
+      "id": "sfx-waves",
+      "category": "sfx",
+      "notes": "Synthesized locally (numpy) for this sample."
+    },
+    {
+      "name": "Tide pad (synth ambient)",
+      "kind": "audio",
+      "src": "media/tide-pad-synth-ambient.mp3",
+      "mime": "audio/mpeg",
+      "size": 288749,
+      "sha256": "c9aee733f97d59a2bd10a33244f6d0b8809293677250c06370d734ff242ab76d",
+      "duration": 24,
+      "id": "music-tide-pad",
+      "category": "music",
+      "notes": "Synthesized locally (numpy) for this sample. Free to reuse."
+    }
+  ]
+}

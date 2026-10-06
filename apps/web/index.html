@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#171413" />
+    <link rel="apple-touch-icon" href="./icon-192.png" />
+    <meta name="description" content="View and edit .sbd storyboards, offline." />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <title>Storyboard Viewer</title>
+    <script>
+      // Apply the saved theme before the first paint (same rules as src/lib/theme.svelte.ts).
+      (function () {
+        var t = 'paper';
+        try {
+          var c = localStorage.getItem('sbd:theme') || 'system';
+          var p = JSON.parse(localStorage.getItem('sbd:theme-pair') || '{}');
+          var dark = matchMedia('(prefers-color-scheme: dark)').matches;
+          t = c === 'system' ? (dark ? p.dark || 'darkroom' : p.light || 'paper') : c;
+        } catch (e) {
+          /* storage blocked: default theme */
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

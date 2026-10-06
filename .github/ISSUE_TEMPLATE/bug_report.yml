@@ -1,0 +1,49 @@
+name: Bug report
+description: Something doesn't work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting! Plain words are perfect; you don't need to be technical.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+      placeholder: I asked my agent to add a shot, but the viewer didn't update…
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run `pnpm sbd serve my-film.sbd`
+        2. Open a shot's Audio section
+        3. …
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where were you using it?
+      multiple: true
+      options:
+        - Claude Code (desktop app)
+        - Claude Code (terminal)
+        - Codex (desktop app)
+        - Codex (terminal)
+        - Browser without an agent
+        - Command line (sbd)
+  - type: input
+    id: env
+    attributes:
+      label: Browser and operating system
+      placeholder: Chrome 150 on macOS 26
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error messages or logs
+      description: Copy any error text from the viewer, the terminal or `sbd validate`.
+      render: text
+  - type: markdown
+    attributes:
+      value: If you can, attach a small `.sbd` file (File → Export .sbd file) that shows the problem.

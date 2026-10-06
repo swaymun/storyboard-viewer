@@ -1,0 +1,20 @@
+{
+  "id": "twist",
+  "title": "Plot twist",
+  "fields": {
+    "beat": "Twist",
+    "on_screen_text": "plot twist: she took my pillow",
+    "camera": "Overhead",
+    "transition": "Hand cover",
+    "sound": "Record scratch"
+  },
+  "variants": [
+    {
+      "id": "overhead",
+      "name": "Overhead",
+      "type": "image",
+      "asset": "cat-05-pillow"
+    }
+  ],
+  "active_variant": "overhead"
+}

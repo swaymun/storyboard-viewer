@@ -1,0 +1,148 @@
+{
+  "format": "sbd",
+  "format_version": "0.1.0",
+  "title": "The Keeper's Light",
+  "preset": "film",
+  "aspect_ratio": "16:9",
+  "canvas": {
+    "width": 1280,
+    "height": 720
+  },
+  "fps": 24,
+  "default_shot_duration": 3,
+  "categories": [
+    {
+      "id": "character",
+      "label": "Character",
+      "kinds": [
+        "image"
+      ]
+    },
+    {
+      "id": "location",
+      "label": "Location / background",
+      "kinds": [
+        "image",
+        "video"
+      ]
+    },
+    {
+      "id": "prop",
+      "label": "Prop",
+      "kinds": [
+        "image"
+      ]
+    },
+    {
+      "id": "footage",
+      "label": "Footage",
+      "kinds": [
+        "video"
+      ]
+    },
+    {
+      "id": "dialogue",
+      "label": "Dialogue",
+      "kinds": [
+        "audio"
+      ]
+    },
+    {
+      "id": "music",
+      "label": "Music",
+      "kinds": [
+        "audio"
+      ]
+    },
+    {
+      "id": "sfx",
+      "label": "Sound effect",
+      "kinds": [
+        "audio"
+      ]
+    },
+    {
+      "id": "custom",
+      "label": "Other",
+      "kinds": [
+        "image",
+        "audio",
+        "video",
+        "font"
+      ]
+    }
+  ],
+  "shot_fields": [
+    {
+      "id": "camera",
+      "label": "Shot size",
+      "type": "select",
+      "options": [
+        "Extreme wide",
+        "Wide",
+        "Full",
+        "Medium wide",
+        "Medium",
+        "Medium close-up",
+        "Close-up",
+        "Extreme close-up",
+        "Insert",
+        "Over the shoulder",
+        "POV"
+      ]
+    },
+    {
+      "id": "angle",
+      "label": "Angle",
+      "placeholder": "Eye level, low, high, Dutch…"
+    },
+    {
+      "id": "movement",
+      "label": "Movement",
+      "type": "select",
+      "options": [
+        "Static",
+        "Pan",
+        "Tilt",
+        "Dolly",
+        "Truck",
+        "Crane",
+        "Handheld",
+        "Zoom",
+        "Tracking"
+      ]
+    },
+    {
+      "id": "lens",
+      "label": "Lens",
+      "placeholder": "35mm"
+    },
+    {
+      "id": "transition",
+      "label": "Transition",
+      "type": "select",
+      "options": [
+        "Cut",
+        "Dissolve",
+        "Fade in",
+        "Fade out",
+        "Wipe",
+        "Match cut",
+        "Smash cut"
+      ]
+    },
+    {
+      "id": "sound",
+      "label": "Sound"
+    },
+    {
+      "id": "notes",
+      "label": "Notes",
+      "type": "longtext"
+    }
+  ],
+  "created": "2026-10-06T12:00:00.000Z",
+  "modified": "2026-10-06T12:00:00.000Z",
+  "generator": "storyboard-viewer 0.1.0",
+  "description": "A four-shot example: script lines, image variants, a canvas composition, a split dialogue track, SFX and background music."
+}

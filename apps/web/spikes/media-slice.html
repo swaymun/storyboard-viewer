@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Spike: media sliced from a packed .sbd</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 24px;
+        max-width: 760px;
+      }
+      pre {
+        background: color-mix(in srgb, currentColor 8%, transparent);
+        padding: 12px;
+        overflow: auto;
+      }
+      video {
+        max-width: 320px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Spike: play media sliced from a packed <code>.sbd</code></h1>
+    <p>
+      Generates a WAV tone and a short recorded video in the browser, packs them with
+      <code>packSbd</code>, reads the central directory from the resulting <code>Blob</code>, and
+      plays each STOREd entry via <code>blob.slice(dataStart, dataEnd)</code> — no decompression.
+      Optionally pick your own media file to test.
+    </p>
+    <p>
+      <button id="run" type="button">Run spike</button>
+      <label>Extra file: <input id="file" type="file" accept="audio/*,video/*" /></label>
+    </p>
+    <div id="players"></div>
+    <pre id="log" aria-live="polite"></pre>
+    <pre id="result" data-status="idle"></pre>
+    <script type="module" src="/src/spikes/media-slice.ts"></script>
+  </body>
+</html>

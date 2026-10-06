@@ -1,0 +1,23 @@
+{
+  "id": "dusk",
+  "title": "Evening harvest",
+  "fields": {
+    "source": "B-roll",
+    "notes": "Locked-off. Hold three seconds after the line."
+  },
+  "variants": [
+    {
+      "id": "golden-hour",
+      "name": "Golden hour",
+      "type": "image",
+      "asset": "salt-07-sunset"
+    },
+    {
+      "id": "blue-hour",
+      "name": "Blue hour",
+      "type": "image",
+      "asset": "salt-07-bluehour"
+    }
+  ],
+  "active_variant": "golden-hour"
+}

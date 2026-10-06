@@ -1,0 +1,132 @@
+{
+  "format": "sbd",
+  "format_version": "0.1.0",
+  "title": "Fernlight Halo - Launch Film",
+  "preset": "motion",
+  "aspect_ratio": "16:9",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+  "fps": 30,
+  "default_shot_duration": 3,
+  "categories": [
+    {
+      "id": "logo",
+      "label": "Logo / icon",
+      "kinds": [
+        "image"
+      ]
+    },
+    {
+      "id": "typography",
+      "label": "Typography",
+      "kinds": [
+        "font"
+      ]
+    },
+    {
+      "id": "product",
+      "label": "Product",
+      "kinds": [
+        "image",
+        "video"
+      ]
+    },
+    {
+      "id": "background",
+      "label": "Background",
+      "kinds": [
+        "image",
+        "video"
+      ]
+    },
+    {
+      "id": "footage",
+      "label": "Footage",
+      "kinds": [
+        "video"
+      ]
+    },
+    {
+      "id": "voiceover",
+      "label": "Voice-over",
+      "kinds": [
+        "audio"
+      ]
+    },
+    {
+      "id": "music",
+      "label": "Music",
+      "kinds": [
+        "audio"
+      ]
+    },
+    {
+      "id": "sfx",
+      "label": "Sound effect",
+      "kinds": [
+        "audio"
+      ]
+    },
+    {
+      "id": "lifestyle",
+      "label": "Lifestyle",
+      "kinds": [
+        "image",
+        "video"
+      ]
+    }
+  ],
+  "shot_fields": [
+    {
+      "id": "on_screen_text",
+      "label": "On-screen text"
+    },
+    {
+      "id": "motion",
+      "label": "Motion",
+      "type": "longtext",
+      "placeholder": "Logo scales in, text slides up"
+    },
+    {
+      "id": "easing",
+      "label": "Easing",
+      "type": "select",
+      "options": [
+        "Linear",
+        "Ease in",
+        "Ease out",
+        "Ease in-out",
+        "Spring"
+      ]
+    },
+    {
+      "id": "transition",
+      "label": "Transition",
+      "type": "select",
+      "options": [
+        "Cut",
+        "Dissolve",
+        "Fade in",
+        "Fade out",
+        "Wipe",
+        "Match cut",
+        "Smash cut"
+      ]
+    },
+    {
+      "id": "brand_notes",
+      "label": "Brand notes"
+    },
+    {
+      "id": "notes",
+      "label": "Notes",
+      "type": "longtext"
+    }
+  ],
+  "created": "2026-10-06T08:16:33.071Z",
+  "modified": "2026-10-06T08:16:33.323Z",
+  "generator": "storyboard-viewer 0.1.0",
+  "description": "A 25-second motion-design launch film for Halo, a sunrise desk lamp from the fictional brand Fernlight."
+}

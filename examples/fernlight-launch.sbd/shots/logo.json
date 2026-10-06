@@ -1,0 +1,53 @@
+{
+  "id": "logo",
+  "title": "Logo lockup",
+  "fields": {
+    "on_screen_text": "fernlight",
+    "motion": "Ring draws on clockwise, sun dot pops in, wordmark fades up.",
+    "easing": "Spring",
+    "transition": "Cut",
+    "brand_notes": "Logo minimum clear space = ring height."
+  },
+  "duration": 3,
+  "variants": [
+    {
+      "id": "lockup",
+      "name": "Lockup",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-dawn",
+          "asset": "fern-bg-dawn",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "ly-2-sun",
+          "asset": "fern-sun",
+          "x": 544,
+          "y": 140,
+          "width": 832,
+          "height": 800,
+          "opacity": 0.35,
+          "filters": [
+            {
+              "type": "blur",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "id": "ly-3-logo",
+          "asset": "fern-logo",
+          "x": 606,
+          "y": 240,
+          "width": 708,
+          "height": 600
+        }
+      ]
+    }
+  ],
+  "active_variant": "lockup"
+}

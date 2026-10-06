@@ -1,0 +1,23 @@
+{
+  "id": "dawn",
+  "title": "Dawn over the pans",
+  "fields": {
+    "source": "B-roll",
+    "notes": "Drone, slow forward drift. Let the sky do the work."
+  },
+  "variants": [
+    {
+      "id": "aerial",
+      "name": "Aerial",
+      "type": "image",
+      "asset": "salt-01-aerial"
+    },
+    {
+      "id": "ground-level",
+      "name": "Ground level",
+      "type": "image",
+      "asset": "salt-01-ground"
+    }
+  ],
+  "active_variant": "aerial"
+}

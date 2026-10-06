@@ -1,0 +1,140 @@
+{
+  "tracks": [],
+  "cues": [
+    {
+      "track": "dialogue",
+      "label": "My cat committed three crimes tonight.…",
+      "asset": "01-june-hook",
+      "target": {
+        "line": "l_kdgo017t"
+      },
+      "id": "c_q4msa1"
+    },
+    {
+      "track": "dialogue",
+      "label": "Crime one. The gravity experiment. Six…",
+      "asset": "02-june-crime-1",
+      "target": {
+        "line": "l_4utixek1"
+      },
+      "id": "c_qxjkal"
+    },
+    {
+      "offset": 0,
+      "gain": 0.6,
+      "track": "sfx",
+      "label": "Whoosh",
+      "asset": "sfx-whoosh",
+      "target": {
+        "shot": "crime-1"
+      },
+      "id": "c_uvm0os"
+    },
+    {
+      "offset": 0.4,
+      "gain": 0.8,
+      "track": "sfx",
+      "label": "Bonk",
+      "asset": "sfx-bonk",
+      "target": {
+        "shot": "crime-1"
+      },
+      "id": "c_fbux4g"
+    },
+    {
+      "track": "dialogue",
+      "label": "Crime two. She emailed my boss. Nine o…",
+      "asset": "03-june-crime-2",
+      "target": {
+        "line": "l_uwtw8n1j"
+      },
+      "id": "c_ykqlma"
+    },
+    {
+      "offset": 0,
+      "gain": 0.6,
+      "track": "sfx",
+      "label": "Whoosh",
+      "asset": "sfx-whoosh",
+      "target": {
+        "shot": "crime-2"
+      },
+      "id": "c_y6i2r0"
+    },
+    {
+      "offset": 0.3,
+      "gain": 0.7,
+      "track": "sfx",
+      "label": "Keys",
+      "asset": "sfx-keys",
+      "target": {
+        "shot": "crime-2"
+      },
+      "id": "c_ueaf7y"
+    },
+    {
+      "track": "dialogue",
+      "label": "Crime three. The Stare. Eleven out of …",
+      "asset": "04-june-crime-3",
+      "target": {
+        "line": "l_3aojejgj"
+      },
+      "id": "c_wsq9yv"
+    },
+    {
+      "offset": 0.2,
+      "gain": 0.7,
+      "track": "sfx",
+      "label": "Horror sting",
+      "asset": "sfx-horror-sting",
+      "target": {
+        "shot": "crime-3"
+      },
+      "id": "c_9q1ru3"
+    },
+    {
+      "track": "dialogue",
+      "label": "Plot twist. She took my pillow.",
+      "asset": "05-june-twist",
+      "target": {
+        "line": "l_7345guv9"
+      },
+      "id": "c_5pssme"
+    },
+    {
+      "offset": 0,
+      "gain": 0.6,
+      "track": "sfx",
+      "label": "Scratch",
+      "asset": "sfx-scratch",
+      "target": {
+        "shot": "twist"
+      },
+      "id": "c_tchyte"
+    },
+    {
+      "track": "dialogue",
+      "label": "Follow for part two. If I survive.",
+      "asset": "06-june-cta",
+      "target": {
+        "line": "l_9gjqg04y"
+      },
+      "id": "c_9suok1"
+    },
+    {
+      "gain": 0.28,
+      "track": "music",
+      "loop": true,
+      "fade_in": 1,
+      "fade_out": 2,
+      "label": "Bouncy beat (synth loop)",
+      "asset": "music-bouncy-beat",
+      "target": {
+        "global": {
+          "start": 0
+        }
+      },
+      "id": "c_3pbanv"
+    }
+  ]
+}

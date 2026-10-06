@@ -1,0 +1,22 @@
+{
+  "id": "cheesecake",
+  "title": "Caught red-handed",
+  "fields": {
+    "camera": "Medium close-up",
+    "angle": "From inside the fridge",
+    "movement": "Static",
+    "lens": "28mm",
+    "transition": "Cut",
+    "sound": "Fridge hum",
+    "notes": "Shoot from inside the fridge, shelves framing Theo."
+  },
+  "variants": [
+    {
+      "id": "board",
+      "name": "Board",
+      "type": "image",
+      "asset": "fridge-04-cheesecake"
+    }
+  ],
+  "active_variant": "board"
+}

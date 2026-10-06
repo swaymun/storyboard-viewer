@@ -1,0 +1,113 @@
+{
+  "script_hash": "0eff8066157341",
+  "shots": [
+    {
+      "id": "hook",
+      "lines": [
+        "l_kdgo017t"
+      ],
+      "end": {
+        "line": "l_kdgo017t",
+        "offset": 39
+      }
+    },
+    {
+      "id": "rate-them",
+      "lines": [
+        "l_kdgo017t"
+      ],
+      "start": {
+        "line": "l_kdgo017t",
+        "offset": 39
+      }
+    },
+    {
+      "id": "crime-1",
+      "lines": [
+        "l_4utixek1"
+      ]
+    },
+    {
+      "id": "crime-2",
+      "lines": [
+        "l_uwtw8n1j"
+      ],
+      "end": {
+        "line": "l_uwtw8n1j",
+        "offset": 32
+      }
+    },
+    {
+      "id": "crime-2-score",
+      "lines": [
+        "l_uwtw8n1j"
+      ],
+      "start": {
+        "line": "l_uwtw8n1j",
+        "offset": 32
+      }
+    },
+    {
+      "id": "crime-3",
+      "lines": [
+        "l_3aojejgj"
+      ]
+    },
+    {
+      "id": "twist",
+      "lines": [
+        "l_7345guv9"
+      ]
+    },
+    {
+      "id": "cta",
+      "lines": [
+        "l_9gjqg04y"
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_kdgo017t",
+      "ordinal": 0,
+      "hash": "1a65e10056f1c4",
+      "text": "My cat committed three crimes tonight. Let's rate them.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_4utixek1",
+      "ordinal": 1,
+      "hash": "1fc91a0dc629e0",
+      "text": "Crime one. The gravity experiment. Six out of ten. Derivative.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_uwtw8n1j",
+      "ordinal": 2,
+      "hash": "161aaf1f85849f",
+      "text": "Crime two. She emailed my boss. Nine out of ten. He replied.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_3aojejgj",
+      "ordinal": 3,
+      "hash": "18f5aea3ca88b0",
+      "text": "Crime three. The Stare. Eleven out of ten. I'm moving out.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_7345guv9",
+      "ordinal": 4,
+      "hash": "13ec795cc624a6",
+      "text": "Plot twist. She took my pillow.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_9gjqg04y",
+      "ordinal": 5,
+      "hash": "0716e03a000837",
+      "text": "Follow for part two. If I survive.",
+      "type": "dialogue"
+    }
+  ]
+}

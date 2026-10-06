@@ -1,0 +1,19 @@
+{
+  "id": "title",
+  "title": "Title card",
+  "fields": {
+    "source": "Graphics",
+    "on_screen_text": "SALT & LIGHT",
+    "notes": "Title fades up over the crystals, music swells and resolves."
+  },
+  "duration": 4,
+  "variants": [
+    {
+      "id": "title-plate",
+      "name": "Title plate",
+      "type": "image",
+      "asset": "salt-08-title"
+    }
+  ],
+  "active_variant": "title-plate"
+}

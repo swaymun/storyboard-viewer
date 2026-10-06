@@ -1,0 +1,26 @@
+{
+  "id": "opening",
+  "title": "The dark lighthouse",
+  "fields": {
+    "camera": "Extreme wide",
+    "movement": "Static",
+    "lens": "24mm",
+    "transition": "Fade in",
+    "notes": "Hold on the dark lamp."
+  },
+  "variants": [
+    {
+      "id": "color",
+      "type": "image",
+      "name": "Color",
+      "asset": "opening-color"
+    },
+    {
+      "id": "sketch",
+      "type": "image",
+      "name": "Sketch",
+      "asset": "opening-sketch"
+    }
+  ],
+  "active_variant": "color"
+}

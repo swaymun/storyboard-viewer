@@ -1,0 +1,17 @@
+{
+  "id": "rake",
+  "title": "The rake",
+  "fields": {
+    "source": "B-roll",
+    "notes": "Macro. Sound of crystals scraping is the star here."
+  },
+  "variants": [
+    {
+      "id": "close-up",
+      "name": "Close-up",
+      "type": "image",
+      "asset": "salt-02-rake"
+    }
+  ],
+  "active_variant": "close-up"
+}

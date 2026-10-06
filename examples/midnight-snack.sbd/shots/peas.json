@@ -1,0 +1,22 @@
+{
+  "id": "peas",
+  "title": "Behind the peas",
+  "fields": {
+    "camera": "Close-up",
+    "angle": "Eye level",
+    "movement": "Zoom",
+    "lens": "50mm",
+    "transition": "Smash cut",
+    "sound": "Comedy sting",
+    "notes": "Snap zoom on Nina. Theo's grin in soft focus."
+  },
+  "variants": [
+    {
+      "id": "board",
+      "name": "Board",
+      "type": "image",
+      "asset": "fridge-07-busted"
+    }
+  ],
+  "active_variant": "board"
+}

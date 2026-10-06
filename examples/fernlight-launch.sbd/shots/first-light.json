@@ -1,0 +1,38 @@
+{
+  "id": "first-light",
+  "title": "First light",
+  "fields": {
+    "motion": "Sun orb rises slowly from the horizon, glow blooms.",
+    "easing": "Ease out",
+    "transition": "Fade in",
+    "brand_notes": "Indigo to peach. No logo yet."
+  },
+  "duration": 3,
+  "variants": [
+    {
+      "id": "layout",
+      "name": "Layout",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-dawn",
+          "asset": "fern-bg-dawn",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "ly-2-sun",
+          "asset": "fern-sun",
+          "x": 860,
+          "y": 640,
+          "width": 208,
+          "height": 200,
+          "opacity": 0.95
+        }
+      ]
+    }
+  ],
+  "active_variant": "layout"
+}

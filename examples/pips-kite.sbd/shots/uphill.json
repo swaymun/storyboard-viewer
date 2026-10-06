@@ -1,0 +1,46 @@
+{
+  "id": "uphill",
+  "title": "Up the hill",
+  "fields": {
+    "camera": "Extreme wide",
+    "action": "Pip trudges up the hill dragging the kite behind; antenna bobs on every step.",
+    "frames": 96,
+    "fx": "Wind in the grass",
+    "transition": "Fade in"
+  },
+  "variants": [
+    {
+      "id": "layout",
+      "name": "Layout",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-hill",
+          "asset": "pip-bg-hill",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "ly-2-kite",
+          "asset": "pip-kite",
+          "x": 250,
+          "y": 940,
+          "width": 157,
+          "height": 170,
+          "rotation": -60
+        },
+        {
+          "id": "ly-3-stand",
+          "asset": "pip-stand",
+          "x": 560,
+          "y": 640,
+          "width": 256,
+          "height": 320
+        }
+      ]
+    }
+  ],
+  "active_variant": "layout"
+}

@@ -1,0 +1,240 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sbd:schema:0.2:shot",
+  "title": "SBD shots/<id>.json",
+  "description": "One shot: fields, duration and visual variants. Its script lines and position live in ids.json.",
+  "type": "object",
+  "required": ["id"],
+  "properties": {
+    "id": {
+      "$ref": "#/$defs/id",
+      "description": "Must equal the file name without .json."
+    },
+    "title": {
+      "type": "string"
+    },
+    "fields": {
+      "type": "object",
+      "description": "Field values keyed by field id (see manifest shot_fields). Unknown keys are allowed (custom fields).",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "null"]
+      }
+    },
+    "duration": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Seconds. Omit to derive from lines and cues."
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "variants": {
+      "type": "array",
+      "description": "Alternative visuals for the shot (e.g. sketch, render, alternate framing).",
+      "items": {
+        "$ref": "#/$defs/variant"
+      }
+    },
+    "active_variant": {
+      "type": ["string", "null"],
+      "description": "ID of the variant shown by default. Defaults to the first variant."
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+    },
+    "variant": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "enum": ["image", "canvas"]
+        },
+        "name": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "image"
+              }
+            },
+            "required": ["type"]
+          },
+          "then": {
+            "$ref": "#/$defs/imageVariant"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "canvas"
+              }
+            },
+            "required": ["type"]
+          },
+          "then": {
+            "$ref": "#/$defs/canvasVariant"
+          }
+        }
+      ]
+    },
+    "imageVariant": {
+      "type": "object",
+      "required": ["type", "asset"],
+      "properties": {
+        "type": {
+          "const": "image"
+        },
+        "asset": {
+          "$ref": "#/$defs/id",
+          "description": "ID of an image (or video) asset."
+        }
+      }
+    },
+    "canvasVariant": {
+      "type": "object",
+      "required": ["type", "layers"],
+      "properties": {
+        "type": {
+          "const": "canvas"
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "background": {
+          "type": "string",
+          "description": "CSS color. Default transparent."
+        },
+        "preview": {
+          "$ref": "#/$defs/id",
+          "description": "Optional image asset holding a flattened render of the composition."
+        },
+        "layers": {
+          "type": "array",
+          "description": "Bottom to top (array order is z-order).",
+          "items": {
+            "$ref": "#/$defs/layer"
+          }
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "required": ["id", "asset"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "asset": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "x": {
+          "type": "number",
+          "description": "Canvas px of the layer origin (top-left before rotation). Default 0."
+        },
+        "y": {
+          "type": "number",
+          "description": "Default 0."
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Unscaled display width. Default: crop width or asset width."
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "scale_x": {
+          "type": "number",
+          "description": "Default 1. Negative flips."
+        },
+        "scale_y": {
+          "type": "number",
+          "description": "Default 1. Negative flips."
+        },
+        "rotation": {
+          "type": "number",
+          "description": "Degrees clockwise around the origin. Default 0."
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Default 1."
+        },
+        "crop": {
+          "type": "object",
+          "description": "Source rectangle in asset pixels.",
+          "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": {
+              "type": "number",
+              "minimum": 0
+            },
+            "y": {
+              "type": "number",
+              "minimum": 0
+            },
+            "width": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "height": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "blur (px), brightness, contrast, saturate (1 = unchanged), grayscale, sepia, invert (0..1), hue_rotate (deg). CSS filter semantics."
+              },
+              "value": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "Default true."
+        },
+        "locked": {
+          "type": "boolean",
+          "description": "Editor hint. Default false."
+        }
+      }
+    }
+  }
+}

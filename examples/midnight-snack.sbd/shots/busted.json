@@ -1,0 +1,22 @@
+{
+  "id": "busted",
+  "title": "Lights on",
+  "fields": {
+    "camera": "Wide",
+    "angle": "Eye level",
+    "movement": "Static",
+    "lens": "24mm",
+    "transition": "Smash cut",
+    "sound": "Light switch click",
+    "notes": "Hard cut to full light. Music stops dead."
+  },
+  "variants": [
+    {
+      "id": "board",
+      "name": "Board",
+      "type": "image",
+      "asset": "fridge-05-doorway"
+    }
+  ],
+  "active_variant": "board"
+}

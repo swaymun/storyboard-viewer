@@ -1,0 +1,19 @@
+{
+  "id": "match",
+  "title": "The match",
+  "fields": {
+    "camera": "Close-up",
+    "movement": "Static",
+    "sound": "Match strike",
+    "transition": "Cut"
+  },
+  "variants": [
+    {
+      "id": "closeup",
+      "type": "image",
+      "name": "Close-up",
+      "asset": "match"
+    }
+  ],
+  "active_variant": "closeup"
+}

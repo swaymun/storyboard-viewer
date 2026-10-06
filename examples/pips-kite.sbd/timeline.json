@@ -1,0 +1,116 @@
+{
+  "tracks": [],
+  "cues": [
+    {
+      "offset": 0,
+      "gain": 0.5,
+      "track": "sfx",
+      "label": "Wind",
+      "asset": "sfx-wind",
+      "target": {
+        "shot": "uphill"
+      },
+      "id": "c_q2fxci"
+    },
+    {
+      "track": "dialogue",
+      "label": "Today's the day. Wind speed: perfect.",
+      "asset": "01-pip-ready",
+      "target": {
+        "line": "l_924tmo67"
+      },
+      "id": "c_eyqe3y"
+    },
+    {
+      "track": "dialogue",
+      "label": "Hoo. You're holding it upside down.",
+      "asset": "02-moss-flop",
+      "target": {
+        "line": "l_iuacwwbz"
+      },
+      "id": "c_6mdfyd"
+    },
+    {
+      "offset": 1.4,
+      "gain": 0.8,
+      "track": "sfx",
+      "label": "Thud",
+      "asset": "sfx-thud",
+      "target": {
+        "shot": "flop"
+      },
+      "id": "c_pbyifm"
+    },
+    {
+      "track": "dialogue",
+      "label": "Wind doesn't care about perfect.",
+      "asset": "03-moss-moss",
+      "target": {
+        "line": "l_crm96yd7"
+      },
+      "id": "c_0a0387"
+    },
+    {
+      "track": "dialogue",
+      "label": "Let it go a little.",
+      "asset": "04-moss-moss",
+      "target": {
+        "line": "l_a0y9bntx"
+      },
+      "id": "c_hkzcju"
+    },
+    {
+      "track": "dialogue",
+      "label": "Whoa. Whoa! WHOA!",
+      "asset": "05-pip-liftoff",
+      "target": {
+        "line": "l_lfqdxqny"
+      },
+      "id": "c_4a1u7d"
+    },
+    {
+      "offset": 0,
+      "gain": 0.7,
+      "track": "sfx",
+      "label": "Wind",
+      "asset": "sfx-wind",
+      "target": {
+        "shot": "liftoff"
+      },
+      "id": "c_ymn70s"
+    },
+    {
+      "track": "dialogue",
+      "label": "It's flying!",
+      "asset": "06-pip-stars",
+      "target": {
+        "line": "l_pyww0q0e"
+      },
+      "id": "c_7obwcq"
+    },
+    {
+      "track": "dialogue",
+      "label": "No, little one. It's dancing.",
+      "asset": "07-moss-stars",
+      "target": {
+        "line": "l_1yjpiqr5"
+      },
+      "id": "c_5mb9nt"
+    },
+    {
+      "gain": 0.3,
+      "track": "music",
+      "loop": true,
+      "fade_in": 1,
+      "fade_out": 2,
+      "label": "Music box waltz (synth)",
+      "asset": "music-music-box",
+      "target": {
+        "global": {
+          "start": 0
+        }
+      },
+      "id": "c_2mg0mr"
+    }
+  ]
+}

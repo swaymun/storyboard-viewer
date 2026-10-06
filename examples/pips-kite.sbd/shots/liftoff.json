@@ -1,0 +1,46 @@
+{
+  "id": "liftoff",
+  "title": "Liftoff",
+  "fields": {
+    "camera": "Wide",
+    "action": "Pip loosens its grip; the kite catches the wind and climbs. Pip is yanked into a joyful hop.",
+    "frames": 96,
+    "fx": "Ribbon trail, grass ripples",
+    "transition": "Cut"
+  },
+  "variants": [
+    {
+      "id": "layout",
+      "name": "Layout",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-hill",
+          "asset": "pip-bg-hill",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "ly-2-kite",
+          "asset": "pip-kite",
+          "x": 1160,
+          "y": 60,
+          "width": 350,
+          "height": 380,
+          "rotation": -12
+        },
+        {
+          "id": "ly-3-jump",
+          "asset": "pip-jump",
+          "x": 520,
+          "y": 470,
+          "width": 528,
+          "height": 520
+        }
+      ]
+    }
+  ],
+  "active_variant": "layout"
+}

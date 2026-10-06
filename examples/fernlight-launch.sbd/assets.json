@@ -1,0 +1,146 @@
+{
+  "assets": [
+    {
+      "name": "Bg dawn",
+      "kind": "image",
+      "src": "media/bg-dawn.webp",
+      "mime": "image/webp",
+      "size": 8918,
+      "sha256": "65401395b42d49416de27a2bfdbc2ac42dc25e8ee6ff8fecb8edc68bb4d8d94d",
+      "width": 1280,
+      "height": 720,
+      "id": "fern-bg-dawn",
+      "category": "background",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Sun",
+      "kind": "image",
+      "src": "media/sun.webp",
+      "mime": "image/webp",
+      "size": 99956,
+      "sha256": "ec3460880560abf7284993bc35ee956de4197c9ed9fb58a66a6ef1a6dcf19715",
+      "width": 885,
+      "height": 851,
+      "id": "fern-sun",
+      "category": "logo",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Lamp",
+      "kind": "image",
+      "src": "media/lamp.webp",
+      "mime": "image/webp",
+      "size": 45188,
+      "sha256": "025d6c267b251f1537e9b68629810643f5b393d61a8a588741c877a00a49e2c8",
+      "width": 743,
+      "height": 1024,
+      "id": "fern-lamp",
+      "category": "product",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Bg day",
+      "kind": "image",
+      "src": "media/bg-day.webp",
+      "mime": "image/webp",
+      "size": 8110,
+      "sha256": "7be02984b5094b29c85d1665dfa2964838480a1a48d33ea4d0fa35cec064f0f0",
+      "width": 1280,
+      "height": 720,
+      "id": "fern-bg-day",
+      "category": "background",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Life",
+      "kind": "image",
+      "src": "media/life.webp",
+      "mime": "image/webp",
+      "size": 41742,
+      "sha256": "c3ff771e55f03ad870c9f6b86351fb91f9ce87bb3e42a92b63f44742a608f6e7",
+      "width": 1280,
+      "height": 720,
+      "id": "fern-life",
+      "category": "lifestyle",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Life evening",
+      "kind": "image",
+      "src": "media/life-evening.webp",
+      "mime": "image/webp",
+      "size": 51432,
+      "sha256": "02ccaeba2cc33467bff881f27b456442c5eaa17ca3ee772ccedc576bbd1e0b0b",
+      "width": 1280,
+      "height": 720,
+      "id": "fern-life-evening",
+      "category": "lifestyle",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "Logo",
+      "kind": "image",
+      "src": "media/logo.webp",
+      "mime": "image/webp",
+      "size": 26358,
+      "sha256": "6e7c4c311b28d3fb39e825cbe0292ee5d0a85869a9dbceedf2d1de28339ce1e7",
+      "width": 850,
+      "height": 720,
+      "id": "fern-logo",
+      "category": "logo",
+      "notes": "Generated with the Codex CLI image generation tool for this sample."
+    },
+    {
+      "name": "VOICE - full voice-over (one take)",
+      "kind": "audio",
+      "src": "media/voice-full-voice-over-one-take.mp3",
+      "mime": "audio/mpeg",
+      "size": 132536,
+      "sha256": "22e0fa8a640cc58da629b1e2e5f06698f6c94cabd36d6594133985d43e1c5346",
+      "duration": 16.507,
+      "id": "voice-full",
+      "category": "voiceover",
+      "tags": [
+        "voice"
+      ],
+      "notes": "Kokoro TTS (kokoro_mlx), voice af_nova."
+    },
+    {
+      "name": "Whoosh",
+      "kind": "audio",
+      "src": "media/whoosh.mp3",
+      "mime": "audio/mpeg",
+      "size": 6103,
+      "sha256": "3f89b086f0ea92bf7e32a6fcaf6efd4b78d71359fe9e940d7113e275c8a89a85",
+      "duration": 0.7,
+      "id": "sfx-whoosh",
+      "category": "sfx",
+      "notes": "Synthesized locally (numpy) for this sample."
+    },
+    {
+      "name": "Shimmer",
+      "kind": "audio",
+      "src": "media/shimmer.mp3",
+      "mime": "audio/mpeg",
+      "size": 16552,
+      "sha256": "50ba0559a11049c0321c57c05529afb7113e4a110392c5afa41c32b712a8dd8a",
+      "duration": 2,
+      "id": "sfx-shimmer",
+      "category": "sfx",
+      "notes": "Synthesized locally (numpy) for this sample."
+    },
+    {
+      "name": "Sunrise bed (synth pad + pluck)",
+      "kind": "audio",
+      "src": "media/sunrise-bed-synth-pad-pluck.mp3",
+      "mime": "audio/mpeg",
+      "size": 384670,
+      "sha256": "7b5fa09f66c73867a343ede498757ca1669a93b7eb586d644d8993e90805faea",
+      "duration": 32,
+      "id": "music-sunrise-bed",
+      "category": "music",
+      "notes": "Synthesized locally (numpy) for this sample. Free to reuse."
+    }
+  ]
+}

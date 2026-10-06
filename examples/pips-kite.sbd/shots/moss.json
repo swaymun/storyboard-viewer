@@ -1,0 +1,87 @@
+{
+  "id": "moss",
+  "title": "Moss",
+  "fields": {
+    "camera": "Medium close-up",
+    "action": "Moss opens one eye, then the other. Slow blink. Feathers ruffle.",
+    "frames": 120,
+    "transition": "Cut",
+    "notes": "Alternate: over Pip's shoulder looking up at Moss."
+  },
+  "variants": [
+    {
+      "id": "on-moss",
+      "name": "On Moss",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-hill",
+          "asset": "pip-bg-hill",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080,
+          "crop": {
+            "x": 700,
+            "y": 60,
+            "width": 560,
+            "height": 315
+          }
+        },
+        {
+          "id": "ly-2-moss",
+          "asset": "pip-moss",
+          "x": 900,
+          "y": 240,
+          "width": 532,
+          "height": 760
+        }
+      ]
+    },
+    {
+      "id": "over-pip-s-shoulder",
+      "name": "Over Pip's shoulder",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-hill",
+          "asset": "pip-bg-hill",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080,
+          "crop": {
+            "x": 480,
+            "y": 60,
+            "width": 800,
+            "height": 450
+          }
+        },
+        {
+          "id": "ly-2-moss",
+          "asset": "pip-moss",
+          "x": 1180,
+          "y": 120,
+          "width": 322,
+          "height": 460
+        },
+        {
+          "id": "ly-3-stand",
+          "asset": "pip-stand",
+          "x": 680,
+          "y": 420,
+          "width": 720,
+          "height": 900,
+          "scale_x": -1,
+          "filters": [
+            {
+              "type": "brightness",
+              "value": 0.75
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "active_variant": "on-moss"
+}

@@ -1,0 +1,22 @@
+{
+  "id": "judgment",
+  "title": "The judgment",
+  "fields": {
+    "camera": "Extreme close-up",
+    "angle": "Eye level",
+    "movement": "Static",
+    "lens": "85mm",
+    "transition": "Cut",
+    "sound": "Electronic eyebrow raise",
+    "notes": "One eyebrow. That's the joke."
+  },
+  "variants": [
+    {
+      "id": "board",
+      "name": "Board",
+      "type": "image",
+      "asset": "fridge-03-screen"
+    }
+  ],
+  "active_variant": "board"
+}

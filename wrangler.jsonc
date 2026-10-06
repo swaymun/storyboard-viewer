@@ -1,0 +1,10 @@
+// Hosted copy of the web app on Cloudflare Workers (static assets only, no Worker script).
+// Deploy with `pnpm deploy:web` (builds apps/web, then `npx wrangler deploy`). See CONTRIBUTING.md.
+{
+  "name": "storyboard-viewer",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "apps/web/dist",
+    "not_found_handling": "single-page-application",
+  },
+}

@@ -1,0 +1,135 @@
+{
+  "format": "sbd",
+  "format_version": "0.2.0",
+  "title": "Rating My Cat's 3 A.M. Crimes",
+  "preset": "vertical",
+  "aspect_ratio": "9:16",
+  "canvas": {
+    "width": 1080,
+    "height": 1920
+  },
+  "fps": 30,
+  "default_shot_duration": 3,
+  "categories": [
+    {
+      "id": "talent",
+      "label": "Talent / creator",
+      "kinds": [
+        "image",
+        "video"
+      ]
+    },
+    {
+      "id": "footage",
+      "label": "Footage / B-roll",
+      "kinds": [
+        "video",
+        "image"
+      ]
+    },
+    {
+      "id": "product",
+      "label": "Product",
+      "kinds": [
+        "image",
+        "video"
+      ]
+    },
+    {
+      "id": "graphics",
+      "label": "Graphics / stickers",
+      "kinds": [
+        "image"
+      ]
+    },
+    {
+      "id": "typography",
+      "label": "Typography",
+      "kinds": [
+        "font"
+      ]
+    },
+    {
+      "id": "voiceover",
+      "label": "Voice-over",
+      "kinds": [
+        "audio"
+      ]
+    },
+    {
+      "id": "music",
+      "label": "Music / trending sound",
+      "kinds": [
+        "audio"
+      ]
+    },
+    {
+      "id": "sfx",
+      "label": "Sound effect",
+      "kinds": [
+        "audio"
+      ]
+    }
+  ],
+  "shot_fields": [
+    {
+      "id": "beat",
+      "label": "Beat",
+      "type": "select",
+      "options": [
+        "Hook",
+        "Setup",
+        "Value",
+        "Twist",
+        "Payoff",
+        "Call to action"
+      ]
+    },
+    {
+      "id": "on_screen_text",
+      "label": "On-screen text",
+      "placeholder": "Wait for it…"
+    },
+    {
+      "id": "camera",
+      "label": "Framing",
+      "type": "select",
+      "options": [
+        "Selfie",
+        "Close-up",
+        "Medium",
+        "Wide",
+        "Overhead",
+        "POV",
+        "Screen recording"
+      ]
+    },
+    {
+      "id": "transition",
+      "label": "Transition",
+      "type": "select",
+      "options": [
+        "Jump cut",
+        "Cut",
+        "Whip pan",
+        "Zoom",
+        "Match cut",
+        "Hand cover",
+        "None"
+      ]
+    },
+    {
+      "id": "sound",
+      "label": "Sound / music cue"
+    },
+    {
+      "id": "notes",
+      "label": "Notes",
+      "type": "longtext"
+    }
+  ],
+  "created": "2026-10-06T08:16:32.546Z",
+  "modified": "2026-10-06T19:11:40.443Z",
+  "generator": "storyboard-viewer 0.1.0",
+  "description": "A fast vertical video (TikTok, Reels, Shorts): a sleepy creator rates the crimes her cat Biscuit committed overnight."
+}

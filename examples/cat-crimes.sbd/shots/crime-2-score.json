@@ -1,0 +1,19 @@
+{
+  "id": "crime-2-score",
+  "title": "Nine out of ten",
+  "fields": {
+    "beat": "Score",
+    "on_screen_text": "9/10 (he replied)",
+    "camera": "Selfie",
+    "transition": "Jump cut"
+  },
+  "variants": [
+    {
+      "name": "Deadpan",
+      "type": "image",
+      "asset": "cat-01-hook",
+      "id": "v_b725ge"
+    }
+  ],
+  "active_variant": "v_b725ge"
+}

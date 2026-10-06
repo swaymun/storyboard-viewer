@@ -1,0 +1,47 @@
+{
+  "name": "@storyboard-viewer/cli",
+  "version": "0.4.1",
+  "description": "The `sbd` command line: create, validate, pack and serve .sbd storyboards, plus an MCP server for agents.",
+  "license": "MIT",
+  "homepage": "https://github.com/swaymun/storyboard-viewer#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swaymun/storyboard-viewer.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/swaymun/storyboard-viewer/issues"
+  },
+  "type": "module",
+  "bin": {
+    "sbd": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "web"
+  ],
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/copy-web.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@storyboard-viewer/format": "workspace:*",
+    "playwright-core": "^1.63.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@storyboard-viewer/web": "workspace:*"
+  }
+}

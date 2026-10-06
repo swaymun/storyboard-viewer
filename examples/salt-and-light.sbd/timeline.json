@@ -1,0 +1,141 @@
+{
+  "tracks": [],
+  "cues": [
+    {
+      "in": 0.25,
+      "out": 4.156,
+      "track": "dialogue",
+      "label": "On the edge of Brannock Bay, the day s…",
+      "asset": "narrator-full",
+      "target": {
+        "line": "l_t24p5i80"
+      },
+      "id": "c_sldvbh"
+    },
+    {
+      "offset": 0,
+      "gain": 0.6,
+      "track": "sfx",
+      "label": "Waves",
+      "asset": "sfx-waves",
+      "target": {
+        "shot": "dawn"
+      },
+      "id": "c_tbvhqs"
+    },
+    {
+      "in": 4.686,
+      "out": 10.619,
+      "track": "dialogue",
+      "label": "For three hundred years, families here…",
+      "asset": "narrator-full",
+      "target": {
+        "line": "l_8vk0zzyo"
+      },
+      "id": "c_fruhyf"
+    },
+    {
+      "in": 0.25,
+      "out": 4.34,
+      "track": "dialogue",
+      "label": "My grandmother used to say salt is jus…",
+      "asset": "edda-take",
+      "target": {
+        "line": "l_81kz1abd"
+      },
+      "id": "c_3qwky0"
+    },
+    {
+      "in": 4.87,
+      "out": 8.291,
+      "track": "dialogue",
+      "label": "You can't hurry it. You can only stay …",
+      "asset": "edda-take",
+      "target": {
+        "line": "l_f6n2rngh"
+      },
+      "id": "c_lnn9h1"
+    },
+    {
+      "offset": 0,
+      "gain": 0.4,
+      "track": "sfx",
+      "label": "Waves",
+      "asset": "sfx-waves",
+      "target": {
+        "shot": "barrows"
+      },
+      "id": "c_qvtvq2"
+    },
+    {
+      "in": 11.149,
+      "out": 15.734,
+      "track": "dialogue",
+      "label": "In the nineteen fifties, more than two…",
+      "asset": "narrator-full",
+      "target": {
+        "line": "l_9d810hwb"
+      },
+      "id": "c_2ot8z7"
+    },
+    {
+      "in": 16.264,
+      "out": 18.334,
+      "track": "dialogue",
+      "label": "Today, there are eleven.",
+      "asset": "narrator-full",
+      "target": {
+        "line": "l_8egd60on"
+      },
+      "id": "c_pynkek"
+    },
+    {
+      "in": 0.25,
+      "out": 2.934,
+      "track": "dialogue",
+      "label": "People ask why I'd want a job that's t…",
+      "asset": "jonah-take",
+      "target": {
+        "line": "l_wdbybwsr"
+      },
+      "id": "c_lf7p68"
+    },
+    {
+      "in": 3.464,
+      "out": 6.349,
+      "track": "dialogue",
+      "label": "Honestly? It's the only place my phone…",
+      "asset": "jonah-take",
+      "target": {
+        "line": "l_ctf1mfm5"
+      },
+      "id": "c_bbojio"
+    },
+    {
+      "in": 18.864,
+      "out": 24.268,
+      "track": "dialogue",
+      "label": "Each evening, the harvest is raked int…",
+      "asset": "narrator-full",
+      "target": {
+        "line": "l_v6rbfkdo"
+      },
+      "id": "c_v30o7m"
+    },
+    {
+      "gain": 0.3,
+      "track": "music",
+      "loop": true,
+      "fade_in": 1,
+      "fade_out": 2,
+      "label": "Tide pad (synth ambient)",
+      "asset": "music-tide-pad",
+      "target": {
+        "global": {
+          "start": 0
+        }
+      },
+      "id": "c_60ki34"
+    }
+  ]
+}

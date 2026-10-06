@@ -1,0 +1,34 @@
+{
+  "id": "sneak",
+  "title": "The approach",
+  "fields": {
+    "camera": "Wide",
+    "angle": "Eye level",
+    "movement": "Static",
+    "lens": "24mm",
+    "transition": "Fade in",
+    "sound": "Fridge hum, sneaky pizzicato",
+    "notes": "Hold on the glow before Theo enters frame."
+  },
+  "variants": [
+    {
+      "id": "wide",
+      "name": "Wide",
+      "type": "image",
+      "asset": "fridge-01-wide"
+    },
+    {
+      "id": "high-angle",
+      "name": "High angle",
+      "type": "image",
+      "asset": "fridge-01-high"
+    },
+    {
+      "id": "silhouette",
+      "name": "Silhouette",
+      "type": "image",
+      "asset": "fridge-01-silhouette"
+    }
+  ],
+  "active_variant": "wide"
+}

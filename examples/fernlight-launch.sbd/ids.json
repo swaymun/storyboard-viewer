@@ -1,0 +1,93 @@
+{
+  "script_hash": "1e324509f1c05e",
+  "shots": [
+    {
+      "id": "first-light",
+      "lines": [
+        "l_gmil84zn"
+      ]
+    },
+    {
+      "id": "rise",
+      "lines": [
+        "l_enxedti3"
+      ]
+    },
+    {
+      "id": "reveal",
+      "lines": []
+    },
+    {
+      "id": "follows",
+      "lines": [
+        "l_osgepdl5"
+      ]
+    },
+    {
+      "id": "dims",
+      "lines": [
+        "l_0wr6wpwi"
+      ]
+    },
+    {
+      "id": "lifestyle",
+      "lines": [
+        "l_k5ez7377"
+      ]
+    },
+    {
+      "id": "logo",
+      "lines": [
+        "l_a5u2wap6"
+      ]
+    },
+    {
+      "id": "endcard",
+      "lines": []
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_gmil84zn",
+      "ordinal": 0,
+      "hash": "0f1b5c1c8302e8",
+      "text": "Every day has a shape.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_enxedti3",
+      "ordinal": 1,
+      "hash": "177f8111b4a4c9",
+      "text": "A morning that rises with you.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_osgepdl5",
+      "ordinal": 2,
+      "hash": "09d7e85eec4d7f",
+      "text": "Halo follows the sun, from first light to last.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_0wr6wpwi",
+      "ordinal": 3,
+      "hash": "173c60588ca54a",
+      "text": "Bright when you need it. Gentle when you don't.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_k5ez7377",
+      "ordinal": 4,
+      "hash": "10652e07a1d881",
+      "text": "Light that keeps time with you.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_a5u2wap6",
+      "ordinal": 5,
+      "hash": "0a8fd5dd1ed381",
+      "text": "Fernlight Halo.",
+      "type": "dialogue"
+    }
+  ]
+}

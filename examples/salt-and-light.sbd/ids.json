@@ -1,0 +1,125 @@
+{
+  "script_hash": "0da4dfda9ba99e",
+  "shots": [
+    {
+      "id": "dawn",
+      "lines": [
+        "l_36k5foh8",
+        "l_t24p5i80"
+      ]
+    },
+    {
+      "id": "rake",
+      "lines": [
+        "l_8vk0zzyo"
+      ]
+    },
+    {
+      "id": "edda",
+      "lines": [
+        "l_81kz1abd",
+        "l_f6n2rngh"
+      ]
+    },
+    {
+      "id": "barrows",
+      "lines": []
+    },
+    {
+      "id": "archive",
+      "lines": [
+        "l_9d810hwb",
+        "l_8egd60on"
+      ]
+    },
+    {
+      "id": "jonah",
+      "lines": [
+        "l_wdbybwsr",
+        "l_ctf1mfm5"
+      ]
+    },
+    {
+      "id": "dusk",
+      "lines": [
+        "l_v6rbfkdo"
+      ]
+    },
+    {
+      "id": "title",
+      "lines": []
+    }
+  ],
+  "lines": [
+    {
+      "id": "l_36k5foh8",
+      "ordinal": 0,
+      "hash": "0ad452d4151fe7",
+      "text": "EXT. BRANNOCK BAY SALT PANS - DAWN",
+      "type": "scene_heading"
+    },
+    {
+      "id": "l_t24p5i80",
+      "ordinal": 1,
+      "hash": "06b227830ab21f",
+      "text": "On the edge of Brannock Bay, the day starts before the sun does.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_8vk0zzyo",
+      "ordinal": 2,
+      "hash": "1752fc2e54fa31",
+      "text": "For three hundred years, families here have farmed the sea, one shallow pan at a time.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_81kz1abd",
+      "ordinal": 3,
+      "hash": "1016091ef41516",
+      "text": "My grandmother used to say salt is just seawater that learned patience.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_f6n2rngh",
+      "ordinal": 4,
+      "hash": "177ddb4e6b7797",
+      "text": "You can't hurry it. You can only stay out of its way.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_9d810hwb",
+      "ordinal": 5,
+      "hash": "062911eb5f2a0b",
+      "text": "In the nineteen fifties, more than two hundred people worked these flats.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_8egd60on",
+      "ordinal": 6,
+      "hash": "09d3e6f09c3308",
+      "text": "Today, there are eleven.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_wdbybwsr",
+      "ordinal": 7,
+      "hash": "07dce4c9d7122e",
+      "text": "People ask why I'd want a job that's this slow.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_ctf1mfm5",
+      "ordinal": 8,
+      "hash": "0a834267eaa7ed",
+      "text": "Honestly? It's the only place my phone doesn't work.",
+      "type": "dialogue"
+    },
+    {
+      "id": "l_v6rbfkdo",
+      "ordinal": 9,
+      "hash": "1e619920ea57f4",
+      "text": "Each evening, the harvest is raked into white hills, and the bay begins again.",
+      "type": "dialogue"
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+# Changelog
+
+All notable changes are listed here. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
+[Semantic Versioning](https://semver.org/).
+
+## [Unreleased]
+
+## [0.4.1] — 2026-10-06
+
+### Added
+
+- **Recent storyboards across ports**: `sbd serve` and `sbd mcp --serve` keep one shared list of
+  the storyboards they served in `~/.config/storyboard-viewer/recent.json` (or
+  `$XDG_CONFIG_HOME/storyboard-viewer/`, or `$SBD_CONFIG_DIR`), with the title, path, kind, when
+  and a small picture. The start screen merges it with the browser's own list (one entry per
+  storyboard, at most five), so a storyboard opened on :4442 shows on :4443 too. Opening one goes
+  to its running viewer, or starts one on the next free port. Server API: `GET /api/recent`,
+  `DELETE /api/recent[?path=]`, `PUT /api/recent/thumbnail`, `POST /api/open` (only paths on the
+  list; writes need the app's header and the same origin).
+- Span handles work from the keyboard: **Esc** then **Tab** reaches them, **←**/**→** move a
+  boundary by a word (**Alt** for a character).
+- The Fountain guide can be resized by dragging its edge (or ←/→ on it); the width is remembered.
+
+### Changed
+
+- **Compact shot cards**: existing details, tags and extra picture versions fold into one quiet
+  summary row ("7 details · 2 tags · 3 versions") in the Script view card and the Board
+  inspector; click or Enter expands them, and the choice holds for the session. The picture,
+  sound and title stay visible.
+- Span handles are easier to grab: a larger invisible hit area (18 px wide, the line's height plus
+  14 px), a resize cursor while hovering and dragging, a slightly bolder bar on hover and a focus
+  ring.
+- A shot with a sound (or details) but no picture offers **Add image** as a small row under the
+  sound instead of a large box; the large drop target stays for completely empty shots.
+- **Clearer playback**: the playing line gets a faint wash, the playing shot's words a stronger
+  tint and underline, and its words on the playing line a thin accent marker sweeping under them
+  in time (a still underline with reduced motion); nothing is marked at rest.
+- The Fountain guide pane is narrower by default (232 px instead of 300 px).
+
+## [0.4.0] — 2026-10-06
+
+### Added
+
+- **Shots on any span of text** (format 0.2): a shot can be a few words, a whole line, several
+  lines, or one of several shots inside one line (the speaker, "the cops", "the cars"). Select
+  words and press Cmd/Ctrl+Enter or the **Make shot** button that appears by the selection: one
+  action, no form. Drag the small handles at the ends of the open or hovered shot to change what
+  it covers (snaps to words, Alt for single characters, across lines); **Extend shot to
+  selection** in the context menu and the Shot menu; **Split shot here** splits at the cursor.
+- **Simple shots**: a shot can be just a picture, just a sound, or both. A card shows only what
+  the shot has: the picture (or an **Add image** drop target: click or drop a file), its sound,
+  its title. Title, details, tags and sound come from the card's **+** menu.
+- **Recent storyboards** on the start screen: the last five opened (served by `sbd serve`,
+  folders, packed files) with a small picture, where they came from and when; one click reopens
+  (folders ask for permission again, packed files open from their saved copy); remove one or
+  clear the list. File → **Open another storyboard…** reaches it from a served storyboard.
+- **Fountain syntax guide**: Help → Fountain syntax guide opens a cheat sheet in a closable pane
+  left of the script (remembered; Esc or × closes it).
+- **Screenwriting Tab**: on an empty line Tab cycles Character → Scene heading → Transition →
+  Action (Shift+Tab back); after a name or dialogue it starts a parenthetical; on action text it
+  makes capitals. It never inserts a tab and never leaves the editor; **Esc then Tab** (or
+  Ctrl+M / Shift+Alt+M on a Mac) moves focus on.
+- MCP: `add_shot` and `set_lines` take `text` (the exact words) or `start_offset` /
+  `end_offset`; new `split_shot` (at a line or inside it); `get_script`, `list_shots` and
+  `get_shot` report spans.
+- Format: `setShotSpan`, `splitShot` at an offset, span-aware `mergeShots`, `spans.ts` helpers
+  (segments, mapping through edits, carving, `locateSpan`), Fountain text positions
+  (`textOffsetToSource`, `sourceToTextOffset`).
+- The `cat-crimes` sample splits two lines into two shots each.
+
+### Changed
+
+- **Calmer shot marking**: no coloured bands or numbers in the margin. A shot's exact words get
+  a light tint and a thin underline in its colour (not the space around them), stronger on hover
+  and for the open shot; the open card is joined to its text by a thin leader line. Collapsed
+  cards are a small thumbnail and the number (and title, when there is one).
+- **Enter, Enter leaves a shot**: a line typed after a blank line below a shot is outside it; one
+  Enter (same paragraph) still continues it. Text typed right after the end of a shot's span stays
+  outside; typing inside a span grows it.
+- The hint line and the toolbar above the script are gone (the editor is the page); "Shot without
+  script text" is in the Shot menu and the context menu (and offered while a storyboard is empty).
+- Board view and printed sheets show a partial shot's words only ("…Let's rate them.").
+- A line split between shots shares its time in the animatic in proportion to the characters
+  each shot covers; a cue on the line starts with its first part.
+- Moving a shot that shares a line with another shot only changes the shot order (its text cannot
+  move without the other shot's).
+- `format_version` is `0.2.0` for new storyboards and when the first span is added; 0.1 files
+  open and validate unchanged. The JSON Schema IDs are `urn:sbd:schema:0.2:*`.
+
+### Fixed
+
+- A menu whose items are all disabled now keeps focus on its title, so Esc closes it.
+
+## [0.3.0] — 2026-10-06
+
+### Added
+
+- **Menu bar**: File, Edit, View, Shot and Help across the top, with keyboard shortcuts shown
+  (WAI-ARIA menubar: F10 to reach it, ←/→ between menus, ↓/Enter to open, Esc to close, type a
+  letter to jump). The `⋯` menu is gone: Appearance is under View, saving and exports under File.
+  Help → Keyboard shortcuts (also **?**) and About.
+- **Context menus** (right-click, Shift+F10 or the Menu key): on script lines (make shot from
+  selection/line, add to previous/next shot, remove from shot, split shot here, insert shot
+  without lines here, attach audio to line, play from here, copy line ID), on shots (bands,
+  cards, Board cards: play, add picture, insert after, duplicate, split, merge, move up/down,
+  copy shot ID, delete), on assets (use in the selected shot, rename, copy ID, delete) and on
+  Soundtrack tracks.
+- **Audio in each shot**: the shot card (and the Board inspector) has an Audio section with the
+  shot's lines and their cues, sounds on the whole shot, a compact waveform trim editor and the
+  cue's settings (plays on line/shot/story, track, gain and mute, fades, offset, loop). The fast
+  way to split one recording keeps working: click a line, P, I / O, A; the next line is selected
+  — also when it is in the next shot, whose card opens with focus on that line.
+- **Soundtrack panel** (View → Soundtrack or the playback bar): music and sounds under the whole
+  story with their trim editor, and all cues on their tracks with mute and solo (while
+  previewing), "muted in the storyboard" (saved) and track gain.
+- Free-text inputs with suggestions (`SuggestInput`) and side-by-side choices (`Segmented`).
+
+### Changed
+
+- **The Timeline tab is folded into the shots** (tabs are Story, Canvas, Assets; keys 1–3).
+  `#tab=timeline` links open the Story tab with the Soundtrack panel.
+- **Script highlighting** tints only the words of a shot's lines (no full-width line backgrounds,
+  nothing on blank lines), with a thin band in the margin. **No shot numbers in the script
+  gutter** (the number is on the card); boundary handles appear when you hover a shot.
+- **No dropdowns.** Shot details are free text; preset values (shot size, movement, transition…)
+  and values used on other shots are offered as suggestions that pop up when you focus the
+  field. The same for Add detail, tags, cue tracks, asset categories (a new name creates the
+  category) and project settings (preset, aspect ratio). Fixed choices (PDF layout, paper, video
+  quality, frame rate, field types) are shown side by side. "select" fields are now "Suggestions".
+- **Cleaner shot cards**: the title is edited in place (no second "Title" field), a smaller
+  picture, variants as a thumbnail strip (the picture shown is outlined, the default has a dot;
+  no "image" / "Active" labels), Details and Audio sections that fold, compact line controls.
+  The Board inspector got the same variant strip with tools for the picture shown.
+- Sliders (playback bar, gain, zoom, canvas opacity and filters) use theme colours: no more bright
+  white tracks in dark themes.
+- The packed-file source label reads ".sbd file" (it clashed with the File menu).
+
+### Fixed
+
+- Moving a shot card with Alt+↑/↓ (or the grip, or the menus) keeps keyboard focus on it, so
+  consecutive moves work (QA C4).
+- The save status says "Unsaved changes" as soon as you type (it said "Saved" until the typed
+  text was committed), and typed text reaches the disk sooner: commit after 0.3 s, autosave
+  0.35 s later (about 0.8 s after the last keystroke instead of about 1.2 s; QA B1). With
+  autosave on, the Save button no longer flickers in and out while typing.
+
+## [0.2.0] — 2026-10-06
+
+### Added
+
+- **Script editor with shot annotations** (Story tab → Script, the new default): the whole
+  script is one plain-text Fountain editor (CodeMirror 6) formatted as a screenplay while you
+  type. Shots are highlighted ranges of lines, Genius-style: a coloured gutter band with drag
+  handles for the first/last line, and the shot's card beside the script (picture with variant
+  carousel, title, details, tags, cues). Make shot from selection (Cmd/Ctrl+Enter), shot without
+  lines (Shift+Cmd/Ctrl+Enter), reorder by dragging cards (Alt+↑/↓ from the keyboard). Line IDs
+  survive typing; typing is one undo step per burst; agent edits merge while you type.
+- **Board view** keeps the classic cards; drag lines between shots (Alt+↑/↓), double-click a line
+  to edit it in the script.
+- **Themes**: Paper, Darkroom, Neutral Pro, Neutral Pro Light, and Maomao/Jinshi Dark/Light
+  (adapted from the MIT-licensed Apothecary Diary VS Code theme), plus System (light/dark pair of
+  your choice). ⋯ menu → Appearance; remembered per browser. New type: IBM Plex Sans/Mono and
+  Courier Prime (bundled, offline).
+- **Optional shot details**: only fields with a value are shown; "Add detail" suggests preset
+  fields or creates a new field on the spot. **Tags** on every shot (type + Enter, autocomplete,
+  remove) and a tag filter in the Story tab.
+- Format: `replaceScriptRange` (free-form edits keeping line IDs), `moveLines`,
+  `moveShotWithLines`, `placeLines`; `mergeProjects` merges scripts line by line (diff3) and shot
+  line lists as sets.
+- MCP: `move_shot` moves the shot's script lines too (`move_lines: false` keeps the old
+  order-only behaviour); `add_shot` accepts `tags`; tool descriptions explain optional fields and
+  tags.
+- Five example storyboards in `examples/` (see `examples/README.md`): a comedy short, a
+  documentary, a vertical TikTok-style video, a motion-design launch film and an animated short,
+  with generated pictures, Kokoro voices and synthesized music and sound effects.
+- README: example storyboards section with an animatic GIF; screenshots show the examples, the
+  Script and Board views; Credits section.
+- `pnpm screenshots -- --shot <id>` also uses that shot for the canvas screenshot; it now also
+  writes `board.webp`.
+
+### Changed
+
+- Reordering shots in the app keeps script order and shot order the same (lines move).
+- The per-line editor and the "Add line" composer (type dropdown) were replaced by the script
+  editor.
+- Agent script edits no longer conflict with a user editing other lines of the script.
+- Every UI color comes from theme tokens; print sheets stay black on white.
+
+### Fixed
+
+- Vertical (9:16) storyboards: the animatic frame no longer overflows the window, and the Story
+  tab shows portrait frames at a scannable size.
+
+## [0.1.0] — 2026-10-06
+
+First public version.
+
+### Format
+
+- `.sbd` format 0.1.0 ([SPEC.md](SPEC.md), JSON Schemas in `schema/`): folder and packed (zip)
+  forms, Fountain script with stable line IDs, shots with image and canvas variants, assets
+  (embedded, linked, remote/HLS), timeline cues with trimming, fades and loops.
+- Presets: Blank, Film / Short, Documentary, Animation, Motion / Brand, Short-form vertical (9:16).
+
+### App
+
+- Story, Canvas, Timeline and Assets tabs; animatic playback with mixed sound.
+- Editing with undo/redo, autosave, live refresh and merging of agent edits with unsaved changes.
+- New storyboard flow with preset picker.
+- Exports: PDF storyboard sheets (print view), animatic video (MP4/WebM, WebCodecs), Fountain
+  script, packed `.sbd`, folder.
+- HLS (`.m3u8`) playback via hls.js where the browser has no native support.
+- Works offline (installable PWA).
+
+### Command line and agents
+
+- `sbd` commands: `new`, `validate`, `pack`, `unpack`, `import-fountain`, `export-fountain`,
+  `import-storyboarder`, `export-pdf`, `clean`, `serve`, `mcp`.
+- MCP server with tools to open, inspect and edit storyboards, attach media and timing, validate,
+  and get the viewer link; `--serve` runs the viewer in the same process (next free port if 4400
+  is taken).
+- Copy-paste setup prompt for Claude Code and Codex, `AGENTS.md`, optional agent skill.

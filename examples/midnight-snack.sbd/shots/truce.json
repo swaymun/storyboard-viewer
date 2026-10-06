@@ -1,0 +1,28 @@
+{
+  "id": "truce",
+  "title": "Truce",
+  "fields": {
+    "camera": "Wide",
+    "angle": "Low, floor level",
+    "movement": "Static",
+    "lens": "24mm",
+    "transition": "Fade out",
+    "sound": "Fridge hum, music returns",
+    "notes": "Warm. They are a team now."
+  },
+  "variants": [
+    {
+      "id": "floor-level",
+      "name": "Floor level",
+      "type": "image",
+      "asset": "fridge-08-floor"
+    },
+    {
+      "id": "overhead",
+      "name": "Overhead",
+      "type": "image",
+      "asset": "fridge-08-overhead"
+    }
+  ],
+  "active_variant": "floor-level"
+}

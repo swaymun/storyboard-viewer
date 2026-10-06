@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sbd:schema:0.2:timeline",
+  "title": "SBD timeline.json",
+  "description": "Media cues: which (part of which) audio/video asset plays against which line, shot, range or the whole story.",
+  "type": "object",
+  "required": ["cues"],
+  "properties": {
+    "tracks": {
+      "type": "array",
+      "description": "Optional track settings. Cues may use track labels not listed here.",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string" },
+          "gain": { "type": "number", "minimum": 0 },
+          "muted": { "type": "boolean" }
+        }
+      }
+    },
+    "cues": { "type": "array", "items": { "$ref": "#/$defs/cue" } }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$" },
+    "cue": {
+      "type": "object",
+      "required": ["id", "asset", "target"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "asset": { "$ref": "#/$defs/id", "description": "Audio or video asset ID." },
+        "in": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Source start in seconds. Default 0."
+        },
+        "out": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Source end in seconds. Default: end of the asset."
+        },
+        "target": {
+          "description": "What the cue is attached to.",
+          "oneOf": [
+            {
+              "type": "object",
+              "required": ["line"],
+              "properties": { "line": { "$ref": "#/$defs/id" } }
+            },
+            {
+              "type": "object",
+              "required": ["shot"],
+              "properties": { "shot": { "$ref": "#/$defs/id" } }
+            },
+            {
+              "type": "object",
+              "required": ["range"],
+              "properties": {
+                "range": {
+                  "type": "array",
+                  "prefixItems": [{ "$ref": "#/$defs/id" }, { "$ref": "#/$defs/id" }],
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "description": "[first line ID, last line ID] (inclusive)."
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": ["global"],
+              "properties": {
+                "global": {
+                  "type": "object",
+                  "properties": {
+                    "start": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Seconds from story start. Default 0."
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "offset": {
+          "type": "number",
+          "description": "Seconds after the target starts. Default 0."
+        },
+        "gain": { "type": "number", "minimum": 0, "description": "Linear volume. Default 1." },
+        "track": {
+          "type": "string",
+          "description": "Free label for mixing/muting: dialogue, music, sfx, video..."
+        },
+        "fade_in": { "type": "number", "minimum": 0 },
+        "fade_out": { "type": "number", "minimum": 0 },
+        "loop": {
+          "type": "boolean",
+          "description": "Loop the [in, out] segment (global cues). Default false."
+        },
+        "label": { "type": "string" }
+      }
+    }
+  }
+}

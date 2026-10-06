@@ -1,0 +1,56 @@
+{
+  "id": "climb",
+  "title": "Maya reaches the top",
+  "fields": {
+    "camera": "Medium wide",
+    "movement": "Handheld",
+    "angle": "Low",
+    "notes": "Canvas variant: arrange Maya and the matchbox."
+  },
+  "variants": [
+    {
+      "id": "layout",
+      "type": "canvas",
+      "name": "Layout",
+      "width": 1280,
+      "height": 720,
+      "background": "#1b1f2b",
+      "layers": [
+        {
+          "id": "bg",
+          "asset": "lantern-room",
+          "name": "Background",
+          "x": 0,
+          "y": 0,
+          "scale_x": 2,
+          "scale_y": 2
+        },
+        {
+          "id": "maya",
+          "asset": "maya",
+          "name": "Maya",
+          "x": 520,
+          "y": 150,
+          "scale_x": 1.6,
+          "scale_y": 1.6
+        },
+        {
+          "id": "box",
+          "asset": "matchbox",
+          "name": "Matchbox",
+          "x": 860,
+          "y": 430,
+          "rotation": -12,
+          "opacity": 0.95,
+          "filters": [
+            {
+              "type": "brightness",
+              "value": 1.1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "active_variant": "layout"
+}

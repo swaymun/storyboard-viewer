@@ -1,0 +1,61 @@
+{
+  "id": "stars",
+  "title": "Dancing",
+  "fields": {
+    "camera": "Extreme wide",
+    "action": "Pip and Moss sit side by side. The kite dances among the stars.",
+    "frames": 168,
+    "fx": "Twinkling stars",
+    "transition": "Fade out"
+  },
+  "variants": [
+    {
+      "id": "color-key",
+      "name": "Color key",
+      "type": "image",
+      "asset": "pip-key-final"
+    },
+    {
+      "id": "layout",
+      "name": "Layout",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-night",
+          "asset": "pip-bg-night",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "ly-2-kite",
+          "asset": "pip-kite",
+          "x": 1080,
+          "y": 90,
+          "width": 221,
+          "height": 240,
+          "rotation": 10
+        },
+        {
+          "id": "ly-3-stand",
+          "asset": "pip-stand",
+          "x": 880,
+          "y": 700,
+          "width": 240,
+          "height": 300,
+          "scale_x": -1
+        },
+        {
+          "id": "ly-4-moss",
+          "asset": "pip-moss",
+          "x": 880,
+          "y": 690,
+          "width": 210,
+          "height": 300
+        }
+      ]
+    }
+  ],
+  "active_variant": "color-key"
+}

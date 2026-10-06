@@ -1,0 +1,26 @@
+{
+  "id": "lifestyle",
+  "title": "At home",
+  "fields": {
+    "motion": "Live action. Slow dolly left past the desk.",
+    "easing": "Linear",
+    "transition": "Dissolve",
+    "brand_notes": "Morning version is the hero; evening is the alternate."
+  },
+  "duration": 3,
+  "variants": [
+    {
+      "id": "morning",
+      "name": "Morning",
+      "type": "image",
+      "asset": "fern-life"
+    },
+    {
+      "id": "evening",
+      "name": "Evening",
+      "type": "image",
+      "asset": "fern-life-evening"
+    }
+  ],
+  "active_variant": "morning"
+}

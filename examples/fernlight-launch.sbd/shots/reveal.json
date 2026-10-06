@@ -1,0 +1,38 @@
+{
+  "id": "reveal",
+  "title": "Hero reveal",
+  "fields": {
+    "on_screen_text": "Halo",
+    "motion": "Background crossfades dawn to day. Hero lamp centered, slow 3% scale up.",
+    "easing": "Ease in-out",
+    "transition": "Dissolve",
+    "brand_notes": "Hero angle. Ring at full brightness."
+  },
+  "duration": 3,
+  "variants": [
+    {
+      "id": "hero",
+      "name": "Hero",
+      "type": "canvas",
+      "layers": [
+        {
+          "id": "ly-1-bg-day",
+          "asset": "fern-bg-day",
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "id": "ly-2-lamp",
+          "asset": "fern-lamp",
+          "x": 626,
+          "y": 90,
+          "width": 668,
+          "height": 920
+        }
+      ]
+    }
+  ],
+  "active_variant": "hero"
+}
