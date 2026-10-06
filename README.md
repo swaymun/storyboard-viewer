@@ -30,21 +30,26 @@ cloud: your storyboards are ordinary files on your computer.
 
 - **Watch your agent work.** Its changes show up in the viewer within a second.
 - **Script first.** Write like in a screenwriting app; select some words and press **Make shot**.
-- **Pictures and sound per shot.** Layers on a canvas, alternate versions, voice clips per line.
+- **Pictures and sound per shot.** Alternate versions, voice clips per line, and a canvas with
+  ready-made layouts (split screen, picture-in-picture, caption band…), captions in a few styles,
+  and TikTok / Reels / Shorts safe zones for vertical video.
 - **Play it as an animatic.** Press Space to play the story with voice, music and effects.
 - **Export.** PDF storyboard sheets, an MP4 animatic, the script, or one `.sbd` file to share.
 - **Import.** [Fountain](https://fountain.io) scripts and
   [Storyboarder](https://wonderunit.com/storyboarder/) scenes.
-- **Works offline,** with eight light and dark themes, and full keyboard support.
+- **Works offline,** with eight light and dark themes, full keyboard support, and short guided
+  tours (Help → Guided tours).
+- **Saves where it came from:** folders, `sbd serve` and (in Chrome and Edge) `.sbd` files save
+  back into the same place.
 
-|                                                                              |                                                                               |
-| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| ![Story tab, Script view](docs/images/story-light.webp)                      | ![Story tab, Board view](docs/images/board.webp)                              |
-| **Script** — write the script; shots are marked on their words.              | **Board** — the classic storyboard: one card per shot, script beside picture. |
-| ![Canvas tab](docs/images/canvas.webp)                                       | ![Assets tab](docs/images/assets.webp)                                        |
-| **Canvas** — arrange pictures in layers: move, scale, rotate, crop, filters. | **Assets** — all images, sounds, videos and fonts, sorted into categories.    |
-| ![A shot's Audio section](docs/images/audio.webp)                            | ![PDF export](docs/images/pdf.webp)                                           |
-| **Audio** — each shot's sound; cut one recording into pieces, one per line.  | **Print / PDF** — storyboard sheets with 3, 6, 9 or 12 shots per page.        |
+|                                                                             |                                                                               |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| ![Story tab, Script view](docs/images/story-light.webp)                     | ![Story tab, Board view](docs/images/board.webp)                              |
+| **Script** — write the script; shots are marked on their words.             | **Board** — the classic storyboard: one card per shot, script beside picture. |
+| ![Canvas tab](docs/images/canvas.webp)                                      | ![Assets tab](docs/images/assets.webp)                                        |
+| **Canvas** — layouts with slots, captions, safe zones; align, group, zoom.  | **Assets** — all images, sounds, videos and fonts, sorted into categories.    |
+| ![A shot's Audio section](docs/images/audio.webp)                           | ![PDF export](docs/images/pdf.webp)                                           |
+| **Audio** — each shot's sound; cut one recording into pieces, one per line. | **Print / PDF** — storyboard sheets with 3, 6, 9 or 12 shots per page.        |
 
 ## Try it now
 
@@ -128,6 +133,7 @@ Then just say what you want, in your own words:
 - "Turn this script into a storyboard, one shot per paragraph." _(paste it, or point to a file)_
 - "Attach `~/Downloads/vo.mp3` and split it across the lines of shots 1 to 4."
 - "Add quiet background music under the whole story, with a fade-out at the end."
+- "Make shot 3 a split screen with the two reaction photos and a bold caption on top."
 - "Check the storyboard for problems, fix what you can, and export a PDF with six shots per page."
 
 The agent can't _draw_ by itself, but it can place pictures you give it (or ones made with an
@@ -166,8 +172,9 @@ Everything in them is made up; all pictures and sounds were generated for this p
 | Right-click or **Shift+F10**          | Commands for a script line, shot or asset |
 | **?**                                 | All keyboard shortcuts                    |
 
-The [user guide](docs/GUIDE.md) explains everything else: the script editor, shots, audio,
-saving, the recent list, themes and the `sbd` command.
+The [user guide](docs/GUIDE.md) explains everything else: the script editor, shots, the canvas
+(layouts, captions, safe zones, shortcuts), audio, saving, the recent list, themes and the `sbd`
+command.
 
 ## The .sbd file, in plain words
 
@@ -228,7 +235,7 @@ The connection becomes active in a new chat. Start a new session, or check with
 Ask your agent "Update Storyboard Viewer", or run `git pull && pnpm install && pnpm build` in the
 project folder. The browser app updates itself.
 
-More answers (read-only files, safety) are in the [user guide](docs/GUIDE.md#more-questions).
+More answers (packed files, safety) are in the [user guide](docs/GUIDE.md#more-questions).
 Found a bug or have an idea? [Open an issue](https://github.com/swaymun/storyboard-viewer/issues).
 Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md) and the
 [Code of Conduct](CODE_OF_CONDUCT.md).
@@ -240,8 +247,9 @@ Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md) and the
   Matheus Montemurro, used under the MIT License (Copyright (c) 2025 Matheus Montemurro; the full
   notice is in [`apps/web/src/themes.css`](apps/web/src/themes.css)). It is a fan-made, unofficial
   work inspired by the anime; names and characters belong to their respective owners.
-- Fonts: [IBM Plex Sans and Mono](https://github.com/IBM/plex) and
-  [Courier Prime](https://quoteunquoteapps.com/courierprime/) (SIL Open Font License), bundled via
+- Fonts: [IBM Plex Sans and Mono](https://github.com/IBM/plex),
+  [Courier Prime](https://quoteunquoteapps.com/courierprime/) and
+  [Montserrat](https://github.com/JulietaUla/Montserrat) (SIL Open Font License), bundled via
   Fontsource.
 - Built with [Svelte](https://svelte.dev), [Konva](https://konvajs.org) (MIT),
   [CodeMirror](https://codemirror.net) (MIT), [fflate](https://github.com/101arrowz/fflate)

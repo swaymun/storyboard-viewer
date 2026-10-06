@@ -29,6 +29,13 @@ the result live in the viewer.
 - **Reorder:** `move_shot { shot_id, index }` moves the shot's script lines too, so the script
   reads in shot order (`move_lines: false` = order only).
 - **Picture for a shot:** `add_asset { path }` then `add_variant { shot_id, asset_id }`.
+- **Layouts and captions (vertical video):** `list_layouts`, then
+  `apply_layout { shot_id, layout: "split", images: [assetA, assetB] }` (split, picture-in-picture,
+  caption-band, three-stack, talking-head-broll, full-bleed; two-up, lower-third, title-card for
+  16:9) and `add_text_layer { shot_id, text, style: "bold", position: "top" }` (styles bold,
+  boxed, lower-third, title, subtitle). Fill an empty slot with `fill_slot { shot_id, slot: "Bottom", asset_id }`;
+  change layers with `update_layer` / `remove_layer`. Keep captions out of the bottom fifth and
+  the right edge of 9:16 frames (the apps' buttons and captions sit there).
 - **One voice-over split across lines:** `add_asset { path: "vo.mp3" }`, then for each line
   `add_cue { asset_id, line_id, in, out, track: "dialogue" }` (seconds inside the recording).
 - **Background music:** `add_cue { asset_id, global_start: 0, track: "music", gain: 0.4, loop: true }`.

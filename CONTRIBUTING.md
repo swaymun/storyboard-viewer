@@ -51,6 +51,7 @@ packages/format/     @storyboard-viewer/format — browser-safe core
   src/project.ts       load/serialize a project, derived views
   src/ops.ts           pure edit operations (used by the app, the server and MCP)
   src/spans.ts         shots on part of a line: segments, mapping through edits, carving
+  src/layouts.ts       canvas layouts, slots (fill / fit), caption styles
   src/merge.ts         three-way merge (agent edits + unsaved app edits)
   src/animatic.ts      playback timing shared by player and exports
   src/validate.ts      schema + reference checks
@@ -72,6 +73,9 @@ apps/web/            Svelte 5 PWA (no SvelteKit)
   src/lib/shot-actions.ts   shot commands shared by cards, context menus and the Shot menu
   src/lib/script-editor/    the script editor: shot marks and handles, Tab keys, actions
   src/lib/animatic-export.ts  WebCodecs video export (Mediabunny, lazy-loaded)
+  src/lib/konva-editor.ts   the canvas editor (selection, snapping, zoom); arrange.ts, safe-zones.ts
+  src/lib/text-render.ts    text layers, drawn the same way in every renderer
+  src/lib/tours.ts          guided tours (steps point at data-tour="…" hooks); tooltip.ts
 e2e/                 Playwright tests (two `sbd serve` instances on temp copies + a static server)
 examples/            sample storyboards
 scripts/             example/fixture/screenshot generators
@@ -103,6 +107,9 @@ More background and the decisions behind them are in [PLAN.md](PLAN.md).
   command lists (e.g. `shotMenuItems`) instead of building new ones.
 - **Keyboard and themes.** Everything works from the keyboard (focus stays on the thing you
   moved); colours come from theme tokens only (`themes.test.ts` checks).
+- **Explain icons.** Icon-only buttons get `{@attach tooltip('What it does', 'shortcut')}` (not
+  `title`). New UI that a tour mentions gets a stable `data-tour="…"` hook; keep
+  `lib/tours.ts` in step (`tours.test.ts` and `e2e/tours.spec.ts` check every target).
 
 ## Pull requests
 

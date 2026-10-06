@@ -1,6 +1,6 @@
-# SBD — Storyboard Document format, v0.2
+# SBD — Storyboard Document format, v0.3
 
-Status: **draft 0.2.0** (2026-10-06; 0.1.0 files stay valid, see §10). The format is used by Storyboard Viewer, the `sbd` CLI and its
+Status: **draft 0.3.0** (2026-10-06; 0.1.0 and 0.2.0 files stay valid, see §10). The format is used by Storyboard Viewer, the `sbd` CLI and its
 MCP server. It is content-agnostic: film, documentary, animation, short-form social video, motion
 design and brand work all use the same structure.
 
@@ -26,7 +26,11 @@ meaning.
 | **Unpacked** | a folder `story.sbd/` | editing (agents, CLI, git, hand edits)     |
 | **Packed**   | a file `story.sbd`    | sharing, opening in the browser, archiving |
 
-Both contain the same tree. `sbd pack` and `sbd unpack` convert between them losslessly.
+Both contain the same tree. `sbd pack` and `sbd unpack` convert between them losslessly. Tools may
+edit either form; a tool that saves a packed file in place should write the new zip to a temporary
+file next to it and rename it over the old one (so readers never see a half-written file), keep
+media STOREd, and keep a backup of the previous version (the reference tools keep the version from
+before their first save as `<file>.bak`).
 
 ### Packed layout (zip)
 
@@ -73,7 +77,7 @@ file name. IDs are unique within their kind (variant and layer IDs within their 
 ```json
 {
   "format": "sbd",
-  "format_version": "0.2.0",
+  "format_version": "0.3.0",
   "title": "The Keeper's Light",
   "preset": "film",
   "aspect_ratio": "16:9",
@@ -91,7 +95,7 @@ file name. IDs are unique within their kind (variant and layer IDs within their 
 | Field                                | Meaning                                                                                                                                         |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `format`                             | always `"sbd"`                                                                                                                                  |
-| `format_version`                     | semver of this spec the file follows (`0.2.0`; `0.1.0` files are read as they are)                                                              |
+| `format_version`                     | semver of this spec the file follows (`0.3.0`; `0.1.0` and `0.2.0` files are read as they are)                                                  |
 | `title`                              | required                                                                                                                                        |
 | `description`, `authors`, `language` | optional metadata (`language` is BCP 47)                                                                                                        |
 | `preset`                             | which preset created the project (§11); informational                                                                                           |
@@ -260,24 +264,83 @@ writing on starts outside it; text typed at the end of a whole-line shot's line 
 ### Layers
 
 Layers are drawn **in array order, first = bottom** (z-order is the array order). Attributes follow
-Konva's `Image` node, so editors can map them 1:1:
+Konva's `Image` node, so editors can map them 1:1. A layer's `kind` (format 0.3) says what it draws:
+
+| `kind`             | Draws                                                    | Needs           |
+| ------------------ | -------------------------------------------------------- | --------------- |
+| `image` or omitted | an image or video asset (every 0.1/0.2 layer)            | `asset`         |
+| `text`             | on-screen text: captions, titles, hooks                  | `text`          |
+| `slot`             | nothing in a finished frame: an empty, named placeholder | `width, height` |
+
+Readers skip layers of a `kind` they do not know (validators warn).
+
+Common fields:
 
 | Field                | Default                    | Meaning                                                            |
 | -------------------- | -------------------------- | ------------------------------------------------------------------ |
-| `id`, `asset`        | required                   | image (or video) asset                                             |
-| `name`               | asset name                 | label in layer lists                                               |
+| `id`                 | required                   |                                                                    |
+| `name`               | asset name / text          | label in layer lists (a slot's name, e.g. "Top", "B-roll")         |
 | `x`, `y`             | 0                          | position of the layer origin (top-left before rotation), canvas px |
-| `width`, `height`    | crop size, else asset size | unscaled display size                                              |
+| `width`, `height`    | crop size, else asset size | unscaled display size (text: `width` is the wrap width)            |
 | `scale_x`, `scale_y` | 1                          | negative flips                                                     |
 | `rotation`           | 0                          | degrees clockwise around the origin                                |
 | `opacity`            | 1                          | 0…1                                                                |
-| `crop`               | none                       | `{x, y, width, height}` source rectangle in asset pixels           |
-| `filters`            | none                       | list of `{type, value}`; see below                                 |
 | `visible`, `locked`  | true, false                | `locked` is an editor hint                                         |
+| `group`              | none                       | (0.3) layers with the same group ID belong together                |
+
+**Image layers:** `asset` (image or video), `crop` = `{x, y, width, height}` source rectangle in
+asset pixels, `filters` (below), and (0.3) `slot` when the picture was fitted into a layout slot.
 
 Filters use **CSS filter semantics**: `blur` (px), `brightness`, `contrast`, `saturate`
 (1 = unchanged), `grayscale`, `sepia`, `invert` (0…1), `hue_rotate` (degrees). Renderers ignore
 unknown filter types (validators warn). Freehand drawing is out of scope.
+
+**Text layers (0.3):** the box's top-left is `x`/`y` and its width `width`; lines wrap inside it
+and the height follows from the lines. `rotation`, `scale_*` and `opacity` apply as for images.
+
+| Field                 | Default         | Meaning                                                                                                                                 |
+| --------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `text`                | required        | the text; `\n` starts a new line                                                                                                        |
+| `font`                | `IBM Plex Sans` | font family. Apps should ship the families they offer (the reference app ships IBM Plex Sans, Montserrat, Courier Prime, IBM Plex Mono) |
+| `font_asset`          | none            | a `font` asset to use instead of `font`                                                                                                 |
+| `font_size`           | 64              | canvas px                                                                                                                               |
+| `font_weight`         | 400             | 100–900                                                                                                                                 |
+| `italic`, `uppercase` | false           |                                                                                                                                         |
+| `color`               | `#ffffff`       | CSS color                                                                                                                               |
+| `align`               | `center`        | `left`, `center`, `right`                                                                                                               |
+| `line_height`         | 1.2             | multiple of `font_size`                                                                                                                 |
+| `stroke`              | none            | `{color, width}` outline outside the glyphs (canvas px)                                                                                 |
+| `shadow`              | none            | `{color, blur?, offset_x?, offset_y?}`                                                                                                  |
+| `box`                 | none            | `{color, padding?, radius?}`: a box behind each line (padding default 0.3 × size, radius 0.2 × size)                                    |
+| `style`               | none            | the caption style it was made from (`bold`, `boxed`, `lower-third`, `title`, `subtitle`); informational                                 |
+
+**Slots (0.3)** come from layouts: named placeholders for pictures. An **empty slot** is a layer
+`{ "kind": "slot", "name": "Top", "x", "y", "width", "height", "fit"? }`. Editors show it as a
+labeled box; finished frames (cards, animatic, PDF, video) do not draw it. A **filled slot** is
+an ordinary image layer whose `x/y/width/height/crop` already place the picture (so 0.1/0.2
+readers draw it correctly), plus `slot`:
+
+```json
+{
+  "id": "top",
+  "asset": "cat-02-glass",
+  "x": 0,
+  "y": 0,
+  "width": 1080,
+  "height": 960,
+  "crop": { "x": 0, "y": 320, "width": 720, "height": 640 },
+  "slot": { "x": 0, "y": 0, "width": 1080, "height": 960, "name": "Top" }
+}
+```
+
+`slot` = the slot's frame in canvas px, its `name`, and `fit`: `cover` (default — fill the
+frame, cropping the overflow, centered) or `contain` (the whole picture, centered, letterboxed).
+Editors re-fit the picture from `slot` (Fit / Fill, moving or resizing the slot) and turn it back
+into an empty slot when the picture is removed.
+
+**Groups (0.3)** are a shared `group` ID on layers (no nesting, no separate group object): editors
+select, move and duplicate the members together; rendering is unchanged, so readers that ignore
+`group` draw the same frame. A group of one is not a group.
 
 ## 7. assets.json
 
@@ -411,6 +474,16 @@ Shots play back to back in `ids.json` order.
   unknown fields they read.
 - Readers should warn (not fail) on a newer major version and still show what they understand.
 
+### 0.2 → 0.3
+
+- New, all optional: layer `kind` (`text`, `slot`), the text fields, `slot` on image layers, and
+  `group` (§6). Layers without `kind` are image layers exactly as before.
+- **0.1 and 0.2 files are valid 0.3 files.** Tools write `format_version` `0.3.0` when they
+  create a project or first use one of these features.
+- A 0.2 reader opening a 0.3 file draws image layers (filled slots included) correctly. It does
+  not understand text and empty slot layers: their `asset` is missing, so it reports them as
+  errors; that is why the version changes.
+
 ### 0.1 → 0.2
 
 - New: optional `start` / `end` on `ids.json` shots (character spans, §5). Nothing else changed.
@@ -438,12 +511,13 @@ restricted afterwards.
 `sbd validate` (and the MCP `validate` tool) report:
 
 - **errors** — schema violations; unknown asset/line/shot/variant IDs; duplicate IDs; a variant or
-  layer using an audio asset; cues on images; `out ≤ in`; embedded files missing from `media/`;
+  layer using an audio asset; an image layer without `asset`; a text layer's `font_asset` that is
+  missing or not a font; cues on images; `out ≤ in`; embedded files missing from `media/`;
   missing linked files; shot files missing; a span `start` / `end` not on the shot's first / last
   line (`span-line`); a span that ends before it starts (`span-empty`).
 - **warnings** — formats outside the browser-safe list; absolute `file:` links; `http://` URLs;
   shared lines and overlapping spans (`shared-line`); span offsets past the end of their line
-  (`span-offset`); orphan shot files; unknown filters; cues past the end of their media; zip
+  (`span-offset`); orphan shot files; unknown filters; unknown layer kinds; cues past the end of their media; zip
   layout problems.
 - **info** — custom fields and categories; the script was re-anchored.
 

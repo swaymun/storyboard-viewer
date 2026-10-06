@@ -6,6 +6,57 @@ All notable changes are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-10-06
+
+### Added
+
+- **Layouts for the canvas.** Start a canvas from a layout that fits the frame, or re-arrange an
+  existing one (**Layout**): vertical 9:16 — full bleed, split top / bottom, picture in picture,
+  bottom caption band, three stacked frames, talking head + B-roll; 16:9 — full frame, two-up,
+  lower third, title card; plus layouts for 1:1 and 4:5. Layouts place named **slots**: drop a
+  picture on a slot to fill it (cover, or **Fit in slot**). Empty slots show only while editing.
+- **Text layers**: captions, hooks and titles typed right on the frame, with caption styles
+  (Bold short-form captions with an outline, Boxed, Lower third, Title, Subtitle), bundled fonts
+  (IBM Plex Sans, Montserrat, Courier Prime, IBM Plex Mono, or the storyboard's own font
+  assets), size, weight, alignment, color swatches, outline, shadow and box. They look the same
+  in the editor, the cards, the animatic, video export and PDF.
+- **Platform safe zones** for vertical video: TikTok, Reels and Shorts show (approximately) where
+  their buttons, captions and top bars cover the picture, next to the title / action safe areas.
+- **Selecting and arranging**: Shift- or Cmd/Ctrl-click and drag a box to select several layers,
+  Cmd/Ctrl+A, Esc; move, resize and rotate them together; align (to the selection or the frame),
+  distribute, **group / ungroup** (Cmd/Ctrl+G), duplicate (Cmd/Ctrl+D or Alt-drag), Fit / Fill /
+  Center, and exact X / Y / W / H / rotation fields.
+- **Snap to guides** shows what a drag snapped to (frame edge or center, safe area, platform
+  zone, another layer, a slot); hold Cmd/Ctrl to move freely.
+- **Zoom** (Cmd/Ctrl+ +/−/0, 100 %, Fit) and panning (scroll, Space-drag) on the canvas.
+- **Layer list**: hide, lock and delete (×) on every row, drag rows (or Alt+↑/↓) to reorder,
+  group headers; Delete / Backspace removes the selection; everything can be undone.
+- **Guided tours** (Help → Guided tours): Getting started, Script & shots, Canvas & layouts,
+  Assets, Audio & soundtrack, Working with your AI agent. The first visit offers Getting started
+  once. Keyboard: → / ← / Esc.
+- **Tooltips** with keyboard shortcuts on icon buttons across the app (also on keyboard focus).
+- A one-time hint strip the first time you use the canvas.
+- **Save in place for `.sbd` files**: in Chrome and Edge, a `.sbd` opened with **Open .sbd file**
+  (or dropped on the start screen, or opened from the installed app) saves — and autosaves — back
+  into the same file, and reopens from the recent list. Safari and Firefox download a copy and
+  say so.
+- MCP tools `list_layouts`, `apply_layout`, `fill_slot`, `add_text_layer`, `add_layer`,
+  `update_layer`, `remove_layer` and `update_variant`; `add_variant` accepts text and slot
+  layers. The cat-crimes example uses layouts with captions.
+
+### Changed
+
+- **Packed `.sbd` files are editable under `sbd serve` and through the MCP tools.** Every save
+  re-packs the file atomically (written next to it, then renamed over it; media stay STOREd),
+  and the version from before the first save of a session is kept as `<file>.bak`. The
+  "read-only" mode and its "How to edit" notice are gone.
+- With the **Animatic** open, the **Soundtrack** (track lanes with cues, playhead, mute / solo /
+  volume) shows directly under the animatic's picture.
+- Snapping is called **Snap to guides**; the canvas toolbar buttons have labels.
+- **Format 0.3** (SPEC §6, §10): layers may have `kind` `text` or `slot`, text fields, a `slot`
+  frame on pictures fitted into a slot, and a `group` ID. 0.1 and 0.2 files stay valid; a
+  project becomes 0.3.0 only when it uses one of these.
+
 ### Fixed
 
 - **Live refresh on Linux**: `sbd serve` missed the second agent (MCP) edit of the same file, so

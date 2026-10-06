@@ -28,7 +28,7 @@ Mobile/iOS, accounts/sign-in, sync/remote connections, freehand drawing, video e
 | ---------------- | -------------------------------------------------------------------------------------- |
 | UI               | Svelte 5 + TypeScript + Vite (no SvelteKit)                                            |
 | Offline          | `vite-plugin-pwa` (Workbox)                                                            |
-| Canvas           | Konva (MIT)                                                                            |
+| Canvas           | Konva (MIT); in-house guided tours and tooltips (0.5.0)                                |
 | Zip              | `fflate`                                                                               |
 | Fountain         | Small in-house line-oriented parser (`packages/format/src/fountain.ts`), decided in M0 |
 | Schema           | JSON Schema (source of truth) → TS types                                               |
@@ -212,7 +212,7 @@ pnpm fixture:storyboarder  # regenerate the Storyboarder test fixture (ffmpeg fo
 - **Script edit ops are ID-exact.** `insert_lines`, `update_line`, `remove_lines` map lines by position around the edit (verified by text) instead of similarity; `set_script` uses re-anchoring. Insertions are always new paragraphs (after/before the paragraph of a line) so Fountain block structure stays valid; removing all dialogue of a cue removes the cue line too.
 - **Edits are rejected only for new errors.** `ProjectStore.edit` compares issues before/after so a project with an existing problem can still be edited; every edit loads fresh from disk (hand edits are never overwritten) and writes changed files atomically (temp + rename), touching `manifest.modified`.
 - **Live refresh = fs.watch (recursive) + 120 ms debounce → SSE.** Native recursive watching on macOS/Windows; on Linux one non-recursive watch per folder instead (Node ≤ 22 emulates `recursive` with per-file inotify watches that go stale when a file is replaced by an atomic rename, so the second agent write to the same file was missed). Same-process edits notify directly and suppress their watcher echo. Folder sources opened in the browser poll every 2 s (no FileSystemObserver).
-- **Packed `.sbd` served read-only** straight from the zip: STOREd entries are streamed from file offsets with Range support; DEFLATEd ones are inflated per request. MCP edits on a packed file fail with "unpack first".
+- **Packed `.sbd` served** straight from the zip: STOREd entries are streamed from file offsets with Range support; DEFLATEd ones are inflated per request. (Read-only until 0.5.0; now saved in place, see 0.5.0.)
 - **Player uses media elements, not decoded Web Audio buffers.** Streams long files, works with Range/Blob slices; drift correction at 0.25 s; per-cue gain, fades, loop and per-track mute via `volume`/`muted`. Sample-accurate mixing (Web Audio graph) can come with the timeline editor if needed.
 - **Animatic timing rules** (SPEC §9) live in `buildAnimatic` (format package) so the player, exports and agents agree.
 - **Working copy** = last opened file kept as packed bytes in IndexedDB ("Reopen …" on the start screen). OPFS not needed yet.
@@ -566,6 +566,89 @@ pnpm fixture:storyboarder  # regenerate the Storyboarder test fixture (ffmpeg fo
 - **README** rewritten shorter for non-technical readers; the long how-to moved to `docs/GUIDE.md`
   (with the `sbd` command table, checked by the docs test).
 
+### 0.5.0 — canvas layouts, captions, guided tours, save in place (2026-10-06)
+
+- **Layer model (format 0.3).** One `Layer` type with an optional `kind` (`image` when omitted,
+  `text`, `slot`) instead of a union or nested layers, so every 0.1/0.2 layer is unchanged and
+  ops keep working on one shape. Text fields are flat (`font_size`, `color`, …) with small
+  objects for `stroke`, `shadow`, `box`, so `update_layer` with `null` removes one effect.
+  **Slots**: an empty slot is a `kind: "slot"` layer; a filled slot is an _ordinary image
+  layer_ (its `x/y/width/height/crop` already place the picture, cover = centered crop) plus
+  `slot: {x, y, width, height, fit?, name?}`. Rejected: a slot layer that carries an `asset` and
+  is fitted at render time — every older reader would then stretch the picture. Resizing a
+  filled slot moves its frame and re-fits the picture (`setSlotFrame`), so it never distorts.
+  **Groups** are a shared `group` ID on flat layers, not nested group layers: rendering is
+  untouched everywhere (cards, print, video, older readers) and the editor expands a click to
+  the group; a group of one dissolves. A project moves to `0.3.0` only when it uses one of these
+  (`withLayerVersion`), like spans did for 0.2. Unknown kinds are a warning and are skipped.
+- **Layouts and caption styles live in the format package** (`layouts.ts`): fractions of the
+  frame, filtered by aspect class (vertical < 0.7, portrait < 0.92, square ≤ 1.08, landscape),
+  so the app, MCP (`apply_layout`, `add_text_layer`) and tests place things identically. Applying
+  to an existing canvas maps pictures to slots by area (largest first); text stays; placeholder
+  text is added only when the canvas has none. Slot layer IDs are the slugged slot names.
+- **One text renderer.** `lib/text-render.ts` wraps and draws text with the 2D canvas API; the
+  Konva editor draws it through a custom `Shape`, the DOM cards / print view through a
+  `<canvas>` per text layer (2× resolution, room for outline and shadow, `data-fonts="loaded"`
+  for the print view's readiness), the video export into its frame canvas. Wrapping and glyph
+  metrics are therefore identical everywhere (DOM text would wrap differently). Montserrat
+  (OFL) was added for the bold caption look; fonts are bundled so PDFs and exports match.
+- **Editor interaction is ours, not Konva's dragging.** Nodes are not `draggable`; pointer
+  handlers move the whole selection (or the clicked layer's group) by one delta, snap the union
+  box (`lib/arrange.ts`, pure and unit-tested) to frame / safe-area / platform / layer / slot
+  lines, label the line, and report one `onMove` — Konva's transformer drag proxy would move
+  every node with its own drag bound and snap them independently. Alt at the start of a drag
+  duplicates (Figma convention); Cmd/Ctrl during a drag moves freely, and a Cmd/Ctrl _click_
+  toggles the selection; Alt pressed after the start also frees the drag. A press on a locked
+  layer starts a marquee (so a locked background does not block box selection). The view is
+  `{zoom, origin}` with "fit" kept until the user zooms or pans; the stage element exposes
+  `data-zoom` / `data-origin-*` for tests and computer-use agents; flattening temporarily
+  renders at 1:1.
+- **Platform safe zones** are fractions of a 1080 × 1920 frame from commonly published guides
+  (Meta's Reels guidance: top 14 %, bottom 35 %; TikTok / Shorts creator guides: a right button
+  column and a bottom caption block of about 20 %), documented as approximate in
+  `lib/safe-zones.ts` and the guide. Shown only on vertical frames.
+- **Tours: in-house, not a library.** Evaluated driver.js (MIT, ~5 KB, framework-agnostic) and
+  Shepherd.js (now AGPL-3.0 with a commercial license — incompatible with an MIT app); Intro.js
+  is AGPL/commercial too; reactour is React-only. driver.js fit the license and size, but its
+  steps cannot wait for async view changes (switching tab, opening the animatic) without
+  overriding its navigation, it does not move focus into the popover, and its theme is its own
+  CSS. A ~250-line Svelte component (`Tour.svelte` + `lib/tours.ts`) does exactly what is needed:
+  per-step `prepare()`, waiting for the target, focus management (into the dialog on each step,
+  back on close), → / ← / Esc, `prefers-reduced-motion`, theme tokens only. Steps target
+  `data-tour="…"` hooks; a unit test checks every target is declared in a component and an e2e
+  test walks every tour on the hosted copy with the bundled example. The first-run offer is a
+  non-modal corner card, shown once per browser (`sbd:tour-offered` set when shown). E2E tests
+  start as a returning user (`storageState` in `playwright.config.ts`).
+- **Tooltips**: one shared `role="tooltip"` element driven by an attachment
+  (`{@attach tooltip(label, shortcut)}`), shown on hover (delay, warm hand-off) and keyboard
+  focus, hoverable, dismissed with Esc, `aria-describedby` while visible; it replaces `title` on
+  icon buttons across the app.
+- **Save in place.** Under `sbd serve` and MCP, `ProjectStore` writes packed files with
+  `writeProjectToPacked`: read the zip, keep media and unknown files, replace the project text
+  files, add new media, `packSbd` (media STOREd, mimetype first), write a temp file in the same
+  folder and rename it over the original; the first save of a store copies the original to
+  `<file>.bak` (one safety copy per session rather than per autosave, which would only hold the
+  previous keystroke). Edits of one store are serialized (a packed file is rewritten as a whole).
+  Media URLs of packed files are versioned by CRC instead of the file's mtime, so a save does not
+  reload every picture. MCP edits packed files the same way (preferred over "unpack first").
+  Re-packing rewrites the whole file per save: fine for storyboard-sized files (a few MB to tens
+  of MB); very large embedded videos should be linked or the storyboard unpacked.
+  In the browser, `showOpenFilePicker` (and dropped files' `getAsFileSystemHandle`, and the PWA
+  launch queue) give a `FileSystemFileHandle`; the bytes are copied into memory at open (a
+  `File` from a handle becomes unreadable once the file is rewritten), saves write through
+  `createWritable`, and autosave is on for these. The handle is kept in the recent list
+  (IndexedDB) instead of a copy of the bytes. Without the API (Safari, Firefox) Save downloads a
+  copy and says why. The headless e2e uses an origin-private file handle in place of the picker.
+- **Soundtrack under the animatic.** With the animatic open, the existing Soundtrack panel is
+  rendered inside the stage below the picture (`docked`: tracks first, smaller picture) instead
+  of above the playback bar; the Soundtrack button toggles it in both places. No second timeline
+  component.
+- **Visual check:** headless Chromium captures (Paper, Darkroom) of the Canvas tab on the
+  minimal example and on `cat-crimes` (layouts, captions, TikTok zones, text controls), the
+  docked soundtrack, the tour popovers; `pnpm screenshots` into a temp folder for `cat-crimes`
+  (`--shot twist` for the canvas, `--shot rate-them` for the Story images). `canvas`,
+  `story-light` and `story-dark` were replaced.
+
 ## Status
 
-All milestones (M0–M4), the 0.2.0, 0.3.0 and 0.4.0 feedback rounds and the 0.4.1 fix release are complete. Being published: GitHub `swaymun/storyboard-viewer` and a hosted copy of the web app on Cloudflare Workers (`pnpm deploy:web`); no npm package. Known gaps: Safari/Firefox untested; Storyboarder multi-board shots not merged and Shot Generator data dropped; animatic export draws canvas-variant video layers as their first frame; no CLI animatic export; PDF grid cells clip very long text; `sbd export-pdf` output is large for image-heavy storyboards; Kokoro voices were not listened to by a person (timings were checked, quality was not); Script view: shot cards are hidden below 860 px width, the editor was only exercised in Chromium; reopening a folder from the recent list was not tested end to end (headless Chromium cannot read stored handles back).
+All milestones (M0–M4), the 0.2.0, 0.3.0 and 0.4.0 feedback rounds, the 0.4.1 fix release and 0.5.0 (canvas layouts, captions, tours, save in place) are complete. Being published: GitHub `swaymun/storyboard-viewer` and a hosted copy of the web app on Cloudflare Workers (`pnpm deploy:web`); no npm package. Known gaps: Safari/Firefox untested; Storyboarder multi-board shots not merged and Shot Generator data dropped; animatic export draws canvas-variant video layers as their first frame; no CLI animatic export; PDF grid cells clip very long text; `sbd export-pdf` output is large for image-heavy storyboards; Kokoro voices were not listened to by a person (timings were checked, quality was not); Script view: shot cards are hidden below 860 px width, the editor was only exercised in Chromium; reopening a folder from the recent list was not tested end to end (headless Chromium cannot read stored handles back).

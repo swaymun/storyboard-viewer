@@ -18,7 +18,9 @@ storyboard.
   refused.
 - **Edits are validated.** Changes that would add errors are rejected, and files are written
   atomically (write to a temp file, then rename).
-- **Packed `.sbd` files are read-only** when served.
+- **Packed `.sbd` files are saved in place** when served: the new file is written next to the
+  old one and renamed over it, and the version from before the first save is kept as
+  `<file>.bak`.
 
 The MCP server talks to your agent over stdio (standard input/output), not over the network.
 Your agent can do whatever the MCP tools allow on the storyboard it opened, including copying

@@ -103,6 +103,17 @@ async function session(colorScheme) {
     deviceScaleFactor: SCALE,
     colorScheme,
   });
+  // a returning user: no first-run tour offer or canvas hint; TikTok's safe zones on vertical
+  // canvases (ignored on other frames)
+  await context.addInitScript(() => {
+    try {
+      localStorage.setItem('sbd:tour-offered', '1');
+      localStorage.setItem('sbd:canvas-hint-done', 'true');
+      localStorage.setItem('sbd:canvas-platforms', '["tiktok"]');
+    } catch {
+      /* ignore */
+    }
+  });
   const page = await context.newPage();
   page.on('crash', () => console.error('page crashed'));
   page.on('pageerror', (e) => console.error('pageerror', e.message));
@@ -156,7 +167,10 @@ try {
         return p.ids.shots.find((s) => hasCanvas(s.id))?.id;
       }, values.shot ?? null);
       if (canvasShot) await openApp(page, `#tab=canvas&shot=${canvasShot}`);
-      await shoot(page, 'canvas', { wait: 900 });
+      // select the top layer (often a caption) to show the selection tools
+      const rows = page.locator('#layer-list button.name[data-layer-id]');
+      if (await rows.count()) await rows.first().click();
+      await shoot(page, 'canvas', { wait: 1200 });
       // Audio (the Timeline tab before 0.3.0): a shot with line cues, its Audio section open on
       // a cue (lines with their cues, waveform trim editor, cue details).
       const audioShot = await page.evaluate((wanted) => {

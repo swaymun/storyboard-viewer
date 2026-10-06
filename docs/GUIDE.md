@@ -7,6 +7,7 @@ Everything about using Storyboard Viewer by hand. To get started, see the
 - [The tabs and menus](#the-tabs-and-menus)
 - [The script editor](#the-script-editor)
 - [Shots](#shots)
+- [Canvas: layouts, captions and layers](#canvas-layouts-captions-and-layers)
 - [Audio](#audio)
 - [Appearance](#appearance)
 - [Saving and opening](#saving-and-opening)
@@ -14,6 +15,7 @@ Everything about using Storyboard Viewer by hand. To get started, see the
 - [Keyboard shortcuts](#keyboard-shortcuts)
 - [The sbd command](#the-sbd-command)
 - [Connecting other MCP clients](#connecting-other-mcp-clients)
+- [Guided tours](#guided-tours)
 - [More questions](#more-questions)
 
 ## Three ways to open it
@@ -24,9 +26,10 @@ Everything about using Storyboard Viewer by hand. To get started, see the
 | **`sbd serve <storyboard>`**                          | The viewer on a `localhost` link for one storyboard, with live refresh and automatic saving.                  |
 | **The browser app** (the hosted link, or any of them) | Open a `.sbd` file or folder, start a new one, or try an example. Files stay on your computer; works offline. |
 
-In the browser app, a **folder** (Chrome or Edge) saves automatically. A **`.sbd` file** or a new
-storyboard is kept in the browser until you press **Save** (Cmd/Ctrl+S), which asks where to
-save it the first time (or downloads it in browsers that can't save in place).
+In the browser app, a **folder** (Chrome or Edge) saves automatically. A **`.sbd` file** opened
+with **Open .sbd file** (or dropped on the start screen) in Chrome or Edge saves back into the
+same file, automatically. In Safari and Firefox, and for a new storyboard, **Save**
+(Cmd/Ctrl+S) asks where to save it (or downloads a copy in browsers that can't save in place).
 
 ## The tabs and menus
 
@@ -35,13 +38,13 @@ The viewer has three tabs. Press **1–3** to switch.
 | Tab        | What it is for                                                                                                                    |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **Story**  | **Script** view: write the script; select words and press **Make shot** (Cmd/Ctrl+Enter). **Board** view: one card per shot.      |
-| **Canvas** | Compose a shot from layers. Drag to move, use the handles to scale and rotate, arrow keys to nudge, `[` `]` to change order.      |
+| **Canvas** | Lay out a shot: layouts with slots for pictures, captions and titles, platform safe zones, layers you can group and align.        |
 | **Assets** | Import pictures, sounds, videos and fonts (drag and drop), give them categories and tags, link big files instead of copying them. |
 
 The menu bar has **File** (new, save, exports, project settings, close), **Edit** (undo, redo,
 copy IDs), **View** (tabs, Script/Board, Soundtrack, Animatic, Appearance), **Shot** (make a shot,
-extend it to the selection, move, duplicate, delete, play) and **Help** (keyboard shortcuts, the
-Fountain syntax guide). Press **F10** to reach it from the keyboard. Right-click (or
+extend it to the selection, move, duplicate, delete, play) and **Help** (guided tours, keyboard
+shortcuts, the Fountain syntax guide). Press **F10** to reach it from the keyboard. Right-click (or
 **Shift+F10**) a script line, a shot or an asset for its commands.
 
 ## The script editor
@@ -85,6 +88,67 @@ underline in its colour, and its card sits beside them. Click a shot's words to 
 While the animatic plays (**Space**), the words being spoken are marked, with a thin line running
 under them.
 
+## Canvas: layouts, captions and layers
+
+The **Canvas** tab arranges a shot's picture from layers: pictures, text and empty slots. Hover
+any button for what it does and its shortcut. A short tour: **Help → Guided tours → Canvas &
+layouts**.
+
+**Start from a layout.** **+ Canvas** (next to the shot's versions) offers layouts that fit the
+storyboard's frame, or a blank canvas. On an existing canvas, **Layout** re-arranges it: its
+pictures move into the slots (largest first) and its text stays. A single picture becomes a
+layout with **Make it a layout**.
+
+| Frame                | Layouts                                                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Vertical 9:16        | Full bleed · Split top / bottom · Picture in picture · Bottom caption band · Three stacked frames · Talking head + B-roll |
+| Landscape 16:9       | Full frame · Two-up · Lower third · Title card                                                                            |
+| Square 1:1, feed 4:5 | Full frame · Two-up (1:1) · Stacked (4:5) · Picture + caption · Title card                                                |
+
+**Slots** are the dashed, labeled boxes of a layout. Drop a picture on one (from the **Images**
+strip on the right, from Assets, or a file from your computer), double-click it, or select it and
+click a picture. The picture **fills** the slot (cropping what sticks out); **Fit in slot** shows
+all of it instead. Empty slots only show while you edit: cards, the animatic, PDFs and videos
+leave them out.
+
+**Text.** **Text** adds a caption; type right on the frame (double-click any text to edit it,
+Cmd/Ctrl+Enter or a click elsewhere to finish, Esc to cancel). On the right: the text itself,
+caption styles (**Bold** — heavy white with an outline, for short-form video; **Boxed**; **Lower
+third**; **Title**; **Subtitle**), font, size, weight, alignment, color, outline, shadow, box and
+capitals. Corner handles scale the text, side handles change where it wraps.
+
+**Guides.** **Safe area** shows the title-safe (80 %) and action-safe (90 %) frames. On vertical
+storyboards, **TikTok**, **Reels** and **Shorts** shade where those apps put their buttons,
+captions and top bar, so you keep text out of them. These areas are approximate: they follow
+the commonly published guides for 1080 × 1920 and differ by phone and app version.
+**Snap to guides** pulls what you drag to the frame's edges and center, the guides that are
+shown, other layers and slots, and says what it snapped to. Hold **Cmd/Ctrl** while dragging (or
+**Alt**, pressed after the drag started) to move freely; starting a drag with **Alt** moves a copy.
+
+**Selecting and arranging.**
+
+- Click a layer; **Shift**-click (or Cmd/Ctrl-click) adds or removes one; drag a box from an
+  empty spot (or from outside the frame) to select everything it touches; **Cmd/Ctrl+A** selects
+  all, **Esc** clears. A locked layer (such as a background) does not move when you drag across
+  it.
+- Drag to move (all selected layers together), **Alt**-drag to move a copy; the handles resize and
+  rotate. Arrow keys nudge (Shift ×10).
+- **Fit**, **Fill** and **Center** fit a picture into the frame (or its slot) or center the
+  selection. **X, Y, W, H** and **Rotation** take exact numbers (the lock keeps proportions).
+- With several layers selected: align their edges or centers, **to the selection** or **to the
+  frame**, and distribute them with equal gaps. **Group** (Cmd/Ctrl+G) keeps layers together;
+  clicking one selects the group. **Ungroup**: Shift+Cmd/Ctrl+G.
+- **Layers** on the right: top of the list is in front. Hover a row to hide, lock or delete
+  (**×**) it; drag rows to reorder (or **Alt+↑/↓** on a row); double-click to rename. **Delete**
+  removes the selection, Cmd/Ctrl+D duplicates, and every change can be undone.
+
+**Zoom.** **−**, **+**, **100 %** and **Fit** in the toolbar (Cmd/Ctrl+−, Cmd/Ctrl++,
+Shift+0, Cmd/Ctrl+0). Scroll, or hold **Space** and drag, to pan; Cmd/Ctrl+scroll zooms at the
+pointer. Positions are always in the frame's own pixels, whatever the zoom.
+
+**Flatten** renders the layout to an image saved as the version's preview (for apps that can't
+draw layers).
+
 ## Audio
 
 Open a shot's **Audio** section to see its lines and their sound. To cut one long recording into
@@ -94,7 +158,10 @@ shot) and its piece starts where the last one ended, so you can go through a who
 Click a line's clip to trim it, change its volume, mute it or delete it.
 
 **Soundtrack** (View menu, or the button in the playback bar) holds music and sounds under the
-whole story, and the tracks: mute or solo a track while you listen, set its volume.
+whole story, and the tracks: every cue at its time with a playhead, mute or solo a track while
+you listen, set its volume, click a cue to open it in its shot. With the **Animatic** open, the
+Soundtrack shows right under the animatic's picture, so you watch and see the sound together;
+the Soundtrack button shows and hides it.
 
 ## Appearance
 
@@ -104,7 +171,9 @@ Dark/Light. Printed sheets are always black on white.
 
 ## Saving and opening
 
-**With your agent or `sbd serve`**, changes save automatically. If your agent changes something
+**With your agent or `sbd serve`**, changes save automatically, into a folder or into a packed
+`.sbd` file (it is re-packed safely: written to a temporary file first, then swapped in, and the
+version from before the first save is kept next to it as `story.sbd.bak`). If your agent changes something
 while you are editing, you see an "Updated by agent" notice and both sets of changes are kept; if
 you both changed the same thing, yours wins and you can switch to the agent's version with one
 click.
@@ -129,21 +198,40 @@ scenes.
 
 Press **?** in the app for the full list.
 
-| Key                                   | What it does                                                 |
-| ------------------------------------- | ------------------------------------------------------------ |
-| **Space**                             | Play / pause the animatic                                    |
-| **J** / **K**                         | Next / previous shot                                         |
-| **1** **2** **3**                     | Story, Canvas, Assets                                        |
-| **Cmd/Ctrl+S**                        | Save                                                         |
-| **Cmd/Ctrl+Z** / **Shift+Cmd/Ctrl+Z** | Undo / redo                                                  |
-| **Cmd/Ctrl+Enter**                    | Make a shot from the selected words (or the line)            |
-| **Shift+Cmd/Ctrl+Enter**              | Shot without script text after the cursor                    |
-| **Alt+↑** / **Alt+↓**                 | Move the focused shot                                        |
-| **Esc**, then **Tab**                 | Leave the script editor                                      |
-| **P**, **I** / **O**, **A**           | Audio: play, mark in / out, assign to the line and go on     |
-| **F10**                               | Go to the menu bar                                           |
-| **Shift+F10** or Menu key             | Context menu of the focused item                             |
-| Canvas: arrows, `[` `]`               | Nudge the layer (Shift: ×10), move it back / forward a layer |
+| Key                                   | What it does                                             |
+| ------------------------------------- | -------------------------------------------------------- |
+| **Space**                             | Play / pause the animatic                                |
+| **J** / **K**                         | Next / previous shot                                     |
+| **1** **2** **3**                     | Story, Canvas, Assets                                    |
+| **Cmd/Ctrl+S**                        | Save                                                     |
+| **Cmd/Ctrl+Z** / **Shift+Cmd/Ctrl+Z** | Undo / redo                                              |
+| **Cmd/Ctrl+Enter**                    | Make a shot from the selected words (or the line)        |
+| **Shift+Cmd/Ctrl+Enter**              | Shot without script text after the cursor                |
+| **Alt+↑** / **Alt+↓**                 | Move the focused shot                                    |
+| **Esc**, then **Tab**                 | Leave the script editor                                  |
+| **P**, **I** / **O**, **A**           | Audio: play, mark in / out, assign to the line and go on |
+| **F10**                               | Go to the menu bar                                       |
+| **Shift+F10** or Menu key             | Context menu of the focused item                         |
+| **?**                                 | All shortcuts                                            |
+
+Canvas (with the frame focused):
+
+| Key                                   | What it does                                               |
+| ------------------------------------- | ---------------------------------------------------------- |
+| Click · **Shift**-click · drag a box  | Select · add or remove · select everything the box touches |
+| **Cmd/Ctrl+A** · **Esc**              | Select all · clear the selection                           |
+| Drag · **Alt**-drag                   | Move · move a copy                                         |
+| Hold **Cmd/Ctrl** while dragging      | Move without snapping (Alt too, once the drag started)     |
+| Arrows (**Shift**: ×10)               | Nudge                                                      |
+| **Delete** / **Backspace**            | Delete the selection                                       |
+| **Cmd/Ctrl+D**                        | Duplicate                                                  |
+| **Cmd/Ctrl+G** · **Shift+Cmd/Ctrl+G** | Group · ungroup                                            |
+| `[` · `]`                             | Send backward · bring forward                              |
+| **Enter** · double-click              | Edit text · choose a picture for a slot                    |
+| **Cmd/Ctrl++** · **Cmd/Ctrl+−**       | Zoom in · out                                              |
+| **Cmd/Ctrl+0** · **Shift+0**          | Zoom to fit · 100 %                                        |
+| **Space**-drag · scroll               | Pan                                                        |
+| **Alt+↑** / **Alt+↓** (layer list)    | Move a layer up / down                                     |
 
 ## The sbd command
 
@@ -187,11 +275,20 @@ the agent's `get_viewer_url` tool returns its link. You can also pass a storyboa
 `… cli.js mcp ~/Storyboards/my-film.sbd --serve`. To remove the connection later:
 `claude mcp remove storyboard --scope user` or `codex mcp remove storyboard`.
 
+## Guided tours
+
+**Help → Guided tours** walks you through the app in a few steps each: **Getting started** (the
+script, making a shot, the shot card, menus, playback, themes), **Script & shots**, **Canvas &
+layouts**, **Assets**, **Audio & soundtrack** and **Working with your AI agent**. The first time
+you open the app it offers Getting started once. Use **→** / **←** (or Next / Back) to move,
+**Esc** to stop. If nothing is open, a tour opens the example storyboard first.
+
 ## More questions
 
-**The viewer says "read-only".**
-You opened a packed `.sbd` file through `sbd serve`. Unpack it (`sbd unpack my-film.sbd`) and
-serve the folder, or choose "Edit a copy".
+**Can I edit a packed `.sbd` file?**
+Yes. Under `sbd serve` (and through your agent) it is saved in place, with `story.sbd.bak` as a
+safety copy of the version from before you started. In the browser app, Chrome and Edge save
+back into the file you opened; Safari and Firefox download a new copy on each Save.
 
 **Is it safe?**
 `sbd serve` only listens on your own computer (localhost) and refuses writes from other

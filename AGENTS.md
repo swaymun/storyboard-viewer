@@ -29,7 +29,9 @@ agents working on this repository. The format itself is specified in [SPEC.md](S
   to a shot takes it out of other shots.
 - **Do not delete media the user may want.** Use `sbd clean <folder>` (dry run) and ask before
   `sbd clean --yes`.
-- **Packed `.sbd` files are read-only** for the tools. Unpack first: `sbd unpack story.sbd`.
+- **Packed `.sbd` files can be edited too** (since 0.5.0): every edit re-packs the file in place
+  (temp file + rename, media kept STOREd), and the version from before your first edit is kept
+  as `story.sbd.bak`. For many edits or git, an unpacked folder (`sbd unpack`) is still nicer.
 - **IDs** match `^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$`. Readable IDs (`opening`, `maya-portrait`)
   are welcome.
 - Unknown fields must be preserved; never "clean up" fields you don't recognise.
@@ -58,7 +60,42 @@ Presets: `film`, `documentary`, `animation`, `motion` (brand/motion design), `ve
   as extra variants rather than deleting them.
 - Canvas compositions: `add_variant { shot_id, layers: [...] }`. Layers are drawn in array
   order (first = bottom) with Konva-style attributes (`x`, `y`, `width`, `height`, `scale_x`,
-  `rotation`, `opacity`, `crop`, `filters` with CSS filter semantics).
+  `rotation`, `opacity`, `crop`, `filters` with CSS filter semantics). Coordinates are canvas
+  pixels of the storyboard's frame (`get_storyboard` → aspect; usually 1920×1080 or 1080×1920).
+
+**Layouts, captions and layers (format 0.3)**
+
+- `list_layouts` → the layouts that fit this storyboard's frame and the caption styles.
+  Vertical 9:16: `full-bleed`, `split`, `picture-in-picture`, `caption-band`, `three-stack`,
+  `talking-head-broll`; 16:9: `full-frame`, `two-up`, `lower-third`, `title-card`; 1:1 / 4:5:
+  `full-frame`, `two-up`, `stacked`, `caption`, `title-card`.
+- `apply_layout { shot_id, layout, images?: [asset IDs in slot order], variant_id?, name? }`
+  makes a new canvas variant (shown at once) with named **slots**; with `variant_id` of a canvas
+  it moves that canvas's pictures into the slots (largest first) and keeps its text; with an
+  image variant, that image goes into the first slot of a new canvas. Slot layer IDs are the
+  slot names in lower case (`top`, `bottom`, `main`, `inset`, `b-roll`…).
+- `fill_slot { shot_id, slot: "Bottom" | layer ID, asset_id, fit?: "cover" | "contain" }` puts
+  a picture into a slot (cover = fill and crop, the default). Empty slots are placeholders the
+  user sees while editing; they are not drawn in cards, the animatic, PDFs or videos.
+- `add_text_layer { shot_id, text, style?, position?, … }`: captions, hooks, titles. Styles:
+  `bold` (heavy white with a black outline: short-form captions), `boxed`, `lower-third`,
+  `title`, `subtitle`. Positions: `top`, `middle`, `bottom` (on 9:16 above the TikTok / Reels /
+  Shorts buttons and captions), `lower-third`; or `x`, `y`, `width` in canvas px. Any text field
+  overrides the style. Keep important text out of the top ~7–14 %, the bottom ~20–35 % and the
+  right ~13 % of vertical frames.
+- `add_layer { shot_id, layer, index? }`, `update_layer { shot_id, layer_id, changes, index? }`
+  (null removes a value; `index` restacks, 0 = bottom), `remove_layer { shot_id, layer_ids }`,
+  `update_variant { shot_id, variant_id, name?, background?, layers? }`. Without `variant_id`
+  the layer tools work on the shot's active variant (it must be a canvas).
+- Layer fields: every layer has `id`, `name`, `x`, `y`, `rotation`, `scale_x`, `scale_y`,
+  `opacity`, `visible`, `locked`, and optionally `group` (layers sharing a group ID move together
+  in the editor). Image layers: `asset`, `width`, `height`, `crop`, `filters`, `slot` (the frame
+  it was fitted into: `{x, y, width, height, fit?, name?}`). Text layers: `kind: "text"`,
+  `text`, `width` (wrap width), `font` (`Montserrat`, `IBM Plex Sans`, `Courier Prime`,
+  `IBM Plex Mono`) or `font_asset`, `font_size`, `font_weight`, `italic`, `uppercase`, `color`,
+  `align`, `line_height`, `stroke {color, width}`, `shadow {color, blur, offset_x, offset_y}`,
+  `box {color, padding, radius}`, `style`. Empty slots: `kind: "slot"`, `name`, `x`, `y`,
+  `width`, `height`, `fit`.
 
 **Audio: one recording split across lines**
 
@@ -197,10 +234,33 @@ The animatic video export exists only in the app (File → Export animatic video
   picker), waveform `[data-waveform]`, `#preview-segment` (P), `#mark-in` / `#mark-out` (I / O),
   `#assign-line` (A), `#add-shot-sound`; the selected cue's details `.cue-panel[data-cue-id]`
   with `#delete-cue`. Keys I / O / P / A / ↑ / ↓ / Delete / Esc work while focus is inside.
-- **Soundtrack panel** `#soundtrack` (View → Soundtrack or `#soundtrack-toggle`): story-wide
+- **Soundtrack panel** `#soundtrack` (View → Soundtrack or `#soundtrack-toggle`; with the
+  animatic `#animatic` open it sits inside it, under the picture): story-wide
   cues `.story-cues [data-cue-id]`, `#add-story-sound`, `#add-story-cue` (add the marked
   segment), lanes `.lane[data-track]` with buttons "Mute <track>" (preview), "Solo track
   <track>", "Mute track <track>" (saved) and a gain slider.
+- **Canvas tab**: the Konva stage `.stage[data-variant-id]` (`role="application"`, focusable; its
+  `data-zoom`, `data-origin-x`, `data-origin-y` give the frame's screen position: screen =
+  stage box + origin + canvas px × zoom). Toolbar: `#new-canvas`, `#apply-layout`, `#add-layer`
+  (image), `#add-text`, `#toggle-guides`, `[data-platform="tiktok|reels|shorts"]` (vertical
+  frames), `#toggle-snap`, `#zoom-out`, `#zoom-100` (`#zoom-level`), `#zoom-in`, `#zoom-fit`.
+  Layout picker `#layout-picker [data-layout=<id>]` (`blank` for an empty canvas). Layer list
+  `#layer-list li[data-layer-row=<id>]` with `button.name[data-layer-id]`, hide / lock and
+  `[data-delete-layer=<id>]`; group headers `[data-group-id]`. Selection panel: `[data-align=left|hcenter|right|top|vcenter|bottom]`,
+  `[data-distribute=x|y]`, `#align-to` (radio: selection / frame), `#group-layers`,
+  `#ungroup-layers`, `#duplicate-layers`, `#delete-layers`, fields labelled X, Y, W, H,
+  Rotation °; text: `#text-content`, `[data-caption-style]`, `[data-font]`, `[data-text-color]`,
+  `[data-text-align]`, `#text-outline`, `#text-shadow`, `#text-box`; inline editor
+  `#text-editor`. `#snap-status` (live region) says what a drag snapped to. The one-time hint
+  strip is `#canvas-hint` (`localStorage` `sbd:canvas-hint-done`); view toggles are remembered
+  in `sbd:canvas-guides`, `sbd:canvas-snap`, `sbd:canvas-platforms`.
+- **Guided tours**: Help → `[data-command="tours"]` → `tour-<id>` (`getting-started`, `script`,
+  `canvas`, `assets`, `audio`, `agent`). The popover is `#tour` (`data-tour-id`,
+  `data-tour-step`, `data-target-found`), with `#tour-next` / `#tour-back`; → / ← / Esc work.
+  Steps point at `[data-tour="…"]` hooks. The first-run offer `#tour-offer` shows once per
+  browser (`localStorage` `sbd:tour-offered`).
+- **Tooltips**: icon buttons show their label and shortcut in a shared `#sbd-tooltip`
+  (`role="tooltip"`, on hover and keyboard focus, Esc hides it).
 - Theme: `data-theme` on `<html>` (`paper`, `darkroom`, `neutral`, `neutral-light`,
   `maomao-dark`, `maomao-light`, `jinshi-dark`, `jinshi-light`); View → Appearance; stored in
   `localStorage` `sbd:theme` (`system` or a theme ID) and `sbd:theme-pair`.
