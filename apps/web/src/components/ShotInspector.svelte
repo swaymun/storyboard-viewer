@@ -2,6 +2,7 @@
   // Side panel for the selected shot (Board view): title, duration, pictures (variants as a
   // thumbnail strip; tools act on the picture shown), details (free text, only fields with a
   // value), tags and the shot's audio. Inputs commit on change.
+  import { tooltip } from '../lib/tooltip';
   import {
     addVariant,
     moveVariant,
@@ -154,7 +155,7 @@
           type="button"
           class="btn ghost tiny"
           aria-pressed={isDefault}
-          title={isDefault ? 'Shown by default' : 'Show this picture by default'}
+          {@attach tooltip(isDefault ? 'Shown by default' : 'Show this picture by default')}
           disabled={isDefault}
           onclick={() => app.edit('Set active variant', (p) => setActiveVariant(p, id, shown.id))}
           >{isDefault ? 'Default' : 'Make default'}</button
@@ -163,7 +164,7 @@
           type="button"
           class="btn ghost icon"
           aria-label="Open {shown.name ?? shown.id} on the canvas"
-          title="Open on canvas"
+          {@attach tooltip('Open on canvas')}
           onclick={() => openOnCanvas(shown.id)}><Icon name="layers" size={14} /></button
         >
         <button

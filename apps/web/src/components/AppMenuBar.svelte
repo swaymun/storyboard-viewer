@@ -9,14 +9,16 @@
   import { THEMES, theme } from '../lib/theme.svelte';
   import { MOD, sep, type BarMenu, type MenuItem } from '../lib/menu';
   import MenuBar from './MenuBar.svelte';
+  import { tour } from '../lib/tour.svelte';
+  import { TOURS } from '../lib/tours';
 
   let { onClose }: { onClose?: () => void } = $props();
 
   const saveLabel = $derived(
     app.saveMode === 'download'
       ? 'Download .sbd'
-      : app.saveMode === 'file' && app.source?.kind === 'zip'
-        ? 'Save .sbd'
+      : app.saveMode === 'file' && app.source?.kind === 'zip' && !app.source.inPlace
+        ? 'Save .sbd…'
         : 'Save',
   );
 
@@ -275,6 +277,16 @@
   }
 
   const help = $derived<MenuItem[]>([
+    {
+      label: 'Guided tours',
+      icon: 'compass',
+      command: 'tours',
+      submenu: TOURS.map((t) => ({
+        label: t.title,
+        command: `tour-${t.id}`,
+        onSelect: () => void tour.start(t.id),
+      })),
+    },
     {
       label: 'Keyboard shortcuts',
       icon: 'search',

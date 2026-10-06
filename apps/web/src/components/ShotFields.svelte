@@ -2,6 +2,7 @@
   // Shot details (fields). Only fields with a value are shown. "Add detail" suggests the
   // project's preset fields and accepts a new name: a new name becomes a field definition in the
   // manifest (one undo step with the value). Emptying a field removes it from the shot.
+  import { tooltip } from '../lib/tooltip';
   import {
     slugify,
     updateManifest,
@@ -179,7 +180,7 @@
               type="button"
               class="rm"
               aria-label="Remove {labelOf(r.key, d)} from {label}"
-              title="Remove"
+              {@attach tooltip('Remove')}
               onclick={() => {
                 pending = pending.filter((k) => k !== r.key);
                 setField(r.key, null);

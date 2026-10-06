@@ -145,7 +145,7 @@
           </p>
         </div>
       {/if}
-      <ol class="shots" ondragend={() => ((dragging = null), (dropAt = null))}>
+      <ol class="shots" data-tour="board" ondragend={() => ((dragging = null), (dropAt = null))}>
         {#each app.shots as { ref, shot, index } (ref.id)}
           {#if app.matchesFilter(shot)}
             <li

@@ -3,6 +3,7 @@
   // more than one). The thumbnail of the picture being shown is outlined; the shot's default
   // variant (active_variant) carries a small dot. ←/→ on the carousel step through variants;
   // the arrows over the picture do the same.
+  import { tooltip } from '../lib/tooltip';
   import type { Shot } from '@storyboard-viewer/format';
   import { app } from '../lib/state.svelte';
   import Icon from './Icon.svelte';
@@ -77,9 +78,9 @@
           type="button"
           class="thumb"
           aria-label="Variant {i + 1}: {v.name ?? v.id}{v.id === defaultId ? ' (default)' : ''}"
-          title="{v.name ?? v.id}{v.id === defaultId ? ' · default' : ''}{v.type === 'canvas'
-            ? ' · layers'
-            : ''}"
+          {@attach tooltip(
+            `${v.name ?? v.id}${v.id === defaultId ? ' · default' : ''}${v.type === 'canvas' ? ' · layers' : ''}`,
+          )}
           aria-current={v.id === current?.id ? 'true' : undefined}
           data-variant-id={v.id}
           onclick={() => app.chooseVariant(shot, v.id)}

@@ -1,6 +1,7 @@
 <script lang="ts">
   // Shot tags: chips with a remove button, plus an input (type + Enter or comma; suggests tags
   // used on other shots; Backspace on an empty input removes the last tag).
+  import { tooltip } from '../lib/tooltip';
   import { updateShot, type Shot } from '@storyboard-viewer/format';
   import { app } from '../lib/state.svelte';
   import Icon from './Icon.svelte';
@@ -54,7 +55,7 @@
           type="button"
           class="x"
           aria-label="Remove tag {t} from {label}"
-          title="Remove tag"
+          {@attach tooltip('Remove tag')}
           onclick={() => remove(t)}><Icon name="close" size={10} /></button
         >
       {/if}

@@ -88,6 +88,7 @@
   class:open
   aria-label="Audio of {label}"
   data-audio-section={id}
+  data-tour="shot-audio"
   bind:this={root}
   {onkeydown}
 >

@@ -10,6 +10,22 @@ export const EDIT_PORT = PORT + 1;
 /** Static copy of the built app without `sbd serve` (like the hosted copy), hosted tests. */
 export const HOSTED_PORT = PORT + 2;
 
+/**
+ * Every test starts as a returning user: the first-run tour offer and the canvas hint strip are
+ * already dismissed (tests for them use a fresh context, see e2e/tours.spec.ts).
+ */
+const RETURNING = [
+  { name: 'sbd:tour-offered', value: '1' },
+  { name: 'sbd:canvas-hint-done', value: 'true' },
+];
+export const returningUser = {
+  cookies: [],
+  origins: [PORT, EDIT_PORT, HOSTED_PORT].map((p) => ({
+    origin: `http://localhost:${p}`,
+    localStorage: RETURNING,
+  })),
+};
+
 // E2E tests run the built CLI (`pnpm build` first): `sbd serve` on a temp copy of
 // examples/minimal.sbd, opened in Chromium; plus apps/web/dist on a plain static server.
 export default defineConfig({
@@ -22,6 +38,7 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
     viewport: { width: 1280, height: 860 },
+    storageState: returningUser,
   },
   projects: [
     {

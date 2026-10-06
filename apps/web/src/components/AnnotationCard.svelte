@@ -4,6 +4,7 @@
   // its sound (when it has any) and the title (when it has one). Details, tags and more pictures
   // appear when they have a value, or from the "+" menu. Collapsed (not the open shot): a small
   // thumbnail and the number. Right-click (or Shift+F10) for the shot's commands.
+  import { tooltip } from '../lib/tooltip';
   import {
     addVariant,
     aspectValue,
@@ -246,6 +247,7 @@
   data-annotation={shot.id}
   aria-labelledby="ann-title-{shot.id}"
   aria-current={active ? 'true' : undefined}
+  data-tour={active ? 'shot-card' : undefined}
   style:top="{top}px"
   style:--shot-c="var(--shot-{color})"
   bind:clientHeight={height}
@@ -261,7 +263,7 @@
         class="grip"
         aria-label="Reorder {label} (moves its script text too)"
         aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
-        title="Drag to reorder (or Alt+↑/↓)"
+        {@attach tooltip('Drag to reorder', 'or Alt+↑/↓')}
         onpointerdown={ongrip}
         onkeydown={(e) => {
           if (!e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
@@ -306,7 +308,15 @@
     {/if}
     <span class="tools">
       {#if active && app.canEdit}
-        <Menu label="Add to {label}" icon="plus" items={addItems} small id="add-to-{shot.id}" />
+        <span data-tour="card-add"
+          ><Menu
+            label="Add to {label}"
+            icon="plus"
+            items={addItems}
+            small
+            id="add-to-{shot.id}"
+          /></span
+        >
       {/if}
       <button
         type="button"

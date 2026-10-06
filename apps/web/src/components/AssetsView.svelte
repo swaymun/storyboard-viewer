@@ -324,7 +324,7 @@
       void importFiles([...(e.dataTransfer?.files ?? [])]);
     }}
   >
-    <div class="filters">
+    <div class="filters" data-tour="assets-filters">
       <div class="top">
         <label class="search">
           <Icon name="search" size={14} />
@@ -342,6 +342,7 @@
               type="button"
               class="btn"
               id="import-assets"
+              data-tour="assets-import"
               disabled={importing}
               onclick={() => fileInput?.click()}
             >
@@ -441,7 +442,7 @@
             : 'No assets yet.'}
       </p>
     {/if}
-    <ul class="grid">
+    <ul class="grid" data-tour="assets-grid">
       {#each filtered as a (a.id)}
         {@const thumb = a.kind === 'image' ? a.src : a.kind === 'video' ? a.poster : undefined}
         <li>

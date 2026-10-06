@@ -10,6 +10,7 @@
   // their words. Consecutive commits coalesce into one undo step. Changes that arrive from
   // outside (agent edits, undo) are applied to the editor as minimal line-level changes so the
   // cursor stays where it is.
+  import { tooltip } from '../lib/tooltip';
   import { defaultKeymap } from '@codemirror/commands';
   import { Annotation, Compartment, EditorState, type ChangeSet } from '@codemirror/state';
   import {
@@ -985,7 +986,7 @@
     <p class="visually-hidden">Read-only script.</p>
   {/if}
   <div class="columns">
-    <div class="page" class:readonly={!app.canEdit} bind:this={page}>
+    <div class="page" class:readonly={!app.canEdit} data-tour="script" bind:this={page}>
       <div class="editor-host" bind:this={host}></div>
       {#if selButton}
         <button
@@ -995,7 +996,7 @@
           style:left="{selButton.x}px"
           style:top="{selButton.y}px"
           aria-keyshortcuts="Control+Enter Meta+Enter"
-          title="Make a shot from the selected text ({mod}Enter)"
+          {@attach tooltip(`Make a shot from the selected text (${mod}Enter)`)}
           onmousedown={(e) => e.preventDefault()}
           onclick={() => makeShotFromSelection()}
           ><Icon name="shot" size={12} />Make shot <kbd>{mod}↵</kbd></button

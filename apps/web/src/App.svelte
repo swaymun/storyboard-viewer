@@ -18,6 +18,8 @@
   import StoryView from './components/StoryView.svelte';
   import PrintView from './components/PrintView.svelte';
   import Toasts from './components/Toasts.svelte';
+  import Tour from './components/Tour.svelte';
+  import { tour } from './lib/tour.svelte';
   import VideoExportDialog from './components/VideoExportDialog.svelte';
   import { player } from './lib/player.svelte';
   import { app, TABS, type Tab } from './lib/state.svelte';
@@ -27,7 +29,10 @@
   let noteTimer: ReturnType<typeof setTimeout> | undefined;
 
   onMount(() => {
-    void app.init();
+    void app.init().then(() => {
+      // first launch: offer the Getting started tour once (never in print / PDF export)
+      if (!app.print) tour.maybeOffer();
+    });
   });
 
   // Old links to the Timeline tab open the Soundtrack panel (the Timeline was folded into shots).
@@ -148,14 +153,14 @@
         </svg>
         {#if app.project}
           <h1 id="project-title" title={app.source?.location}>{app.project.manifest.title}</h1>
-          <span class="source" title={app.source?.location}>{sourceLabel}</span>
+          <span class="source" data-tour="source" title={app.source?.location}>{sourceLabel}</span>
           <AppMenuBar onClose={app.source?.kind !== 'server' ? closeProject : undefined} />
         {:else}
           <h1>Storyboard Viewer</h1>
         {/if}
       </div>
       {#if app.project}
-        <div class="tabs" role="tablist" aria-label="Views">
+        <div class="tabs" role="tablist" aria-label="Views" data-tour="tabs">
           {#each TABS as tab, i (tab.id)}
             <button
               type="button"
@@ -204,13 +209,15 @@
     </div>
 
     {#if app.project}
-      {#if ui.soundtrackOpen}<SoundtrackPanel />{/if}
+      <!-- with the animatic open, the soundtrack shows under its picture (PlayerBar) -->
+      {#if ui.soundtrackOpen && !player.stageOpen}<SoundtrackPanel />{/if}
       <PlayerBar />
     {/if}
   </div>
 {/if}
 
 <Toasts />
+<Tour />
 <ContextMenu />
 <HelpDialogs />
 <NewStoryboardDialog bind:open={ui.newOpen} />

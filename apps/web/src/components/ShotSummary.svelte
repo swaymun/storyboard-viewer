@@ -2,6 +2,7 @@
   // One quiet row that stands for a shot's details, tags and extra versions (pictures) while
   // they are folded away: "7 details · 2 tags · 3 versions". Click or Enter expands them; the
   // choice holds for the rest of the session (every card and the Board inspector).
+  import { tooltip } from '../lib/tooltip';
   import type { Shot } from '@storyboard-viewer/format';
   import { shotSummary } from '../lib/shot-summary';
   import { ui } from '../lib/ui.svelte';
@@ -23,7 +24,7 @@
   aria-expanded={ui.shotMore}
   aria-controls={controls}
   aria-label="{ui.shotMore ? 'Hide' : 'Show'} details, tags and versions of {label}"
-  title={ui.shotMore ? 'Hide' : 'Show'}
+  {@attach tooltip(ui.shotMore ? 'Hide' : 'Show')}
   onclick={() => ui.setShotMore(!ui.shotMore)}
 >
   <span class="chev" class:open={ui.shotMore} aria-hidden="true"

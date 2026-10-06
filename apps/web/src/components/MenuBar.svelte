@@ -65,13 +65,20 @@
 
 <svelte:window onpointerdown={onWindowPointer} />
 
-<div class="menubar" role="menubar" aria-label="Application menu" bind:this={bar}>
+<div
+  class="menubar"
+  role="menubar"
+  aria-label="Application menu"
+  data-tour="menubar"
+  bind:this={bar}
+>
   {#each menus as m, i (m.id)}
     <div class="m">
       <button
         type="button"
         role="menuitem"
         id={m.id}
+        data-tour={m.id}
         class="title"
         aria-haspopup="menu"
         aria-expanded={openId === m.id}

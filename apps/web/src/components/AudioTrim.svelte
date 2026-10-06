@@ -3,6 +3,7 @@
   // its waveform with cue regions and the in/out selection, transport (P), in/out marks (I/O,
   // typed seconds or dragged) and the main action: assign to the selected line (A) in a shot's
   // Audio section, or add the segment to the whole story in the Soundtrack panel.
+  import { tooltip } from '../lib/tooltip';
   import { formatTime } from '../lib/player.svelte';
   import { app } from '../lib/state.svelte';
   import { audio, lineLabel, targetLabel } from '../lib/audio-editor.svelte';
@@ -43,7 +44,7 @@
       class="source"
       id="audio-source"
       data-source-id={audio.sourceId}
-      title="Choose another recording"
+      {@attach tooltip('Choose another recording')}
       onclick={chooseSource}
     >
       <Icon name="volume" size={12} />
@@ -87,7 +88,7 @@
         class="btn tiny"
         id="preview-segment"
         aria-keyshortcuts="P"
-        title="Play (P)"
+        {@attach tooltip('Play', 'P')}
         onclick={() => audio.preview(true)}
         ><Icon name={audio.previewing ? 'pause' : 'play'} size={11} />
         <span class="visually-hidden"
@@ -103,7 +104,7 @@
         type="button"
         class="btn ghost tiny"
         aria-keyshortcuts="I"
-        title="Mark in at the playhead (I)"
+        {@attach tooltip('Mark in at the playhead', 'I')}
         onclick={() => audio.mark('in')}>I</button
       >
       <input
@@ -121,7 +122,7 @@
         type="button"
         class="btn ghost tiny"
         aria-keyshortcuts="O"
-        title="Mark out at the playhead (O)"
+        {@attach tooltip('Mark out at the playhead', 'O')}
         onclick={() => audio.mark('out')}>O</button
       >
       <input
@@ -147,9 +148,11 @@
             id="assign-line"
             aria-keyshortcuts="A"
             disabled={!app.selectedLine || audio.markIn === null || audio.markOut === null}
-            title={app.selectedLine
-              ? `Assign to: ${lineLabel(app.selectedLine)} (A)`
-              : 'Select a line first'}
+            {@attach tooltip(
+              app.selectedLine
+                ? `Assign to: ${lineLabel(app.selectedLine)} (A)`
+                : 'Select a line first',
+            )}
             onclick={() => audio.assign()}>Assign <kbd>A</kbd></button
           >
         {:else}
@@ -158,7 +161,7 @@
             class="btn tiny primary"
             id="add-story-cue"
             disabled={!audio.source}
-            title="Add the marked segment (or the whole file) under the whole story"
+            {@attach tooltip('Add the marked segment (or the whole file) under the whole story')}
             onclick={() => audio.addSegment({ global: { start: 0 } }, 'story')}>Add to story</button
           >
         {/if}

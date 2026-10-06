@@ -1,6 +1,7 @@
 <script lang="ts">
   // Properties of the selected cue (shared audio editor): what it plays on, track (free text
   // with suggestions), gain and mute, fades, offset, loop; delete. Commits on change.
+  import { tooltip } from '../lib/tooltip';
   import {
     isGlobalTarget,
     isLineTarget,
@@ -83,7 +84,7 @@
           class="btn ghost icon"
           id="delete-cue"
           aria-label="Delete cue"
-          title="Delete cue (Delete)"
+          {@attach tooltip('Delete cue', 'Delete')}
           onclick={() => audio.deleteCue()}><Icon name="trash" size={13} /></button
         >
       {/if}
@@ -91,7 +92,7 @@
         type="button"
         class="btn ghost icon"
         aria-label="Close cue"
-        title="Close (Esc)"
+        {@attach tooltip('Close', 'Esc')}
         onclick={() => audio.clear()}><Icon name="close" size={13} /></button
       >
     </header>
@@ -161,7 +162,7 @@
             class="btn ghost icon"
             aria-pressed={muted}
             aria-label={muted ? 'Unmute cue' : 'Mute cue'}
-            title={muted ? 'Unmute' : 'Mute (gain 0)'}
+            {@attach tooltip(muted ? 'Unmute' : 'Mute (gain 0)')}
             onclick={() =>
               audio.patchCue(muted ? 'Unmute cue' : 'Mute cue', { gain: muted ? null : 0 })}
             ><Icon name={muted ? 'mute' : 'volume'} size={13} /></button

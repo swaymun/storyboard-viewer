@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tooltip } from '../lib/tooltip';
   import { aspectValue, type Shot, type ShotRef } from '@storyboard-viewer/format';
   import { isContextMenuKey } from '../lib/menu';
   import { moveShotBy, shotMenuItems } from '../lib/shot-actions';
@@ -94,7 +95,7 @@
         draggable="true"
         aria-label="Reorder {label}"
         aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
-        title="Drag to reorder (or Alt+↑/↓)"
+        {@attach tooltip('Drag to reorder', 'or Alt+↑/↓')}
         ondragstart={(e) => ondragstartshot?.(e, shot.id)}
         onkeydown={(e) => {
           if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {

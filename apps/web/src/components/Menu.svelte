@@ -1,4 +1,5 @@
 <script lang="ts" module>
+  import { tooltip } from '../lib/tooltip';
   export type { MenuItem } from '../lib/menu';
 </script>
 
@@ -62,7 +63,7 @@
     class:icon={!text}
     class:small
     aria-label={text ? undefined : label}
-    title={label}
+    {@attach tooltip(label)}
     aria-haspopup="menu"
     aria-expanded={open}
     aria-controls={open ? uid : undefined}

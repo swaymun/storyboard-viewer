@@ -2,6 +2,7 @@
   // Help → Fountain syntax guide: a short cheat sheet in a closable pane on the left, so it can
   // stay open next to the script while writing. Esc (inside the pane) or × closes it; the choice
   // is remembered (ui.guideOpen).
+  import { tooltip } from '../lib/tooltip';
   import { onMount } from 'svelte';
   import { MOD } from '../lib/menu';
   import { GUIDE_WIDTH, ui } from '../lib/ui.svelte';
@@ -148,7 +149,7 @@
       class="btn ghost icon"
       id="guide-close"
       aria-label="Close the Fountain syntax guide"
-      title="Close (Esc)"
+      {@attach tooltip('Close', 'Esc')}
       onclick={close}><Icon name="close" size={14} /></button
     >
   </header>
@@ -197,7 +198,7 @@
   aria-valuemin={GUIDE_WIDTH.min}
   aria-valuemax={GUIDE_WIDTH.max}
   tabindex="0"
-  title="Drag to resize"
+  {@attach tooltip('Drag to resize')}
   onpointerdown={startResize}
   onkeydown={resizeKey}
   ondblclick={() => ui.setGuideWidth(GUIDE_WIDTH.default)}

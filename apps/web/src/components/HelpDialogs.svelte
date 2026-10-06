@@ -34,6 +34,28 @@
       ],
     },
     {
+      title: 'Canvas (with the frame focused)',
+      keys: [
+        ['Click / ⇧-click', 'Select a layer / add or remove it from the selection'],
+        ['Drag on empty space', 'Select everything the box touches'],
+        [`${MOD}A / Esc`, 'Select all / clear the selection'],
+        ['Drag · Alt-drag', 'Move · move a copy'],
+        [
+          `Hold ${MOD === '⌘' ? '⌘' : 'Ctrl'} while dragging`,
+          'Move without snapping (Alt too, once the drag started)',
+        ],
+        ['← → ↑ ↓ (⇧ ×10)', 'Nudge by 1 px (10 px)'],
+        ['Delete / Backspace', 'Delete the selection'],
+        [`${MOD}D`, 'Duplicate'],
+        [`${MOD}G / ⇧${MOD}G`, 'Group / ungroup'],
+        ['[ / ]', 'Send backward / bring forward'],
+        ['Enter · double-click', 'Edit text · choose a picture for a slot'],
+        [`${MOD}+ / ${MOD}− / ${MOD}0 / ⇧0`, 'Zoom in / out / to fit / 100 %'],
+        ['Space-drag · scroll', 'Pan'],
+        ['Alt+↑ / Alt+↓ (layer list)', 'Move a layer up / down'],
+      ],
+    },
+    {
       title: 'Audio (in a shot’s Audio section or the Soundtrack)',
       keys: [
         ['↑ / ↓', 'Previous / next line'],
