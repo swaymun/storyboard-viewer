@@ -63,8 +63,14 @@ test('recent storyboards are shared between ports and reopen from any of them', 
   const A = `http://localhost:${PORT_A}`;
   const B = `http://localhost:${PORT_B}`;
 
+  // The app sends its thumbnail once the first picture has decoded, after the page is shown;
+  // leaving A before that would cancel it (a slow CI runner showed this).
+  const thumbSent = page.waitForResponse(
+    (r) => r.url() === `${A}/api/recent/thumbnail` && r.request().method() === 'PUT',
+  );
   await page.goto(`${A}/`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Alpha Story');
+  expect((await thumbSent).ok()).toBe(true);
   await page.goto(`${B}/`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Beta Story');
 

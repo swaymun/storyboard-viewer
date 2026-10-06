@@ -4,8 +4,8 @@
  * events (consumed by the HTTP server's SSE stream).
  */
 import { EventEmitter } from 'node:events';
-import { existsSync, statSync, watch, type FSWatcher } from 'node:fs';
-import { basename, dirname, join, resolve } from 'node:path';
+import { existsSync, readdirSync, statSync, watch, type Dirent, type FSWatcher } from 'node:fs';
+import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { hasErrors, validateProject, type Issue, type SbdProject } from '@storyboard-viewer/format';
 import {
   isIgnoredPath,
@@ -35,13 +35,21 @@ export interface ChangeEvent {
   origin?: string;
 }
 
+type WatchMode = 'native' | 'per-directory';
+
+function defaultWatchMode(): WatchMode {
+  const env = process.env['SBD_WATCH'];
+  if (env === 'native' || env === 'per-directory') return env;
+  return process.platform === 'darwin' || process.platform === 'win32' ? 'native' : 'per-directory';
+}
+
 const issueKey = (i: Issue) => `${i.code}|${i.file ?? ''}|${i.message}`;
 
 export class ProjectStore extends EventEmitter<{ change: [ChangeEvent] }> {
   readonly path: string;
   readonly kind: ProjectKind;
   revision = 0;
-  private watcher: FSWatcher | undefined;
+  private watcher: { close(): void } | undefined;
   private pending = new Set<string>();
   private timer: NodeJS.Timeout | undefined;
   /**
@@ -152,8 +160,18 @@ export class ProjectStore extends EventEmitter<{ change: [ChangeEvent] }> {
     this.emit('change', ev);
   }
 
-  /** Watches the folder (or packed file) and emits debounced change events. */
-  startWatching(debounceMs = 120): void {
+  /**
+   * Watches the folder (or packed file) and emits debounced change events.
+   *
+   * Folders: `fs.watch(dir, {recursive: true})` is native on macOS (FSEvents) and Windows only.
+   * Elsewhere (Linux) Node ≤ 22 emulates it with one inotify watch per *file*, and a file
+   * replaced by an atomic rename (how every write here and in `sbd mcp` lands) leaves that watch
+   * on the old, deleted inode: the second write to the same file is never reported. So off
+   * macOS/Windows each directory gets its own non-recursive watch (a directory watch reports
+   * renames into it by name and survives its files being replaced), and new subfolders are
+   * picked up as they appear. `SBD_WATCH=native|per-directory` overrides the choice.
+   */
+  startWatching(debounceMs = 120, mode: WatchMode = defaultWatchMode()): void {
     if (this.watcher) return;
     const onEvent = (file: string | null) => {
       const rel = (file ?? '').split('\\').join('/');
@@ -172,11 +190,16 @@ export class ProjectStore extends EventEmitter<{ change: [ChangeEvent] }> {
         this.notify(files, 'watch');
       }, debounceMs);
     };
-    this.watcher =
+    if (this.kind === 'folder' && mode === 'per-directory') {
+      this.watcher = new DirectoryTreeWatcher(this.path, onEvent);
+      return;
+    }
+    const w =
       this.kind === 'folder'
         ? watch(this.path, { recursive: true }, (_e, f) => onEvent(f))
         : watch(dirname(this.path), (_e, f) => onEvent(f));
-    this.watcher.on('error', () => {
+    this.watcher = w;
+    w.on('error', () => {
       /* folder removed etc.; keep serving the last state */
     });
   }
@@ -185,5 +208,97 @@ export class ProjectStore extends EventEmitter<{ change: [ChangeEvent] }> {
     this.watcher?.close();
     this.watcher = undefined;
     clearTimeout(this.timer);
+  }
+}
+
+/**
+ * A recursive folder watch built from one non-recursive `fs.watch` per directory (see
+ * `startWatching`). Reports paths relative to the root with `/` separators; skips ignored
+ * (dot) folders.
+ */
+class DirectoryTreeWatcher {
+  private dirs = new Map<string, FSWatcher>();
+  private closed = false;
+
+  constructor(
+    private readonly root: string,
+    private readonly onEvent: (rel: string | null) => void,
+  ) {
+    this.add('');
+  }
+
+  /** Watches `rel` (a folder under the root) and every folder below it. */
+  private add(rel: string): void {
+    if (this.closed || this.dirs.has(rel)) return;
+    const abs = rel ? join(this.root, rel) : this.root;
+    let w: FSWatcher;
+    try {
+      w = watch(abs, (_e, f) => this.onChange(rel, f));
+    } catch {
+      return; // gone already
+    }
+    w.on('error', () => this.remove(rel));
+    this.dirs.set(rel, w);
+    let entries: Dirent[] = [];
+    try {
+      entries = readdirSync(abs, { withFileTypes: true });
+    } catch {
+      /* removed meanwhile */
+    }
+    for (const e of entries) {
+      const child = rel ? `${rel}/${e.name}` : e.name;
+      if (e.isDirectory() && !isIgnoredPath(child)) this.add(child);
+    }
+  }
+
+  /** Stops watching `rel` and the folders below it. */
+  private remove(rel: string): void {
+    for (const [d, w] of this.dirs) {
+      if (rel === '' || d === rel || d.startsWith(`${rel}/`)) {
+        w.close();
+        this.dirs.delete(d);
+      }
+    }
+  }
+
+  private onChange(dir: string, name: string | Buffer | null): void {
+    if (this.closed) return;
+    if (name == null) {
+      this.onEvent(dir || null);
+      return;
+    }
+    const rel = dir ? `${dir}/${String(name)}` : String(name);
+    if (!isIgnoredPath(rel)) {
+      // a folder created (or moved in) gets its own watch; a removed one is dropped
+      let isDir = false;
+      try {
+        isDir = statSync(join(this.root, rel)).isDirectory();
+      } catch {
+        if (this.dirs.has(rel)) this.remove(rel);
+      }
+      if (isDir && !this.dirs.has(rel)) {
+        this.add(rel);
+        // files written into it before its watch started
+        for (const f of this.filesBelow(rel)) this.onEvent(f);
+      }
+    }
+    this.onEvent(rel);
+  }
+
+  private filesBelow(rel: string): string[] {
+    try {
+      return readdirSync(join(this.root, rel), { recursive: true, withFileTypes: true })
+        .filter((e) => e.isFile())
+        .map((e) => relative(this.root, join(e.parentPath, e.name)).split(sep).join('/'))
+        .filter((f) => !isIgnoredPath(f));
+    } catch {
+      return [];
+    }
+  }
+
+  close(): void {
+    this.closed = true;
+    for (const w of this.dirs.values()) w.close();
+    this.dirs.clear();
   }
 }

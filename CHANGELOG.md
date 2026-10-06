@@ -6,6 +6,14 @@ All notable changes are listed here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- **Live refresh on Linux**: `sbd serve` missed the second agent (MCP) edit of the same file, so
+  the open app did not update. Node's recursive `fs.watch` on Linux watches each file, and those
+  watches go stale when a file is replaced by an atomic rename; the server now watches each folder
+  instead (macOS and Windows keep the native recursive watch; `SBD_WATCH=native|per-directory`
+  overrides).
+
 ## [0.4.1] — 2026-10-06
 
 ### Added
