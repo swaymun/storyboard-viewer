@@ -350,7 +350,7 @@ export const COMMANDS: readonly Command[] = [
     usage: 'sbd serve <path> [--port 4400] [--host 127.0.0.1] [--open]',
     summary: 'Serve the viewer + storyboard on localhost with live refresh',
     details:
-      'Accepts an unpacked folder (live refresh on every change) or a packed .sbd (read-only).\n' +
+      'Accepts an unpacked folder or a packed .sbd file (live refresh on every change; a packed file is saved in place, its previous version kept once as <file>.bak).\n' +
       'The storyboard is added to the recent list shared by every sbd serve\n' +
       '(~/.config/storyboard-viewer/recent.json; SBD_CONFIG_DIR or XDG_CONFIG_HOME change the folder).',
     options: {
@@ -370,7 +370,7 @@ export const COMMANDS: readonly Command[] = [
         log: (m) => io.err(m),
       });
       io.out(`Storyboard Viewer: ${srv.url}`);
-      io.out(`Serving ${store.path}${store.readOnly ? ' (read-only)' : ''}. Press Ctrl+C to stop.`);
+      io.out(`Serving ${store.path}. Press Ctrl+C to stop.`);
       if (values['open']) openBrowser(srv.url);
       return untilSignal(() => srv.close());
     },

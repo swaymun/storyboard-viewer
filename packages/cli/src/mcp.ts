@@ -41,6 +41,20 @@ import {
   updateManifest,
   updateShot,
   activeVariant,
+  slotFrameOf,
+  addLayer,
+  applyLayout,
+  canvasSizeOf,
+  CAPTION_STYLES,
+  fillSlot,
+  layoutsFor,
+  moveLayer,
+  newId,
+  removeLayers,
+  textLayerInput,
+  updateLayers,
+  updateVariant,
+  type CanvasVariant,
   PRESET_IDS,
   type CueInput,
   type CueTarget,
@@ -53,7 +67,7 @@ import {
 import { prepareAsset } from './media-import.js';
 import { createStoryboard } from './project-files.js';
 import { startServer, type RunningServer } from './server.js';
-import { EditRejectedError, ProjectStore } from './store.js';
+import { EditRejectedError, ProjectStore, type EditOptions } from './store.js';
 import { findViewer } from './registry.js';
 import { VERSION } from './version.js';
 
@@ -113,7 +127,23 @@ function shotView(p: SbdProject, id: string, detail: boolean) {
         ? { id: v.id, type: v.type, name: v.name, asset: v.asset }
         : detail
           ? v
-          : { id: v.id, type: v.type, name: v.name, layers: v.layers.length },
+          : {
+              id: v.id,
+              type: v.type,
+              name: v.name,
+              layers: v.layers.length,
+              ...(v.layers.some((l) => slotFrameOf(l))
+                ? {
+                    slots: v.layers
+                      .filter((l) => slotFrameOf(l))
+                      .map((l) => ({
+                        layer_id: l.id,
+                        name: slotFrameOf(l)!.name,
+                        image: l.asset ?? null,
+                      })),
+                  }
+                : {}),
+            },
     ),
   };
   if (hasSpan(ref)) {
@@ -147,7 +177,10 @@ function summary(p: SbdProject, issues: Issue[], store: ProjectStore, viewerUrl:
   const counts = (sev: string) => issues.filter((i) => i.severity === sev).length;
   return {
     path: store.path,
-    form: store.kind === 'folder' ? 'unpacked folder (editable)' : 'packed .sbd (read-only)',
+    form:
+      store.kind === 'folder'
+        ? 'unpacked folder'
+        : 'packed .sbd file (saved in place; the previous version is kept as .bak)',
     viewer_url: viewerUrl,
     title: m.title,
     preset: m.preset,
@@ -183,10 +216,49 @@ function summary(p: SbdProject, issues: Issue[], store: ProjectStore, viewerUrl:
 
 const idString = z.string().min(1);
 const fieldValue = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+const textStyleFields = {
+  font: z
+    .string()
+    .optional()
+    .describe('Font family: Montserrat, IBM Plex Sans, Courier Prime, IBM Plex Mono'),
+  font_asset: z.string().optional().describe('A font asset ID to use instead of font'),
+  font_size: z.number().positive().optional().describe('Canvas px'),
+  font_weight: z.number().min(1).max(1000).optional(),
+  italic: z.boolean().optional(),
+  uppercase: z.boolean().optional(),
+  color: z.string().optional().describe('CSS color, default #ffffff'),
+  align: z.enum(['left', 'center', 'right']).optional(),
+  line_height: z.number().positive().optional(),
+  stroke: z.object({ color: z.string(), width: z.number().min(0) }).optional(),
+  shadow: z
+    .object({
+      color: z.string(),
+      blur: z.number().min(0).optional(),
+      offset_x: z.number().optional(),
+      offset_y: z.number().optional(),
+    })
+    .optional(),
+  box: z
+    .object({
+      color: z.string(),
+      padding: z.number().min(0).optional(),
+      radius: z.number().min(0).optional(),
+    })
+    .optional(),
+};
+
 const layerSchema = z
   .object({
     id: z.string().optional(),
-    asset: idString.describe('Image asset ID'),
+    kind: z
+      .enum(['image', 'text', 'slot'])
+      .optional()
+      .describe('image (default), text (on-screen text) or slot (empty placeholder)'),
+    asset: idString.optional().describe('Image layers: image or video asset ID'),
+    text: z.string().optional().describe('Text layers: the text'),
+    group: z.string().optional().describe('Group ID shared by layers that belong together'),
+    fit: z.enum(['cover', 'contain']).optional().describe('Slot layers: how a picture fits'),
+    ...textStyleFields,
     name: z.string().optional(),
     x: z.number().optional(),
     y: z.number().optional(),
@@ -397,8 +469,9 @@ export async function createMcpSession(opts: McpOptions = {}): Promise<McpSessio
   const edit = async (
     fn: Parameters<ProjectStore['edit']>[0],
     describe: (r: { project: SbdProject } & Record<string, unknown>) => Record<string, unknown>,
+    opts: EditOptions = {},
   ): Promise<ToolResult> => {
-    const r = await requireStore().edit(fn);
+    const r = await requireStore().edit(fn, opts);
     const warnings = r.issues.filter((i) => i.severity === 'warning').map((i) => i.message);
     return text({
       ok: true,
@@ -413,7 +486,7 @@ export async function createMcpSession(opts: McpOptions = {}): Promise<McpSessio
     {
       title: 'Open a storyboard',
       description:
-        'Open a storyboard so the other tools work on it. `path` is an unpacked folder (e.g. "./my-film.sbd") or a packed .sbd file (read-only). Set create=true to make a new, empty storyboard at that path (optionally with a preset: blank, film, documentary, animation, motion, vertical).',
+        'Open a storyboard so the other tools work on it. `path` is an unpacked folder (e.g. "./my-film.sbd") or a packed .sbd file (both editable; a packed file is re-packed in place on every edit, its previous version kept once as <file>.bak). Set create=true to make a new, empty storyboard at that path (optionally with a preset: blank, film, documentary, animation, motion, vertical).',
       inputSchema: {
         path: idString.describe('Path to the storyboard folder (or packed .sbd file)'),
         create: z
@@ -953,8 +1026,12 @@ export async function createMcpSession(opts: McpOptions = {}): Promise<McpSessio
     },
     tool(async (a: Parameters<typeof prepareAsset>[1]) => {
       const s = requireStore();
-      if (s.readOnly) throw new Error(`${s.name} is a packed .sbd (read-only). Unpack it first.`);
-      const { asset, created } = await prepareAsset(s.path, a);
+      const packed = s.kind === 'packed';
+      const { asset, created, files } = await prepareAsset(
+        s.path,
+        a,
+        packed ? { packed: { exists: (rel) => s.has(rel) } } : {},
+      );
       try {
         return await edit(
           (p) => addAsset(p, asset),
@@ -962,10 +1039,13 @@ export async function createMcpSession(opts: McpOptions = {}): Promise<McpSessio
             asset: r.project.assets.assets.find((x) => x.id === r['id']),
             copied: created,
           }),
+          packed ? { add: files } : {},
         );
       } catch (e) {
-        const { rm } = await import('node:fs/promises');
-        for (const f of created) await rm(resolve(s.path, f), { force: true });
+        if (!packed) {
+          const { rm } = await import('node:fs/promises');
+          for (const f of created) await rm(resolve(s.path, f), { force: true });
+        }
         throw e;
       }
     }),
@@ -1017,7 +1097,7 @@ export async function createMcpSession(opts: McpOptions = {}): Promise<McpSessio
     {
       title: 'Add a visual variant to a shot',
       description:
-        'Add an alternative visual to a shot. Simple case: asset_id of an image (or video) asset. Composition: layers = list of image layers (asset, x, y, scale_x, scale_y, rotation, opacity, crop, filters), bottom layer first, coordinates in canvas pixels (default canvas size from the storyboard, usually 1920x1080). The new variant becomes the active one unless activate=false.',
+        'Add an alternative visual to a shot. Simple case: asset_id of an image (or video) asset. Composition: layers = list of layers, bottom first, coordinates in canvas pixels (default canvas size from the storyboard, e.g. 1920x1080 or 1080x1920): image layers (asset, x, y, width, height, scale_x, scale_y, rotation, opacity, crop, filters), text layers (kind "text", text, x, y, width = wrap width, font, font_size, font_weight, color, align, stroke, shadow, box) and empty slots (kind "slot", name, x, y, width, height). For ready-made arrangements prefer apply_layout; for captions add_text_layer. The new variant becomes the active one unless activate=false.',
       inputSchema: {
         shot_id: idString,
         asset_id: z.string().optional(),
@@ -1035,7 +1115,7 @@ export async function createMcpSession(opts: McpOptions = {}): Promise<McpSessio
       async (a: {
         shot_id: string;
         asset_id?: string;
-        layers?: Array<Partial<Layer> & { asset: string }>;
+        layers?: Array<Partial<Layer>>;
         width?: number;
         height?: number;
         background?: string;
@@ -1062,6 +1142,326 @@ export async function createMcpSession(opts: McpOptions = {}): Promise<McpSessio
           (r) => ({ variant_id: r['id'], shot: shotView(r.project, a.shot_id, false) }),
         ),
     ),
+  );
+
+  /** The canvas variant a layer tool works on: the given one, else the shot's active one. */
+  const canvasFor = (p: SbdProject, shotId: string, variantId?: string): CanvasVariant => {
+    const shot = p.shots[shotId];
+    if (!shot) throw new Error(`Unknown shot "${shotId}"`);
+    const v = variantId
+      ? shot.variants?.find((x) => x.id === variantId)
+      : (activeVariant(shot) ?? undefined);
+    if (!v)
+      throw new Error(
+        `Shot "${shotId}" has no ${variantId ? `variant "${variantId}"` : 'variants'}`,
+      );
+    if (v.type !== 'canvas')
+      throw new Error(
+        `Variant "${v.id}" is a single image, not a layout. Use apply_layout (it can turn it into one) or add_variant with layers.`,
+      );
+    return v;
+  };
+  const variantField = z
+    .string()
+    .optional()
+    .describe("Canvas variant ID (default: the shot's active variant)");
+  const layersView = (p: SbdProject, shotId: string, variantId: string) =>
+    canvasFor(p, shotId, variantId).layers;
+
+  server.registerTool(
+    'update_variant',
+    {
+      title: 'Change a variant',
+      description:
+        'Rename a variant, change its notes, or (canvas variants) its background color or size, or replace all of its layers at once (same layer format as add_variant). null removes a value.',
+      inputSchema: {
+        shot_id: idString,
+        variant_id: idString,
+        name: z.string().nullable().optional(),
+        notes: z.string().nullable().optional(),
+        background: z.string().nullable().optional(),
+        width: z.number().positive().nullable().optional(),
+        height: z.number().positive().nullable().optional(),
+        layers: z.array(layerSchema).optional(),
+      },
+    },
+    tool(
+      async ({
+        shot_id,
+        variant_id,
+        ...rest
+      }: { shot_id: string; variant_id: string } & Record<string, unknown>) =>
+        edit(
+          (p) => {
+            const patch = { ...rest } as Record<string, unknown>;
+            for (const k of Object.keys(patch)) if (patch[k] === undefined) delete patch[k];
+            if (Array.isArray(patch['layers'])) {
+              const taken = new Set<string>();
+              patch['layers'] = (patch['layers'] as Array<Partial<Layer>>).map((l) => {
+                const id = l.id ?? newId('ly', taken);
+                taken.add(id);
+                return { ...l, id };
+              });
+            }
+            // layers are checked by validation (unknown assets, missing text) before saving
+            return { project: updateVariant(p, shot_id, variant_id, patch as never) };
+          },
+          (r) => ({ shot: shotView(r.project, shot_id, true) }),
+        ),
+    ),
+  );
+
+  server.registerTool(
+    'list_layouts',
+    {
+      title: 'List canvas layouts and caption styles',
+      description:
+        "Ready-made layouts (named slots for pictures, sometimes placeholder text) that suit this storyboard's frame (9:16 vertical, 16:9, 1:1, 4:5), and the caption styles for add_text_layer.",
+      inputSchema: {},
+      annotations: { readOnlyHint: true },
+    },
+    tool(async () => {
+      const opened = await requireStore().load();
+      const size = canvasSizeOf({}, opened.project.manifest);
+      return text({
+        frame: size,
+        layouts: layoutsFor(size.width, size.height).map((l) => ({
+          id: l.id,
+          name: l.name,
+          description: l.description,
+          slots: l.slots.map((s) => s.name),
+          texts: (l.texts ?? []).map((t) => t.name),
+        })),
+        caption_styles: CAPTION_STYLES.map((c) => ({ id: c.id, description: c.description })),
+        text_positions: ['top', 'middle', 'bottom', 'lower-third'],
+      });
+    }),
+  );
+
+  server.registerTool(
+    'apply_layout',
+    {
+      title: 'Apply a layout to a shot',
+      description:
+        'Arrange a shot with a ready-made layout (see list_layouts), e.g. "split" (top/bottom), "picture-in-picture", "caption-band", "two-up", "lower-third". Without variant_id a new canvas variant is made (and shown); images (asset IDs) fill the slots in order. With variant_id of a canvas variant its pictures are moved into the slots (largest first) and its text stays; with an image variant, that image goes into the first slot of a new canvas variant. Empty slots are placeholders the user sees in the editor (not in exports); fill them with fill_slot.',
+      inputSchema: {
+        shot_id: idString,
+        layout: z.string().describe('Layout ID from list_layouts'),
+        variant_id: z.string().optional(),
+        images: z.array(z.string()).optional().describe('Asset IDs for the slots, in slot order'),
+        name: z.string().optional().describe('Name of a new variant'),
+        activate: z.boolean().optional(),
+      },
+    },
+    tool(
+      async (a: {
+        shot_id: string;
+        layout: string;
+        variant_id?: string;
+        images?: string[];
+        name?: string;
+        activate?: boolean;
+      }) =>
+        edit(
+          (p) =>
+            applyLayout(
+              p,
+              a.shot_id,
+              a.layout,
+              defined({
+                variantId: a.variant_id,
+                images: a.images,
+                name: a.name,
+                activate: a.activate,
+              }),
+            ),
+          (r) => ({ variant_id: r['id'], shot: shotView(r.project, a.shot_id, true) }),
+        ),
+    ),
+  );
+
+  server.registerTool(
+    'fill_slot',
+    {
+      title: 'Put a picture into a layout slot',
+      description:
+        'Fill an empty slot (or replace the picture in a slot) of a canvas variant with an image or video asset. slot = the slot layer ID or its name ("Top", "B-roll"). fit: cover (default, fills the slot and crops) or contain (shows the whole picture).',
+      inputSchema: {
+        shot_id: idString,
+        variant_id: variantField,
+        slot: z.string(),
+        asset_id: idString,
+        fit: z.enum(['cover', 'contain']).optional(),
+      },
+    },
+    tool(
+      async (a: {
+        shot_id: string;
+        variant_id?: string;
+        slot: string;
+        asset_id: string;
+        fit?: 'cover' | 'contain';
+      }) => {
+        let vid = '';
+        return edit(
+          (p) => {
+            vid = canvasFor(p, a.shot_id, a.variant_id).id;
+            return { project: fillSlot(p, a.shot_id, vid, a.slot, a.asset_id, a.fit) };
+          },
+          (r) => ({ variant_id: vid, layers: layersView(r.project, a.shot_id, vid) }),
+        );
+      },
+    ),
+  );
+
+  server.registerTool(
+    'add_text_layer',
+    {
+      title: 'Add on-screen text (caption, hook, title)',
+      description:
+        'Add a text layer to a canvas variant in a caption style: bold (short-form captions: heavy white text with outline), boxed (dark text on white boxes), lower-third (name/title on a dark band), title (big capitals), subtitle (plain white with shadow). position: top, middle, bottom (above the TikTok/Reels/Shorts buttons on vertical frames) or lower-third; or give x/y/width in canvas px. Any text attribute (font, font_size, color, align, stroke, shadow, box) overrides the style. If the shot shows a single image, first make it a layout with apply_layout.',
+      inputSchema: {
+        shot_id: idString,
+        variant_id: variantField,
+        text: z.string(),
+        style: z.enum(['bold', 'boxed', 'lower-third', 'title', 'subtitle']).optional(),
+        position: z.enum(['top', 'middle', 'bottom', 'lower-third']).optional(),
+        id: z.string().optional(),
+        name: z.string().optional(),
+        x: z.number().optional(),
+        y: z.number().optional(),
+        width: z.number().positive().optional(),
+        rotation: z.number().optional(),
+        ...textStyleFields,
+      },
+    },
+    tool(
+      async ({
+        shot_id,
+        variant_id,
+        ...rest
+      }: { shot_id: string; variant_id?: string; text: string } & Record<string, unknown>) => {
+        let vid = '';
+        return edit(
+          (p) => {
+            const v = canvasFor(p, shot_id, variant_id);
+            vid = v.id;
+            const input = textLayerInput(defined(rest) as never, canvasSizeOf(v, p.manifest));
+            return addLayer(p, shot_id, vid, input);
+          },
+          (r) => ({
+            variant_id: vid,
+            layer: layersView(r.project, shot_id, vid).find((l) => l.id === r['id']),
+          }),
+        );
+      },
+    ),
+  );
+
+  server.registerTool(
+    'add_layer',
+    {
+      title: 'Add a layer to a canvas variant',
+      description:
+        'Add one layer on top (or at index, 0 = bottom): an image layer (asset, x, y, width, height, scale_x, scale_y, rotation, opacity, crop, filters), a text layer (kind "text", text, …; add_text_layer is easier) or an empty slot (kind "slot", name, x, y, width, height). Canvas px.',
+      inputSchema: {
+        shot_id: idString,
+        variant_id: variantField,
+        layer: layerSchema,
+        index: z.number().int().min(0).optional(),
+      },
+    },
+    tool(
+      async (a: {
+        shot_id: string;
+        variant_id?: string;
+        layer: Partial<Layer>;
+        index?: number;
+      }) => {
+        let vid = '';
+        return edit(
+          (p) => {
+            vid = canvasFor(p, a.shot_id, a.variant_id).id;
+            return addLayer(
+              p,
+              a.shot_id,
+              vid,
+              a.layer as never,
+              a.index === undefined ? {} : { index: a.index },
+            );
+          },
+          (r) => ({
+            variant_id: vid,
+            layer_id: r['id'],
+            layers: layersView(r.project, a.shot_id, vid),
+          }),
+        );
+      },
+    ),
+  );
+
+  server.registerTool(
+    'update_layer',
+    {
+      title: 'Change a layer',
+      description:
+        'Change attributes of one layer of a canvas variant (position, size, rotation, opacity, crop, filters, text and text style, visible, locked, group, name). null removes a value. To move a layer in the stacking order give index (0 = bottom).',
+      inputSchema: {
+        shot_id: idString,
+        variant_id: variantField,
+        layer_id: idString,
+        changes: z
+          .record(z.string(), z.unknown())
+          .describe(
+            'Attributes to set, same names as in add_layer (x, y, width, text, color, stroke…); null removes one',
+          ),
+        index: z.number().int().min(0).optional(),
+      },
+    },
+    tool(
+      async (a: {
+        shot_id: string;
+        variant_id?: string;
+        layer_id: string;
+        changes: Record<string, unknown>;
+        index?: number;
+      }) => {
+        let vid = '';
+        return edit(
+          (p) => {
+            vid = canvasFor(p, a.shot_id, a.variant_id).id;
+            let next = updateLayers(p, a.shot_id, vid, { [a.layer_id]: a.changes as never });
+            if (a.index !== undefined) next = moveLayer(next, a.shot_id, vid, a.layer_id, a.index);
+            return { project: next };
+          },
+          (r) => ({ variant_id: vid, layers: layersView(r.project, a.shot_id, vid) }),
+        );
+      },
+    ),
+  );
+
+  server.registerTool(
+    'remove_layer',
+    {
+      title: 'Remove layers',
+      description: 'Delete one or more layers from a canvas variant (the assets stay).',
+      inputSchema: {
+        shot_id: idString,
+        variant_id: variantField,
+        layer_ids: z.array(idString).min(1),
+      },
+      annotations: { destructiveHint: true },
+    },
+    tool(async (a: { shot_id: string; variant_id?: string; layer_ids: string[] }) => {
+      let vid = '';
+      return edit(
+        (p) => {
+          vid = canvasFor(p, a.shot_id, a.variant_id).id;
+          return { project: removeLayers(p, a.shot_id, vid, a.layer_ids) };
+        },
+        (r) => ({ variant_id: vid, layers: layersView(r.project, a.shot_id, vid) }),
+      );
+    }),
   );
 
   server.registerTool(

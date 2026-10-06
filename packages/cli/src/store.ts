@@ -2,17 +2,27 @@
  * ProjectStore: one storyboard on disk. Loads fresh state for every read (so hand edits are
  * always picked up), applies edit operations with validation and atomic writes, and emits change
  * events (consumed by the HTTP server's SSE stream).
+ *
+ * Unpacked folders get only their changed files rewritten (each atomically). Packed `.sbd`
+ * files are saved in place (0.5.0): the zip is re-packed with the new text files (media kept,
+ * STOREd) into a temp file next to it and renamed over it; before the first save of a session
+ * the previous version is copied to `<file>.bak`.
  */
 import { EventEmitter } from 'node:events';
 import { existsSync, readdirSync, statSync, watch, type Dirent, type FSWatcher } from 'node:fs';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { hasErrors, validateProject, type Issue, type SbdProject } from '@storyboard-viewer/format';
 import {
+  atomicWriteFile,
+  backupPath,
   isIgnoredPath,
   openProjectPath,
+  packedPaths,
   projectKind,
   resolveLinked,
+  safeJoin,
   writeProjectToFolder,
+  writeProjectToPacked,
   type OpenedProject,
   type ProjectKind,
 } from '@storyboard-viewer/format/node';
@@ -25,6 +35,13 @@ export class EditRejectedError extends Error {
   ) {
     super(message);
   }
+}
+
+export interface EditOptions {
+  /** Client that made the edit (the web app passes its client ID when saving). */
+  origin?: string;
+  /** Package files to add in the same write (new media), path → bytes. */
+  add?: Record<string, Uint8Array>;
 }
 
 export interface ChangeEvent {
@@ -58,6 +75,10 @@ export class ProjectStore extends EventEmitter<{ change: [ChangeEvent] }> {
    * one made a few milliseconds later by another process (an agent).
    */
   private recentWrites = new Map<string, string>();
+  /** Edits run one after another (a packed file is rewritten as a whole). */
+  private queue: Promise<unknown> = Promise.resolve();
+  /** Whether this process already kept a `.bak` of the packed file. */
+  private backedUp = false;
 
   private constructor(path: string, kind: ProjectKind) {
     super();
@@ -79,8 +100,51 @@ export class ProjectStore extends EventEmitter<{ change: [ChangeEvent] }> {
     return basename(this.path);
   }
 
+  /** Always false since 0.5.0: packed files are saved in place too. */
   get readOnly(): boolean {
-    return this.kind === 'packed';
+    return false;
+  }
+
+  /** Where the previous version of a packed file is kept (null for folders). */
+  get backupFile(): string | null {
+    return this.kind === 'packed' ? backupPath(this.path) : null;
+  }
+
+  /** Runs `fn` after every earlier edit of this store finished. */
+  private serial<T>(fn: () => Promise<T>): Promise<T> {
+    const run = this.queue.then(fn, fn);
+    this.queue = run.catch(() => undefined);
+    return run;
+  }
+
+  /** Package paths that exist (unique media names). */
+  async has(rel: string): Promise<boolean> {
+    if (this.kind === 'folder') return existsSync(join(this.path, rel));
+    return (await packedPaths(this.path)).has(rel);
+  }
+
+  /**
+   * Adds files to the package right away (media uploads): copied into the folder, or re-packed
+   * into the packed file. `write` is called only for folders (the caller copies there).
+   */
+  async addFiles(files: Record<string, Uint8Array>): Promise<string[]> {
+    if (this.kind === 'folder') return Object.keys(files);
+    return this.serial(async () => {
+      const opened = await this.load();
+      const r = await writeProjectToPacked(this.path, opened.project, {
+        add: files,
+        backup: this.takeBackup(),
+        touchModified: false,
+      });
+      this.markWritten(r.written);
+      return r.written;
+    });
+  }
+
+  private takeBackup(): boolean {
+    if (this.backedUp) return false;
+    this.backedUp = true;
+    return true;
   }
 
   /** Loads the current state from disk (re-anchoring in memory if the script changed). */
@@ -100,16 +164,18 @@ export class ProjectStore extends EventEmitter<{ change: [ChangeEvent] }> {
    */
   async edit<T extends { project: SbdProject }>(
     fn: (p: SbdProject, opened: OpenedProject) => T | Promise<T>,
-    opts: { origin?: string } = {},
+    opts: EditOptions = {},
   ): Promise<T & { issues: Issue[]; written: string[] }> {
-    if (this.readOnly) {
-      throw new Error(
-        `${this.name} is a packed .sbd (read-only). Unpack it first: sbd unpack "${this.path}"`,
-      );
-    }
+    return this.serial(() => this.editNow(fn, opts));
+  }
+
+  private async editNow<T extends { project: SbdProject }>(
+    fn: (p: SbdProject, opened: OpenedProject) => T | Promise<T>,
+    opts: EditOptions,
+  ): Promise<T & { issues: Issue[]; written: string[] }> {
     const opened = await this.load();
     const result = await fn(opened.project, opened);
-    const files = new Set(opened.files);
+    const files = new Set([...opened.files, ...Object.keys(opts.add ?? {})]);
     const issues = validateProject(result.project, {
       hasFile: (p) => files.has(p),
       linkedExists: (src) => {
@@ -127,7 +193,19 @@ export class ProjectStore extends EventEmitter<{ change: [ChangeEvent] }> {
         );
       }
     }
-    const { written, deleted } = await writeProjectToFolder(this.path, result.project);
+    const added = Object.keys(opts.add ?? {});
+    if (this.kind === 'folder')
+      for (const [rel, bytes] of Object.entries(opts.add ?? {}))
+        await atomicWriteFile(safeJoin(this.path, rel), bytes);
+    const { written, deleted } =
+      this.kind === 'folder'
+        ? await writeProjectToFolder(this.path, result.project)
+        : await writeProjectToPacked(this.path, result.project, {
+            backup: !this.backedUp,
+            ...(opts.add ? { add: opts.add } : {}),
+          });
+    if (this.kind === 'folder') written.unshift(...added);
+    if (this.kind === 'packed' && (written.length || deleted.length)) this.backedUp = true;
     const changed = [...written, ...deleted];
     this.markWritten(changed);
     if (changed.length) this.notify(changed, 'edit', opts.origin);
@@ -136,6 +214,8 @@ export class ProjectStore extends EventEmitter<{ change: [ChangeEvent] }> {
 
   /** Remembers files written by this process so the watcher skips their echo. */
   markWritten(files: readonly string[]): void {
+    // a packed file is one file on disk: its own name is what the watcher reports
+    if (this.kind === 'packed') files = files.length ? [basename(this.path)] : [];
     for (const f of files) {
       const stamp = this.stamp(f);
       if (stamp) this.recentWrites.set(f, stamp);
@@ -145,7 +225,7 @@ export class ProjectStore extends EventEmitter<{ change: [ChangeEvent] }> {
 
   private stamp(rel: string): string | null {
     try {
-      const st = statSync(join(this.path, rel));
+      const st = statSync(this.kind === 'packed' ? this.path : join(this.path, rel));
       return `${st.size}:${st.mtimeMs}:${st.ino}`;
     } catch {
       return 'deleted';

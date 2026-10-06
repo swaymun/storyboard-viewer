@@ -1,4 +1,12 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -10,7 +18,7 @@ import {
   serializeProject,
   updateShot,
 } from '@storyboard-viewer/format';
-import { readFolderTree } from '@storyboard-viewer/format/node';
+import { openProjectPath, readFolderTree, zipFileReader } from '@storyboard-viewer/format/node';
 import { ProjectStore, startServer, type RunningServer } from '../src/index.js';
 import {
   configDir,
@@ -167,15 +175,16 @@ describe('sbd serve', () => {
     expect(body.reanchor).not.toBeNull();
   });
 
-  it('serves a packed .sbd read-only, slicing STOREd media', async () => {
+  it('serves a packed .sbd (slicing STOREd media) and saves edits in place', async () => {
     const ex = exampleCopy();
     cleanups.push(ex.cleanup);
     const file = join(ex.work, 'packed.sbd');
     writeFileSync(file, packSbd(await readFolderTree(ex.dir)));
+    const original = readFileSync(file);
     const { store, base } = await serve(file);
-    expect(store.readOnly).toBe(true);
+    expect(store.readOnly).toBe(false);
     const body = await getJson(`${base}/api/project`);
-    expect(body.source.readOnly).toBe(true);
+    expect(body.source).toMatchObject({ kind: 'packed', readOnly: false });
     const wav = readFileSync(join(ex.dir, 'media/music.wav'));
     const part = await fetch(`${base}/api/files/media/music.wav`, {
       headers: { range: 'bytes=1000-1099' },
@@ -184,9 +193,32 @@ describe('sbd serve', () => {
     expect(Buffer.from(await part.arrayBuffer())).toEqual(wav.subarray(1000, 1100));
     const json = await getJson(`${base}/api/files/manifest.json`);
     expect(json.title).toBe("The Keeper's Light");
-    await expect(store.edit((p) => ({ project: p }))).rejects.toThrow(/read-only/);
     const dl = await fetch(`${base}/api/download`);
-    expect(Buffer.from(await dl.arrayBuffer())).toEqual(readFileSync(file));
+    expect(Buffer.from(await dl.arrayBuffer())).toEqual(original);
+
+    // an edit re-packs the file in place; the previous version is kept as .bak
+    const r = await store.edit((p) => ({ project: updateShot(p, 'climb', { title: 'Packed!' }) }));
+    expect(r.written).toEqual(expect.arrayContaining(['shots/climb.json', 'manifest.json']));
+    expect(readFileSync(`${file}.bak`)).toEqual(original);
+    const after = readFileSync(file);
+    expect(after.subarray(30, 38).toString()).toBe('mimetype');
+    const reopened = await openProjectPath(file);
+    await reopened.close();
+    expect(reopened.project.shots['climb']!.title).toBe('Packed!');
+    expect(reopened.issues.filter((i) => i.severity === 'error')).toEqual([]);
+    // media are still STOREd (sliceable) and unchanged
+    const zr = await zipFileReader(file);
+    expect(zr.entry('media/music.wav')!.method).toBe(0);
+    expect(Buffer.from((await zr.read('media/music.wav'))!)).toEqual(wav);
+    await zr.close();
+    // media URLs are versioned by content, so a save does not reload every picture
+    const again = await getJson(`${base}/api/project`);
+    expect(again.media['media/music.wav'].mtime).toBe(body.media['media/music.wav'].mtime);
+    // the .bak keeps the version from before this session's first save
+    await store.edit((p) => ({ project: updateShot(p, 'climb', { title: 'Twice' }) }));
+    expect(readFileSync(`${file}.bak`)).toEqual(original);
+    // no temp files left behind
+    expect(readdirSync(ex.work).filter((f) => f.startsWith('.'))).toEqual([]);
   });
 
   it('serves the web app with SPA fallback', async () => {
@@ -324,15 +356,33 @@ describe('sbd serve', () => {
       expect(missing.status).toBe(404);
     });
 
-    it('refuses writes to a packed .sbd', async () => {
+    it('saves app edits and media uploads into a packed .sbd', async () => {
       const ex = exampleCopy();
       cleanups.push(ex.cleanup);
       const file = join(ex.work, 'packed.sbd');
       writeFileSync(file, packSbd(await readFolderTree(ex.dir)));
       const { base } = await serve(file);
-      const res = await fetch(`${base}/api/project`, { method: 'PUT', headers, body: '{}' });
-      expect(res.status).toBe(409);
-      expect((await json(res)).readOnly).toBe(true);
+      const loaded = (await getJson(`${base}/api/project`)).project;
+      const res = await put(base, loaded, updateShot(loaded, 'climb', { title: 'From the app' }));
+      expect(res.status).toBe(200);
+      expect((await json(res)).project.shots.climb.title).toBe('From the app');
+      const png = readFileSync(join(ex.dir, 'media/maya.png'));
+      const up = await fetch(`${base}/api/media?name=${encodeURIComponent('New Pic.png')}`, {
+        method: 'POST',
+        headers: { 'x-sbd-client': 'test-client' },
+        body: png,
+      });
+      expect(up.status).toBe(200);
+      const { asset } = await json(up);
+      expect(asset.src).toBe('media/new-pic.png');
+      const zr = await zipFileReader(file);
+      expect(zr.entry('media/new-pic.png')!.method).toBe(0);
+      await zr.close();
+      const served = await fetch(`${base}/api/files/media/new-pic.png`);
+      expect(Buffer.from(await served.arrayBuffer())).toEqual(png);
+      const reopened = await openProjectPath(file);
+      await reopened.close();
+      expect(reopened.project.shots['climb']!.title).toBe('From the app');
     });
   });
 });

@@ -1,8 +1,11 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
+import { packSbd } from '@storyboard-viewer/format';
+import { openProjectPath, readFolderTree } from '@storyboard-viewer/format/node';
 import { createMcpSession, ProjectStore, startServer, type McpOptions } from '../src/index.js';
 import { EXAMPLE, exampleCopy, getJson } from './helpers.js';
 
@@ -60,6 +63,14 @@ describe('MCP server', () => {
       'remove_cue',
       'validate',
       'get_viewer_url',
+      'update_variant',
+      'list_layouts',
+      'apply_layout',
+      'fill_slot',
+      'add_text_layer',
+      'add_layer',
+      'update_layer',
+      'remove_layer',
     ])
       expect(names).toContain(n);
     for (const t of tools) expect(t.description!.length).toBeGreaterThan(20);
@@ -307,6 +318,99 @@ describe('MCP server', () => {
       shots.json.shots.find((x: { id: string }) => x.id === id).span?.text;
     expect(span('lamp-on')).toBe('the old lamp is dark.');
     expect(span('lamp-dark')).toBe('At the top of the tower, ');
+  });
+
+  it('lays out a vertical shot: layout, slots, captions, layers', async () => {
+    const work = mkdtempSync(join(tmpdir(), 'sbd-mcp-'));
+    cleanups.push(() => rmSync(work, { recursive: true, force: true }));
+    const { call } = await connect();
+    const path = join(work, 'reel.sbd');
+    expect(
+      (await call('open_storyboard', { path, create: true, preset: 'vertical' })).isError,
+    ).toBe(false);
+    const pic = (await call('add_asset', { path: join(EXAMPLE, 'media/maya.png'), id: 'maya' }))
+      .json;
+    expect(pic.ok).toBe(true);
+    await call('add_asset', { path: join(EXAMPLE, 'media/lamp.png'), id: 'lamp' });
+    await call('add_shot', { id: 'hook', title: 'Hook' });
+    const layouts = (await call('list_layouts')).json;
+    expect(layouts.frame).toEqual({ width: 1080, height: 1920 });
+    expect(layouts.layouts.map((l: { id: string }) => l.id)).toContain('split');
+    expect(layouts.caption_styles.map((c: { id: string }) => c.id)).toContain('bold');
+
+    const applied = await call('apply_layout', {
+      shot_id: 'hook',
+      layout: 'split',
+      images: ['lamp'],
+    });
+    expect(applied.isError).toBe(false);
+    const vid = applied.json.variant_id;
+    const slots = applied.json.shot.variants[0].layers;
+    expect(slots.map((l: { id: string }) => l.id)).toEqual(['top', 'bottom']);
+    expect(slots[0]).toMatchObject({ asset: 'lamp', slot: { name: 'Top' } });
+    expect(slots[1]).toMatchObject({ kind: 'slot', name: 'Bottom' });
+
+    const filled = await call('fill_slot', { shot_id: 'hook', slot: 'Bottom', asset_id: 'maya' });
+    expect(filled.isError).toBe(false);
+    expect(filled.json.layers[1]).toMatchObject({ id: 'bottom', asset: 'maya' });
+
+    const caption = await call('add_text_layer', {
+      shot_id: 'hook',
+      text: 'My cat did WHAT?',
+      style: 'bold',
+      position: 'top',
+    });
+    expect(caption.isError).toBe(false);
+    expect(caption.json.layer).toMatchObject({ kind: 'text', font: 'Montserrat', style: 'bold' });
+    const textId = caption.json.layer.id;
+
+    const upd = await call('update_layer', {
+      shot_id: 'hook',
+      layer_id: textId,
+      changes: { color: '#ffe600', stroke: null },
+      index: 0,
+    });
+    expect(upd.isError).toBe(false);
+    expect(upd.json.layers[0]).toMatchObject({ id: textId, color: '#ffe600' });
+    expect(upd.json.layers[0].stroke).toBeUndefined();
+
+    const rm = await call('remove_layer', { shot_id: 'hook', layer_ids: [textId] });
+    expect(rm.json.layers).toHaveLength(2);
+    const bad = await call('add_layer', { shot_id: 'hook', layer: { kind: 'text' } });
+    expect(bad.isError).toBe(true);
+    const ren = await call('update_variant', {
+      shot_id: 'hook',
+      variant_id: vid,
+      name: 'Reaction',
+      background: '#000000',
+    });
+    expect(ren.json.shot.variants[0]).toMatchObject({ name: 'Reaction', background: '#000000' });
+    const v = await call('validate');
+    expect(v.json.valid).toBe(true);
+    const manifest = JSON.parse(readFileSync(join(path, 'manifest.json'), 'utf8'));
+    expect(manifest.format_version).toBe('0.3.0');
+  });
+
+  it('edits a packed .sbd in place (same atomic re-pack as the viewer)', async () => {
+    const ex = exampleCopy();
+    cleanups.push(ex.cleanup);
+    const file = join(ex.work, 'story-packed.sbd');
+    writeFileSync(file, packSbd(await readFolderTree(ex.dir)));
+    const original = readFileSync(file);
+    const { call } = await connect();
+    const o = await call('open_storyboard', { path: file });
+    expect(o.json.form).toMatch(/packed/);
+    const r = await call('update_shot', { shot_id: 'climb', title: 'Edited packed' });
+    expect(r.isError).toBe(false);
+    const a = await call('add_asset', { path: join(EXAMPLE, 'media/lamp.png'), id: 'lamp-2' });
+    expect(a.isError).toBe(false);
+    expect(a.json.asset.src).toBe('media/lamp.png'.replace('lamp', 'lamp-2'));
+    const reopened = await openProjectPath(file);
+    await reopened.close();
+    expect(reopened.project.shots['climb']!.title).toBe('Edited packed');
+    expect(reopened.files).toContain('media/lamp-2.png');
+    expect(readFileSync(`${file}.bak`)).toEqual(original);
+    expect((await call('validate')).json.valid).toBe(true);
   });
 
   it('rejects edits that would break the storyboard and keeps files unchanged', async () => {

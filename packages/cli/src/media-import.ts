@@ -79,20 +79,33 @@ export async function ffprobe(file: string): Promise<Probe> {
   }
 }
 
-async function uniqueMediaPath(projectDir: string, stem: string, ext: string): Promise<string> {
+async function uniqueMediaPath(
+  exists: (rel: string) => boolean | Promise<boolean>,
+  stem: string,
+  ext: string,
+): Promise<string> {
   let rel = `media/${stem}${ext}`;
-  for (let n = 2; existsSync(join(projectDir, rel)); n++) rel = `media/${stem}-${n}${ext}`;
+  for (let n = 2; await exists(rel); n++) rel = `media/${stem}-${n}${ext}`;
   return rel;
 }
 
+export interface PrepareOptions {
+  /**
+   * Packed storyboards: which package paths exist, and collect embedded files into `files`
+   * instead of copying them (the caller writes them into the zip with the edit).
+   */
+  packed?: { exists(rel: string): Promise<boolean> };
+}
+
 /**
- * Builds the asset entry and (for embed) copies the file into `media/`. Returns the asset input
- * plus the package files that were created.
+ * Builds the asset entry and (for embed) copies the file into `media/` of a folder, or (packed)
+ * returns its bytes in `files`. Returns the asset input plus the package files created.
  */
 export async function prepareAsset(
   projectPath: string,
   input: ImportAssetInput,
-): Promise<{ asset: AssetInput; created: string[] }> {
+  opts: PrepareOptions = {},
+): Promise<{ asset: AssetInput; created: string[]; files: Record<string, Uint8Array> }> {
   if (!!input.path === !!input.url)
     throw new Error('Give exactly one of "path" (local file) or "url"');
   if (input.url) {
@@ -110,7 +123,7 @@ export async function prepareAsset(
       src: input.url,
       mime: mimeForPath(input.url),
     };
-    return { asset: decorate(asset, input), created: [] };
+    return { asset: decorate(asset, input), created: [], files: {} };
   }
   const file = resolve(input.path!);
   const st = await stat(file).catch(() => null);
@@ -148,22 +161,26 @@ export async function prepareAsset(
       asset.mime = `${asset.mime}; codecs="${probe.codecs.join(', ')}"`;
   }
   const created: string[] = [];
+  const files: Record<string, Uint8Array> = {};
   const mode = input.mode ?? 'embed';
   if (mode === 'embed') {
     const rel = await uniqueMediaPath(
-      projectPath,
+      opts.packed ? (r) => opts.packed!.exists(r) : (r) => existsSync(join(projectPath, r)),
       slugify(input.name ?? basename(file, ext), 'asset'),
       ext,
     );
-    await mkdir(join(projectPath, 'media'), { recursive: true });
-    await copyFile(file, join(projectPath, rel));
+    if (opts.packed) files[rel] = bytes;
+    else {
+      await mkdir(join(projectPath, 'media'), { recursive: true });
+      await copyFile(file, join(projectPath, rel));
+    }
     asset.src = rel;
     created.push(rel);
   } else {
     const relPath = relative(linkBase(projectPath), file).split(sep).join('/');
     asset.src = `file:${relPath}`;
   }
-  return { asset: decorate(asset, input), created };
+  return { asset: decorate(asset, input), created, files };
 }
 
 function decorate(asset: AssetInput, input: ImportAssetInput): AssetInput {

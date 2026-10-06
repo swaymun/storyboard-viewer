@@ -218,8 +218,7 @@ async function sendZipEntry(
       sendError(res, 404, 'Not found');
       return;
     }
-    const st = statSync(zipPath);
-    const etag = `"${entry.crc32.toString(36)}-${Math.floor(st.mtimeMs).toString(36)}"`;
+    const etag = `"${entry.crc32.toString(36)}-${entry.size.toString(36)}"`;
     if (entry.method === 0) {
       const base = entry.dataStart;
       sendRanged(req, res, entry.size, contentType(name), etag, (start, end) =>
@@ -316,9 +315,17 @@ export async function startServer(
           }
         }
       } else {
-        const st = statSync(store.path);
-        for (const f of opened.files)
-          if (f.startsWith('media/')) media[f] = { size: 0, mtime: Math.floor(st.mtimeMs) };
+        // version by content (CRC), not the file's mtime: saving the .sbd must not make every
+        // picture reload
+        const reader = await zipFileReader(store.path);
+        try {
+          for (const f of opened.files) {
+            const e = f.startsWith('media/') ? reader.entry(f) : undefined;
+            if (e) media[f] = { size: e.size, mtime: e.crc32 };
+          }
+        } finally {
+          await reader.close();
+        }
       }
       sendJson(res, 200, {
         project: opened.project,
@@ -487,13 +494,6 @@ export async function startServer(
       sendJson(res, 200, { url: await viewerFor(target) });
       return;
     }
-    if (store.readOnly) {
-      sendJson(res, 409, {
-        error: `${store.name} is a packed .sbd (read-only). Unpack it to edit: sbd unpack "${store.path}"`,
-        readOnly: true,
-      });
-      return;
-    }
     const client = String(req.headers['x-sbd-client']);
     if (path === '/api/project' && req.method === 'PUT') {
       const body = JSON.parse((await readBody(req, 64 * 1024 * 1024)).toString('utf8')) as {
@@ -571,9 +571,18 @@ export async function startServer(
         const input: Parameters<typeof prepareAsset>[1] = { path: tmp, mode: 'embed' };
         const stem = url.searchParams.get('stem');
         if (stem) input.name = stem;
-        const { asset, created } = await prepareAsset(store.path, input);
-        store.markWritten(created);
-        sendJson(res, 200, { asset, created });
+        if (store.kind === 'packed') {
+          // re-packed into the .sbd right away (the asset entry is saved with the next edit)
+          const { asset, created, files } = await prepareAsset(store.path, input, {
+            packed: { exists: (rel) => store.has(rel) },
+          });
+          await store.addFiles(files);
+          sendJson(res, 200, { asset, created });
+        } else {
+          const { asset, created } = await prepareAsset(store.path, input);
+          store.markWritten(created);
+          sendJson(res, 200, { asset, created });
+        }
       } finally {
         await rm(dir, { recursive: true, force: true });
       }
