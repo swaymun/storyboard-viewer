@@ -36,3 +36,36 @@ jobs:
           name: playwright-results
           path: test-results/
           retention-days: 7
+
+  deploy:
+    # Publish the browser app to Cloudflare Workers after tests pass on main.
+    # Needs repo secret CLOUDFLARE_API_TOKEN ("Edit Cloudflare Workers" template)
+    # and repo variable CLOUDFLARE_ACCOUNT_ID. Skipped until the token exists.
+    needs: build-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: deploy-web
+      cancel-in-progress: false
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check for Cloudflare token
+        id: token
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"; else echo "::notice::CLOUDFLARE_API_TOKEN not set; skipping deploy"; fi
+      - uses: actions/checkout@v4
+        if: steps.token.outputs.ok == 'true'
+      - uses: pnpm/action-setup@v4
+        if: steps.token.outputs.ok == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.token.outputs.ok == 'true'
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+        if: steps.token.outputs.ok == 'true'
+      - run: pnpm deploy:web
+        if: steps.token.outputs.ok == 'true'

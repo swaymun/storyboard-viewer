@@ -125,6 +125,11 @@ pnpm deploy:web          # builds apps/web, then `npx wrangler@4 deploy`
 pnpm deploy:web:dry      # the same with --dry-run (no login needed)
 ```
 
+Pushes to `main` deploy automatically: the `deploy` job in `.github/workflows/ci.yml` runs
+`pnpm deploy:web` after the tests pass. It needs the repository secret `CLOUDFLARE_API_TOKEN`
+(a Cloudflare API token from the "Edit Cloudflare Workers" template) and the repository variable
+`CLOUDFLARE_ACCOUNT_ID`; without the token the job is skipped.
+
 Without `sbd serve` the app never calls `/api` (`sbd serve` marks the index.html it serves), so
 any static host works: serve `apps/web/dist` with a fallback to `index.html`. `e2e/hosted.spec.ts`
 tests this setup. The "Try an example" files come from the committed `examples/`: after changing
