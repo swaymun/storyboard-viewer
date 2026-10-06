@@ -2,8 +2,10 @@
  * Accessible tooltips for buttons (mostly icon buttons): `{@attach tooltip('Duplicate', '⌘D')}`.
  *
  * - Shows on hover (after a short delay; at once when moving between tooltipped controls) and on
- *   keyboard focus; hides on leave, blur, click and Esc (WCAG 1.4.13: dismissible, hoverable,
- *   persistent: moving the pointer onto the tooltip keeps it open).
+ *   keyboard focus; hides on leave, blur, any press and Esc (WCAG 1.4.13: dismissible, hoverable,
+ *   persistent: moving the pointer onto the tooltip keeps it open). It never takes clicks
+ *   (`pointer-events: none`; "hoverable" is tracked by position), never shows while a button is
+ *   held (drags), and goes away when typing starts.
  * - One shared `role="tooltip"` element; the control gets `aria-describedby` while it shows, and
  *   an `aria-label` from the tooltip text when it has no accessible name of its own.
  * - Replaces the native `title` (which is not keyboard accessible and would show twice).
@@ -29,17 +31,34 @@ function element(): HTMLDivElement {
   tip.className = 'sbd-tooltip';
   tip.setAttribute('role', 'tooltip');
   tip.hidden = true;
-  tip.addEventListener('pointerenter', () => clearTimeout(hideTimer));
-  tip.addEventListener('pointerleave', () => scheduleHide());
   document.body.append(tip);
   return tip;
 }
 
+/** Any key but a lone modifier or Tab hides it (Esc dismisses; typing must not be covered). */
 function onKey(e: KeyboardEvent) {
-  if (e.key === 'Escape' && owner) {
-    hide();
-    // Esc only dismisses the tooltip here when nothing else wants it (dialogs, menus still get it)
-  }
+  if (!owner) return;
+  if (['Shift', 'Control', 'Alt', 'Meta', 'Tab'].includes(e.key)) return;
+  hide();
+}
+
+/** Any press anywhere hides it at once (it must never sit on top of what is clicked next). */
+function onPress() {
+  if (owner) hide();
+}
+
+/** While the pointer is over the tooltip itself, it stays (hoverable without taking clicks). */
+function onMove(e: PointerEvent) {
+  if (!owner || !tip || tip.hidden) return;
+  const r = tip.getBoundingClientRect();
+  const t = owner.getBoundingClientRect();
+  const inside = (b: DOMRect) =>
+    e.clientX >= b.left - 2 &&
+    e.clientX <= b.right + 2 &&
+    e.clientY >= b.top - 8 &&
+    e.clientY <= b.bottom + 8;
+  if (inside(r) || inside(t)) clearTimeout(hideTimer);
+  else scheduleHide();
 }
 
 function place(target: HTMLElement, el: HTMLDivElement) {
@@ -71,6 +90,8 @@ function show(target: HTMLElement, text: string, shortcut: string | undefined) {
   place(target, el);
   target.setAttribute('aria-describedby', ID);
   window.addEventListener('keydown', onKey, true);
+  window.addEventListener('pointerdown', onPress, true);
+  window.addEventListener('pointermove', onMove, true);
 }
 
 function hide() {
@@ -81,6 +102,8 @@ function hide() {
   if (owner) lastHidden = Date.now();
   owner = null;
   window.removeEventListener('keydown', onKey, true);
+  window.removeEventListener('pointerdown', onPress, true);
+  window.removeEventListener('pointermove', onMove, true);
 }
 
 function scheduleHide() {
@@ -99,15 +122,17 @@ export function tooltip(text: string, shortcut?: string): Attachment<HTMLElement
     if (node.hasAttribute('title')) node.removeAttribute('title');
     if (!hasName(node)) node.setAttribute('aria-label', text);
     if (shortcut) node.dataset['shortcut'] = shortcut;
-    const enter = () => {
+    const enter = (e: PointerEvent) => {
       clearTimeout(showTimer);
+      if (e.buttons) return; // dragging something: no tooltips on the way
       const warm = owner !== null || Date.now() - lastHidden < WARM;
       if (warm) show(node, text, shortcut);
       else showTimer = setTimeout(() => show(node, text, shortcut), DELAY);
     };
     const leave = () => {
       clearTimeout(showTimer);
-      if (owner === node) scheduleHide();
+      // onMove keeps it while the pointer goes onto the tooltip
+      if (owner === node && !tip?.matches(':hover')) scheduleHide();
     };
     const focus = () => {
       if (node.matches(':focus-visible')) show(node, text, shortcut);

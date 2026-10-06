@@ -274,7 +274,7 @@ h3 {
   background: var(--fg);
   border-radius: var(--radius);
   box-shadow: 0 2px 8px var(--shadow-color);
-  pointer-events: auto;
+  pointer-events: none;
 }
 .sbd-tooltip[hidden] {
   display: none;
