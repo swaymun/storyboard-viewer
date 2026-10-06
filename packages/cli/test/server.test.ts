@@ -194,12 +194,12 @@ describe('sbd serve', () => {
     const json = await getJson(`${base}/api/files/manifest.json`);
     expect(json.title).toBe("The Keeper's Light");
     const dl = await fetch(`${base}/api/download`);
-    expect(Buffer.from(await dl.arrayBuffer())).toEqual(original);
+    expect(Buffer.from(await dl.arrayBuffer()).equals(original)).toBe(true);
 
     // an edit re-packs the file in place; the previous version is kept as .bak
     const r = await store.edit((p) => ({ project: updateShot(p, 'climb', { title: 'Packed!' }) }));
     expect(r.written).toEqual(expect.arrayContaining(['shots/climb.json', 'manifest.json']));
-    expect(readFileSync(`${file}.bak`)).toEqual(original);
+    expect(readFileSync(`${file}.bak`).equals(original)).toBe(true);
     const after = readFileSync(file);
     expect(after.subarray(30, 38).toString()).toBe('mimetype');
     const reopened = await openProjectPath(file);
@@ -209,14 +209,14 @@ describe('sbd serve', () => {
     // media are still STOREd (sliceable) and unchanged
     const zr = await zipFileReader(file);
     expect(zr.entry('media/music.wav')!.method).toBe(0);
-    expect(Buffer.from((await zr.read('media/music.wav'))!)).toEqual(wav);
+    expect(Buffer.from((await zr.read('media/music.wav'))!).equals(wav)).toBe(true);
     await zr.close();
     // media URLs are versioned by content, so a save does not reload every picture
     const again = await getJson(`${base}/api/project`);
     expect(again.media['media/music.wav'].mtime).toBe(body.media['media/music.wav'].mtime);
     // the .bak keeps the version from before this session's first save
     await store.edit((p) => ({ project: updateShot(p, 'climb', { title: 'Twice' }) }));
-    expect(readFileSync(`${file}.bak`)).toEqual(original);
+    expect(readFileSync(`${file}.bak`).equals(original)).toBe(true);
     // no temp files left behind
     expect(readdirSync(ex.work).filter((f) => f.startsWith('.'))).toEqual([]);
   });
@@ -379,7 +379,7 @@ describe('sbd serve', () => {
       expect(zr.entry('media/new-pic.png')!.method).toBe(0);
       await zr.close();
       const served = await fetch(`${base}/api/files/media/new-pic.png`);
-      expect(Buffer.from(await served.arrayBuffer())).toEqual(png);
+      expect(Buffer.from(await served.arrayBuffer()).equals(png)).toBe(true);
       const reopened = await openProjectPath(file);
       await reopened.close();
       expect(reopened.project.shots['climb']!.title).toBe('From the app');

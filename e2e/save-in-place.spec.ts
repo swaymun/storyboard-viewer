@@ -69,7 +69,7 @@ test('sbd serve saves a packed .sbd in place (atomic re-pack, .bak of the origin
   const { read, valid } = unpacked(file);
   expect(read('shots/climb.json').title).toBe('Saved into the packed file');
   expect(valid).toMatch(/0 errors/);
-  expect(readFileSync(`${file}.bak`)).toEqual(original);
+  expect(readFileSync(`${file}.bak`).equals(original)).toBe(true);
   expect(readFileSync(file).subarray(30, 38).toString()).toBe('mimetype');
   // the pictures still come out of the (new) zip
   await expect(page.locator('[data-shot-id="opening"] img').first()).toHaveJSProperty(

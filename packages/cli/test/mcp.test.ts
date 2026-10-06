@@ -409,7 +409,7 @@ describe('MCP server', () => {
     await reopened.close();
     expect(reopened.project.shots['climb']!.title).toBe('Edited packed');
     expect(reopened.files).toContain('media/lamp-2.png');
-    expect(readFileSync(`${file}.bak`)).toEqual(original);
+    expect(readFileSync(`${file}.bak`).equals(original)).toBe(true);
     expect((await call('validate')).json.valid).toBe(true);
   });
 
