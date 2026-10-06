@@ -108,3 +108,60 @@ export function guideTargets(
   }
   return { x, y };
 }
+
+export interface Box {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/** A zone label to place: the zone it names and the label's size (unrotated). */
+export interface LabelRequest {
+  zone: Box;
+  width: number;
+  height: number;
+  /** Narrow zones (the button columns): the label runs down the side, turned 90°. */
+  vertical: boolean;
+}
+
+const hit = (a: Box, b: Box) =>
+  a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+
+/**
+ * Places zone labels so that none overlaps another, even when several platforms mark the same
+ * part of the frame. A label starts in its zone's top-left corner (vertical ones: top-right,
+ * running down) and moves along the edge past the labels already placed, then to the next row
+ * (column). Returns each label's occupied box (axis-aligned) in the units of the input.
+ */
+export function placeZoneLabels(reqs: readonly LabelRequest[], gap: number): Box[] {
+  const placed: Box[] = [];
+  for (const q of reqs) {
+    const z = q.zone;
+    const w = q.vertical ? q.height : q.width;
+    const h = q.vertical ? q.width : q.height;
+    const start = q.vertical
+      ? { x: z.x + z.width - gap - w, y: z.y + gap }
+      : { x: z.x + gap, y: z.y + gap };
+    const b: Box = { ...start, width: w, height: h };
+    for (let i = 0; i < 500; i++) {
+      const c = placed.find((p) => hit(p, b));
+      if (!c) break;
+      if (q.vertical) {
+        b.y = c.y + c.height + gap;
+        if (b.y + h > z.y + z.height - gap) {
+          b.y = start.y;
+          b.x -= w + gap; // next column, further into the frame
+        }
+      } else {
+        b.x = c.x + c.width + gap;
+        if (b.x + w > z.x + z.width - gap) {
+          b.x = start.x;
+          b.y += h + gap; // next row
+        }
+      }
+    }
+    placed.push(b);
+  }
+  return placed;
+}

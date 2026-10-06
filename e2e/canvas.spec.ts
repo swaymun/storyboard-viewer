@@ -50,6 +50,42 @@ async function at(page: Page, x: number, y: number) {
   };
 }
 
+type Box = { x: number; y: number; width: number; height: number };
+const intersects = (a: Box, b: Box) =>
+  a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+
+/** The transformer's rotate handle and the stage size (screen px inside the stage). */
+async function rotater(page: Page) {
+  return page.evaluate(() => {
+    type N = {
+      getClientRect(): { x: number; y: number; width: number; height: number };
+      isVisible(): boolean;
+      findOne(sel: string): N | undefined;
+      nodes(): unknown[];
+    };
+    type S = { container(): HTMLElement; width(): number; height(): number; findOne(s: string): N };
+    const stage = (window as unknown as { Konva: { stages: S[] } }).Konva.stages.find(
+      (s) => s.container().isConnected,
+    )!;
+    const tr = stage.findOne('Transformer');
+    const rot = tr.findOne('.rotater')!;
+    return {
+      nodes: tr.nodes().length,
+      visible: rot.isVisible(),
+      rect: rot.getClientRect(),
+      stage: { width: stage.width(), height: stage.height() },
+    };
+  });
+}
+function expectInside(r: Awaited<ReturnType<typeof rotater>>) {
+  expect(r.nodes).toBeGreaterThan(0);
+  expect(r.visible).toBe(true);
+  expect(r.rect.x).toBeGreaterThanOrEqual(0);
+  expect(r.rect.y).toBeGreaterThanOrEqual(0);
+  expect(r.rect.x + r.rect.width).toBeLessThanOrEqual(r.stage.width);
+  expect(r.rect.y + r.rect.height).toBeLessThanOrEqual(r.stage.height);
+}
+
 async function drag(page: Page, from: { x: number; y: number }, to: { x: number; y: number }) {
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
@@ -304,6 +340,100 @@ test('zoom buttons and keys; numeric position, size and rotation', async ({ page
   await expect.poll(() => layerOf('maya').rotation).toBe(15);
 });
 
+test('the rotate handle of a full-frame selection stays on the stage', async ({ page }) => {
+  await open(page);
+  await page.locator('.stage').focus();
+  await page.keyboard.press('ControlOrMeta+a');
+  await expect(page.locator('#layer-list li.selected')).toHaveCount(3);
+  expectInside(await rotater(page));
+  // panned so that the frame's top touches the stage's: the handle moves below the selection
+  const stage = page.locator('.stage');
+  const top = Number(await stage.getAttribute('data-origin-y'));
+  const sb = (await stage.boundingBox())!;
+  await page.mouse.move(sb.x + sb.width / 2, sb.y + sb.height / 2);
+  await page.mouse.wheel(0, top - 4);
+  await expect.poll(async () => Number(await stage.getAttribute('data-origin-y'))).toBeLessThan(10);
+  const r = await rotater(page);
+  expectInside(r);
+  expect(r.rect.y).toBeGreaterThan(sb.height / 2); // below
+});
+
+test('numeric rotation for several layers turns them as one', async ({ page }) => {
+  await open(page);
+  await page.locator('button[data-layer-id="maya"]').click();
+  await page.locator('button[data-layer-id="box"]').click({ modifiers: ['Shift'] });
+  const rot = page.getByLabel('Rotation °');
+  // Maya 0°, the matchbox −12°: mixed
+  await expect(rot).toBeEnabled();
+  await expect(rot).toHaveValue('');
+  await expect(rot).toHaveAttribute('placeholder', 'Mixed');
+  const before = { maya: layerOf('maya'), box: layerOf('box') };
+  await rot.fill('10');
+  await rot.press('Enter');
+  await expect(page.locator('#undo')).toHaveAttribute('aria-label', 'Undo: Rotate layers');
+  await expect(status(page)).toHaveText('Saved');
+  await expect.poll(() => layerOf('maya').rotation).toBe(10);
+  expect(layerOf('box').rotation).toBe(-2);
+  // turned around the selection's center, not each around its own corner
+  expect(layerOf('maya').x).not.toBe(before.maya.x);
+  expect(layerOf('box').x).not.toBe(before.box.x);
+  expect(layerOf('bg').rotation).toBeUndefined();
+  // one undo restores both
+  await page.locator('#undo').click();
+  await expect(status(page)).toHaveText('Saved');
+  await expect.poll(() => layerOf('maya').rotation).toBeUndefined();
+  expect(layerOf('box')).toMatchObject({ x: 860, y: 430, rotation: -12 });
+
+  // the same rotation everywhere: the field shows it, a new value applies to all
+  await page.locator('button[data-layer-id="box"]').click();
+  await rot.fill('0');
+  await rot.press('Enter');
+  await expect(status(page)).toHaveText('Saved');
+  await page.locator('button[data-layer-id="maya"]').click({ modifiers: ['Shift'] });
+  await expect(rot).toHaveValue('0');
+  await rot.fill('-30');
+  await rot.press('Enter');
+  await expect(status(page)).toHaveText('Saved');
+  await expect.poll(() => layerOf('maya').rotation).toBe(-30);
+  expect(layerOf('box').rotation).toBe(-30);
+  await expect(rot).toHaveValue('-30');
+});
+
+test('dragging a row anywhere reorders layers; the row buttons still click', async ({ page }) => {
+  await open(page);
+  // rows are top-first: box, maya, bg. Drag the background's name (not the grip) above the box.
+  const from = (await page.locator('button[data-layer-id="bg"]').boundingBox())!;
+  const to = (await page.locator('[data-layer-row="box"]').boundingBox())!;
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(from.x + from.width / 2, from.y - 20, { steps: 4 });
+  await page.mouse.move(to.x + 40, to.y + 3, { steps: 6 });
+  await expect(page.locator('[data-layer-row="box"]')).toHaveClass(/drop-before/);
+  await page.mouse.up();
+  await expect(page.locator('#undo')).toHaveAttribute('aria-label', 'Undo: Reorder layers');
+  await expect(status(page)).toHaveText('Saved');
+  expect(climbVariant().layers.map((l: { id: string }) => l.id)).toEqual(['maya', 'box', 'bg']);
+  await expect(page.locator('#layer-list [data-layer-row]').first()).toHaveAttribute(
+    'data-layer-row',
+    'bg',
+  );
+  // a plain click on the row still selects; lock and hide still toggle
+  await page.locator('button[data-layer-id="maya"]').click();
+  await expect(page.locator('[data-layer-row="maya"]')).toHaveClass(/selected/);
+  await page.getByRole('button', { name: 'Lock Maya' }).click();
+  await expect.poll(() => layerOf('maya').locked).toBe(true);
+  await page.getByRole('button', { name: 'Hide Maya' }).click();
+  await expect.poll(() => layerOf('maya').visible).toBe(false);
+  expect(climbVariant().layers.map((l: { id: string }) => l.id)).toEqual(['maya', 'box', 'bg']);
+  // Alt+↓ still moves the focused row
+  await page.locator('button[data-layer-id="bg"]').click();
+  await page.locator('button[data-layer-id="bg"]').press('Alt+ArrowDown');
+  await expect(status(page)).toHaveText('Saved');
+  await expect
+    .poll(() => climbVariant().layers.map((l: { id: string }) => l.id))
+    .toEqual(['maya', 'bg', 'box']);
+});
+
 test.describe('vertical frame (hosted example)', () => {
   test.use({ baseURL: `http://localhost:${EDIT_PORT + 1}` });
 
@@ -351,5 +481,59 @@ test.describe('vertical frame (hosted example)', () => {
     await page.mouse.up();
     // the other platforms only show on vertical frames
     await expect(page.locator('[data-platform]')).toHaveCount(3);
+  });
+
+  test('all three platforms on: zone labels never overlap; Fit leaves room for handles', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await page.locator('[data-example="cat-crimes.sbd"]').click();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await page.goto('/#tab=canvas&shot=hook');
+    await expect(page.locator('#layer-list [data-layer-row]').first()).toBeVisible();
+    for (const p of ['tiktok', 'reels', 'shorts'])
+      await page.locator(`[data-platform="${p}"]`).click();
+    await expect(page.locator('[data-platform][aria-pressed="true"]')).toHaveCount(3);
+    const labels = await page.evaluate(() => {
+      type N = {
+        name(): string;
+        getClientRect(): { x: number; y: number; width: number; height: number };
+      };
+      type S = {
+        container(): HTMLElement;
+        width(): number;
+        height(): number;
+        find(s: string): N[];
+      };
+      const stage = (window as unknown as { Konva: { stages: S[] } }).Konva.stages.find(
+        (s) => s.container().isConnected,
+      )!;
+      return {
+        stage: { width: stage.width(), height: stage.height() },
+        list: stage.find('.zone-label').map((n) => ({ name: n.name(), ...n.getClientRect() })),
+      };
+    });
+    expect(labels.list).toHaveLength(9);
+    for (const p of ['tiktok', 'reels', 'shorts'])
+      expect(labels.list.filter((l) => l.name.includes(`zone-label-${p}`))).toHaveLength(3);
+    for (let i = 0; i < labels.list.length; i++) {
+      const a = labels.list[i]!;
+      expect(a.x).toBeGreaterThanOrEqual(0);
+      expect(a.y).toBeGreaterThanOrEqual(0);
+      for (let j = i + 1; j < labels.list.length; j++)
+        expect(intersects(a, labels.list[j]!), `${a.name} × ${labels.list[j]!.name}`).toBe(false);
+    }
+
+    // QA-01: at Fit, a full-frame selection's rotate handle is on the stage, and it turns it
+    await page.locator('#zoom-fit').click();
+    await page.locator('.stage').focus();
+    await page.keyboard.press('ControlOrMeta+a');
+    const r = await rotater(page);
+    expectInside(r);
+    const stageBox = (await page.locator('.stage').boundingBox())!;
+    const hx = stageBox.x + r.rect.x + r.rect.width / 2;
+    const hy = stageBox.y + r.rect.y + r.rect.height / 2;
+    await drag(page, { x: hx, y: hy }, { x: hx + 120, y: hy + 30 });
+    await expect(page.locator('#undo')).toHaveAttribute('aria-label', /Undo: Transform layers?/);
   });
 });

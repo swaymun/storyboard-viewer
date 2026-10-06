@@ -649,6 +649,42 @@ pnpm fixture:storyboarder  # regenerate the Storyboarder test fixture (ffmpeg fo
   (`--shot twist` for the canvas, `--shot rate-them` for the Story images). `canvas`,
   `story-light` and `story-dark` were replaced.
 
+### 0.5.1 — fix release after the 0.5.0 QA round (2026-10-06)
+
+- **Room for handles.** Fit pads the frame by `FIT_PAD` = rotate-anchor offset (30 px, down from
+  Konva's 50) + anchor size (9) + 8 px of air, so a full-frame selection's rotate handle is on the
+  stage at Fit. When the view is zoomed or panned so that there is no room above the selection,
+  `placeRotater()` tries `rotateAnchorAngle` 0 → 180 → 90 → 270 and keeps the first whose anchor
+  lies inside the stage (never while a rotation is in progress); it runs after view changes,
+  selection changes, drags and transforms. Rejected: an overflow margin outside the stage (the
+  stage fills its host; a margin would only move the clipping) and clamping the anchor (Konva
+  computes it from the box).
+- **Rotating several layers numerically** uses the same path as the rotate handle: the editor's
+  `rotated(ids, deg)` turns each node's origin around the center of the selection's bounding
+  box (`rotateAbout` in `lib/arrange.ts`, unit-tested) and returns transformer-style attributes,
+  which `transformed()` applies as one undo step ("Rotate layers"). Locked and hidden layers stay.
+  Mixed rotations show a blank field with a "Mixed" placeholder; a typed number is then the
+  amount to turn by (with a shared rotation it is the new rotation).
+- **Platform zone labels** are Konva `Label`s (tag in the platform's color, white text ≥ 4.5:1,
+  unit-tested) placed by `placeZoneLabels` (`lib/safe-zones.ts`, pure): each starts in its zone's
+  top-left corner (button columns: top-right, turned 90°) and slides along the edge past labels
+  already placed, then to the next row / column, so labels never intersect. Kept one label per
+  zone rather than merging coincident ones ("TikTok · Reels top bar"): the zones differ in size,
+  and a tag in each platform's color says which edge belongs to whom. The platform colors are
+  theme-independent `:root` tokens (`--canvas-platform-<id>` and `-fill`), since they are drawn
+  over pictures; `--canvas-zone(-line)` were removed. The toolbar buttons carry a matching legend
+  square (filled when on). E2E reads the label boxes through `window.Konva.stages`.
+- **Tour offer** moved from the bottom-left corner (over Play) to the top right below the header;
+  Esc inside it dismisses it. E2E checks it intersects neither the header, `#play-toggle` nor the
+  playback bar.
+- **Layer rows drag as a whole** with pointer events instead of HTML drag and drop (Chromium does
+  not start a drag on the row's name `<button>`): a press that moves 4 px starts the drag, the row
+  under the pointer shows the drop line, the click after a drag is swallowed, and presses on the
+  row's icon buttons and the rename field are ignored. The grip stays as a visual hint.
+- The canvas mask outside the frame is one even-odd shape instead of four rectangles, whose
+  shared edges showed as faint lines at fractional zooms. `canvas.webp` was refreshed (new zone
+  colors and labels).
+
 ## Status
 
-All milestones (M0–M4), the 0.2.0, 0.3.0 and 0.4.0 feedback rounds, the 0.4.1 fix release and 0.5.0 (canvas layouts, captions, tours, save in place) are complete. Being published: GitHub `swaymun/storyboard-viewer` and a hosted copy of the web app on Cloudflare Workers (`pnpm deploy:web`); no npm package. Known gaps: Safari/Firefox untested; Storyboarder multi-board shots not merged and Shot Generator data dropped; animatic export draws canvas-variant video layers as their first frame; no CLI animatic export; PDF grid cells clip very long text; `sbd export-pdf` output is large for image-heavy storyboards; Kokoro voices were not listened to by a person (timings were checked, quality was not); Script view: shot cards are hidden below 860 px width, the editor was only exercised in Chromium; reopening a folder from the recent list was not tested end to end (headless Chromium cannot read stored handles back).
+All milestones (M0–M4), the 0.2.0, 0.3.0 and 0.4.0 feedback rounds, the 0.4.1 fix release, 0.5.0 (canvas layouts, captions, tours, save in place) and the 0.5.1 fix release are complete. Being published: GitHub `swaymun/storyboard-viewer` and a hosted copy of the web app on Cloudflare Workers (`pnpm deploy:web`); no npm package. Known gaps: Safari/Firefox untested; Storyboarder multi-board shots not merged and Shot Generator data dropped; animatic export draws canvas-variant video layers as their first frame; no CLI animatic export; PDF grid cells clip very long text; `sbd export-pdf` output is large for image-heavy storyboards; Kokoro voices were not listened to by a person (timings were checked, quality was not); Script view: shot cards are hidden below 860 px width, the editor was only exercised in Chromium; reopening a folder from the recent list was not tested end to end (headless Chromium cannot read stored handles back).

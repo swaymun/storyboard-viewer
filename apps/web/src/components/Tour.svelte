@@ -2,7 +2,8 @@
   // The guided tour overlay: a dimmed page with a cut-out around the step's target and a small
   // dialog next to it. Keyboard: → / Enter next, ← back, Esc ends; focus moves into the dialog
   // on every step and back to where it was when the tour ends. No animation when the user
-  // prefers reduced motion. Also the first-run offer ("Take a 1-minute tour?").
+  // prefers reduced motion. Also the first-run offer ("Take a 1-minute tour?"), a non-modal card
+  // at the top right below the header (clear of the playback controls).
   import { tick } from 'svelte';
   import { tour } from '../lib/tour.svelte';
   import { TOURS } from '../lib/tours';
@@ -196,7 +197,15 @@
 {/if}
 
 {#if tour.offer && !tour.tour}
-  <section class="offer" id="tour-offer" aria-label="Guided tour">
+  <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+  <section
+    class="offer"
+    id="tour-offer"
+    aria-label="Guided tour"
+    onkeydown={(e) => {
+      if (e.key === 'Escape') tour.dismissOffer();
+    }}
+  >
     <Icon name="compass" size={18} />
     <div>
       <p><b>New here?</b> {gettingStarted.summary}.</p>
@@ -304,14 +313,16 @@
     gap: 6px;
     margin-top: 12px;
   }
+  /* top right, just below the header: never over the playback bar (Play, the scrubber) at the
+     bottom, nor over the menus and tabs in the header */
   .offer {
     position: fixed;
-    left: 16px;
-    bottom: 16px;
+    right: 16px;
+    top: 64px;
     z-index: 800;
     display: flex;
     gap: 10px;
-    max-width: 320px;
+    max-width: min(320px, calc(100vw - 32px));
     padding: 12px 14px;
     color: var(--fg);
     background: var(--surface);

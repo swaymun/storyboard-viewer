@@ -289,9 +289,11 @@
     if (ok && dup) selected = newIds;
   }
 
-  function transformed(attrs: Record<string, NodeAttrs>) {
+  function transformed(attrs: Record<string, NodeAttrs>, label?: string) {
     const { s, v } = ids();
-    edit(Object.keys(attrs).length > 1 ? 'Transform layers' : 'Transform layer', (p) => {
+    const n = Object.keys(attrs).length;
+    if (!n) return;
+    edit(label ?? (n > 1 ? 'Transform layers' : 'Transform layer'), (p) => {
       let cur = p;
       const patches: Record<string, LayerPatch> = {};
       for (const [id, a] of Object.entries(attrs)) {
@@ -675,7 +677,10 @@
       return { x: l.x ?? 0, y: l.y ?? 0, w, h, r: l.rotation ?? 0, hFixed: false };
     }
     const b = handle?.bounds(selected);
-    return b ? { x: b.x, y: b.y, w: b.width, h: b.height, r: null, hFixed: true } : null;
+    // several layers: one rotation when they all share it, else blank ("Mixed")
+    const turns = [...new Set(sel.map((l) => l.rotation ?? 0))];
+    const r = turns.length === 1 ? turns[0]! : null;
+    return b ? { x: b.x, y: b.y, w: b.width, h: b.height, r, hFixed: true } : null;
   });
   let keepRatio = $state(true);
   const num = (e: Event) => Number((e.target as HTMLInputElement).value);
@@ -684,6 +689,13 @@
   function setField(key: 'x' | 'y' | 'w' | 'h' | 'r', value: number) {
     if (!metrics || !Number.isFinite(value)) return;
     if (!single) {
+      if (key === 'r') {
+        // turn the selection as a whole around its center: by the difference to the shared
+        // rotation, or (mixed rotations) by the number typed
+        const deg = value - (metrics.r ?? 0);
+        if (deg && handle) transformed(handle.rotated(selected, deg), 'Rotate layers');
+        return;
+      }
       if (key !== 'x' && key !== 'y') return;
       const u = units();
       const d = key === 'x' ? { dx: value - metrics.x, dy: 0 } : { dx: 0, dy: value - metrics.y };
@@ -1020,6 +1032,63 @@
     edit('Reorder layers', (p) => moveLayers(p, s, v, set, to));
   }
 
+  /**
+   * Dragging a row (anywhere on it, not only the grip) reorders: pointer events rather than
+   * HTML drag and drop, since Chromium does not start a drag on a <button> (the row's name).
+   * Presses on the row's own buttons (hide, lock, delete) and the rename field are left alone,
+   * and a press that does not move stays a click.
+   */
+  let rowPress: { id: string; x: number; y: number } | null = null;
+  let swallowClick = false;
+  function rowPointerDown(e: PointerEvent, id: string) {
+    if (!editable || e.button !== 0) return;
+    if ((e.target as HTMLElement).closest('.tiny, .rename')) return;
+    rowPress = { id, x: e.clientX, y: e.clientY };
+    window.addEventListener('pointermove', rowPointerMove);
+    window.addEventListener('pointerup', rowPointerUp);
+    window.addEventListener('pointercancel', rowPointerCancel);
+  }
+  function rowPointerMove(e: PointerEvent) {
+    if (!rowPress) return;
+    if (!dragRow) {
+      if (Math.hypot(e.clientX - rowPress.x, e.clientY - rowPress.y) < 4) return;
+      dragRow = rowPress.id;
+    }
+    e.preventDefault();
+    const li = document
+      .elementFromPoint(e.clientX, e.clientY)
+      ?.closest<HTMLElement>('#layer-list li[data-layer-row]');
+    const target = li?.dataset['layerRow'];
+    if (!li || !target) {
+      dropRow = null;
+      return;
+    }
+    const r = li.getBoundingClientRect();
+    dropRow = { id: target, after: e.clientY > r.top + r.height / 2 };
+  }
+  function rowPointerEnd() {
+    rowPress = null;
+    window.removeEventListener('pointermove', rowPointerMove);
+    window.removeEventListener('pointerup', rowPointerUp);
+    window.removeEventListener('pointercancel', rowPointerCancel);
+  }
+  function rowPointerUp() {
+    const dragged = !!dragRow;
+    rowPointerEnd();
+    if (!dragged) return;
+    // the click that follows a drag must not select the row it ended on
+    swallowClick = true;
+    setTimeout(() => (swallowClick = false), 0);
+    if (dropRow) dropOnRow(dropRow.id, dropRow.after);
+    else dragRow = null;
+  }
+  function rowPointerCancel() {
+    rowPointerEnd();
+    dragRow = null;
+    dropRow = null;
+  }
+  onDestroy(rowPointerEnd);
+
   function rowKey(e: KeyboardEvent, id: string) {
     if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
       e.preventDefault();
@@ -1162,7 +1231,9 @@
                       : [...platforms, p.id])}
                   {@attach tooltip(
                     `Show where ${p.name} puts its buttons and captions (approximate)`,
-                  )}><span>{p.name}</span></button
+                  )}
+                  ><span class="legend legend-{p.id}" aria-hidden="true"></span><span>{p.name}</span
+                  ></button
                 >
               {/each}
             {/if}
@@ -1369,39 +1440,18 @@
             class:grouped
             class:drop-before={dropRow?.id === l.id && !dropRow.after}
             class:drop-after={dropRow?.id === l.id && dropRow.after}
+            class:dragging={dragRow === l.id}
             data-layer-row={l.id}
-            ondragover={(e) => {
-              if (!dragRow) return;
+            onpointerdown={(e) => rowPointerDown(e, l.id)}
+            onclickcapture={(e) => {
+              if (!swallowClick) return;
+              e.stopPropagation();
               e.preventDefault();
-              const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-              dropRow = { id: l.id, after: e.clientY > r.top + r.height / 2 };
-            }}
-            ondragleave={() => {
-              if (dropRow?.id === l.id) dropRow = null;
-            }}
-            ondrop={(e) => {
-              e.preventDefault();
-              if (dropRow) dropOnRow(dropRow.id, dropRow.after);
             }}
           >
             {#if editable}
-              <!-- role=button span: Chromium does not drag from <button> -->
-              <span
-                class="grip"
-                role="button"
-                tabindex="-1"
-                aria-label="Drag to reorder {layerName(l)} (or Alt+↑/↓ on the layer)"
-                draggable="true"
-                ondragstart={(e) => {
-                  dragRow = l.id;
-                  e.dataTransfer?.setData('text/plain', l.id);
-                  if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
-                }}
-                ondragend={() => {
-                  dragRow = null;
-                  dropRow = null;
-                }}><Icon name="grip" size={12} /></span
-              >
+              <!-- the whole row drags (see rowPointerDown); the grip only shows that it can -->
+              <span class="grip" aria-hidden="true"><Icon name="grip" size={12} /></span>
             {/if}
             {#if renaming === l.id}
               <input
@@ -1645,9 +1695,14 @@
                 ><span>Rotation °</span><input
                   type="number"
                   step="1"
-                  disabled={!single}
                   value={metrics.r ?? ''}
-                  onchange={(e) => setField('r', num(e))}
+                  placeholder={metrics.r === null ? 'Mixed' : ''}
+                  onchange={(e) => {
+                    const t = e.target as HTMLInputElement;
+                    if (t.value.trim() === '') return;
+                    setField('r', num(e));
+                    if (metrics?.r === null) t.value = ''; // mixed: a number turns by that much
+                  }}
                 /></label
               >
               {#if single && !metrics.hFixed}
@@ -2094,6 +2149,11 @@
     border-radius: var(--radius);
     border-top: 2px solid transparent;
     border-bottom: 2px solid transparent;
+    user-select: none;
+  }
+  .layer-list li.dragging {
+    opacity: 0.55;
+    cursor: grabbing;
   }
   .layer-list li.grouped {
     margin-left: 14px;
@@ -2224,6 +2284,26 @@
   }
   .tool.slim {
     padding: 0 6px;
+  }
+  /* legend: each platform's color, as its zones and label tags on the frame use it */
+  .legend {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    border: 1.5px solid var(--legend);
+  }
+  .tool[aria-pressed='true'] .legend {
+    background: var(--legend);
+  }
+  .legend-tiktok {
+    --legend: var(--canvas-platform-tiktok);
+  }
+  .legend-reels {
+    --legend: var(--canvas-platform-reels);
+  }
+  .legend-shorts {
+    --legend: var(--canvas-platform-shorts);
   }
   .zoom-level {
     min-width: 46px;

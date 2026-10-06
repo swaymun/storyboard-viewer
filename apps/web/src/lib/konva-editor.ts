@@ -16,9 +16,16 @@
  */
 import type Konva from 'konva';
 import { layerKind, type Asset, type CanvasVariant, type Layer } from '@storyboard-viewer/format';
-import { rectTargets, snapRect, union, type Rect } from './arrange';
+import { rectTargets, rotateAbout, snapRect, union, type Rect } from './arrange';
 import { setMediaSource } from './hls';
-import { PLATFORMS, SAFE_AREAS, guideTargets, type Platform, type SnapLine } from './safe-zones';
+import {
+  PLATFORMS,
+  SAFE_AREAS,
+  guideTargets,
+  placeZoneLabels,
+  type Platform,
+  type SnapLine,
+} from './safe-zones';
 import { drawText, loadTextFonts, measureText } from './text-render';
 import { theme } from './theme.svelte';
 import { cssFilter } from './visual';
@@ -87,13 +94,26 @@ export interface EditorHandle {
   bounds(ids: readonly string[]): Rect | null;
   /** Each layer's box in canvas px. */
   boxes(ids: readonly string[]): Map<string, Rect>;
+  /**
+   * The selection turned by `deg` around the center of its bounding box (locked and hidden
+   * layers stay), as transformer results: apply them like a rotation with the handle.
+   */
+  rotated(ids: readonly string[], deg: number): Record<string, NodeAttrs>;
   /** Where a layer sits in the container (px), for the inline text editor. */
   screenBox(id: string): { x: number; y: number; zoom: number; rotation: number } | null;
   readonly view: { zoom: number; x: number; y: number; fit: boolean };
   destroy(): void;
 }
 
-const PAD = 36;
+/** Transformer handles (screen px): the rotate handle sits ROTATE_OFFSET outside the box. */
+const ANCHOR = 9;
+const ROTATE_OFFSET = 30;
+/**
+ * Space around the frame at Fit: room for every handle of a full-frame selection (the rotate
+ * handle and its anchor, plus a little air), so it can be grabbed without panning first.
+ */
+export const FIT_PAD = ROTATE_OFFSET + ANCHOR + 8;
+const PAD = FIT_PAD;
 const SNAP_PX = 7;
 const DRAG_PX = 3;
 const round = (n: number, d = 2) => Math.round(n * 10 ** d) / 10 ** d;
@@ -168,8 +188,9 @@ export async function createEditor(
   const transformer = new K.Transformer({
     rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315],
     rotationSnapTolerance: 4,
-    anchorSize: 9,
+    anchorSize: ANCHOR,
     anchorCornerRadius: 2,
+    rotateAnchorOffset: ROTATE_OFFSET,
     flipEnabled: true,
     ignoreStroke: true,
   });
@@ -183,8 +204,15 @@ export async function createEditor(
     guide: theme.token('--canvas-guide', 'skyblue'),
     snap: theme.token('--canvas-snap', 'magenta'),
     label: theme.token('--canvas-label-fg', 'white'),
-    zone: theme.token('--canvas-zone', 'rgba(255,0,0,0.15)'),
-    zoneLine: theme.token('--canvas-zone-line', 'red'),
+    platform: Object.fromEntries(
+      PLATFORMS.map((p) => [
+        p.id,
+        {
+          line: theme.token(`--canvas-platform-${p.id}`, 'red'),
+          fill: theme.token(`--canvas-platform-${p.id}-fill`, 'rgba(255,0,0,0.12)'),
+        },
+      ]),
+    ) as Record<Platform, { line: string; fill: string }>,
     slot: theme.token('--canvas-slot', 'rgba(128,128,128,0.3)'),
     slotFg: theme.token('--canvas-slot-fg', 'white'),
     mask: theme.token('--canvas-mask', 'black'),
@@ -225,6 +253,7 @@ export async function createEditor(
     drawGuides();
     drawSlots();
     transformer.forceUpdate();
+    placeRotater();
     stage.batchDraw();
     cb.onView({ zoom: view.zoom, fit: view.fit });
   };
@@ -252,11 +281,20 @@ export async function createEditor(
     mask.destroyChildren();
     const { width: W, height: H } = input.size;
     const far = 100000;
+    const fill = c.mask;
     mask.add(
-      new K.Rect({ x: -far, y: -far, width: 2 * far, height: far, fill: c.mask }),
-      new K.Rect({ x: -far, y: H, width: 2 * far, height: far, fill: c.mask }),
-      new K.Rect({ x: -far, y: 0, width: far, height: H, fill: c.mask }),
-      new K.Rect({ x: W, y: 0, width: far, height: H, fill: c.mask }),
+      // one shape with a hole (even-odd), not four rectangles: abutting translucent rectangles
+      // show seams along the frame's edges at fractional zooms
+      new K.Shape({
+        sceneFunc: (ctx) => {
+          const g = ctx._context;
+          g.beginPath();
+          g.rect(-far, -far, 2 * far, 2 * far);
+          g.rect(0, 0, W, H);
+          g.fillStyle = fill;
+          g.fill('evenodd');
+        },
+      }),
       new K.Rect({
         x: 0,
         y: 0,
@@ -274,40 +312,55 @@ export async function createEditor(
     guideGroup.destroyChildren();
     const { width: W, height: H } = input.size;
     const sw = 1 / view.zoom;
+    // zones first (each platform in its own color), then their labels as small tags in the
+    // platform's color, placed so that they never cover one another
+    const requests: Array<{ label: Konva.Label; vertical: boolean; zone: Rect }> = [];
     for (const p of PLATFORMS) {
       if (!input.platforms.includes(p.id)) continue;
+      const pc = c.platform[p.id];
       for (const z of p.zones) {
         const r = { x: z.x * W, y: z.y * H, width: z.w * W, height: z.h * H };
         guideGroup.add(
           new K.Rect({
             ...r,
-            fill: c.zone,
-            stroke: c.zoneLine,
-            strokeWidth: sw,
-            dash: [4 * sw, 3 * sw],
+            name: `zone zone-${p.id}`,
+            fill: pc.fill,
+            stroke: pc.line,
+            strokeWidth: 1.5 * sw,
+            dash: [5 * sw, 3 * sw],
           }),
+        );
+        const label = new K.Label({ name: `zone-label zone-label-${p.id}` });
+        label.add(
+          new K.Tag({ fill: pc.line, cornerRadius: 3 * sw }),
           new K.Text({
-            // narrow, tall areas (the button column) get their label running down the side
-            ...(r.width * view.zoom < 90
-              ? {
-                  x: r.x + r.width - 4 * sw,
-                  y: r.y + 6 * sw,
-                  rotation: 90,
-                  width: r.height - 12 * sw,
-                }
-              : { x: r.x + 6 * sw, y: r.y + 4 * sw, width: Math.max(10, r.width - 12 * sw) }),
             text: z.label,
             fontSize: smallText(11),
             fontFamily: 'IBM Plex Sans, sans-serif',
+            padding: 3 * sw,
             fill: c.label,
-            shadowColor: 'black',
-            shadowBlur: 2 * sw,
-            shadowOpacity: 0.6,
-            wrap: 'word',
           }),
         );
+        requests.push({ label, vertical: r.width * view.zoom < 90, zone: r });
       }
     }
+    const boxes = placeZoneLabels(
+      requests.map((q) => ({
+        zone: q.zone,
+        width: q.label.width(),
+        height: q.label.height(),
+        vertical: q.vertical,
+      })),
+      3 * sw,
+    );
+    requests.forEach((q, i) => {
+      const b = boxes[i]!;
+      // turned 90° clockwise about its origin, a label extends to the left of it
+      q.label.setAttrs(
+        q.vertical ? { x: b.x + b.width, y: b.y, rotation: 90 } : { x: b.x, y: b.y, rotation: 0 },
+      );
+      guideGroup.add(q.label);
+    });
     if (!input.guides) return;
     const dash = [6 * sw, 4 * sw];
     for (const s of SAFE_AREAS) {
@@ -368,6 +421,28 @@ export async function createEditor(
     }
   };
 
+  /**
+   * Keeps the rotate handle on the stage: it sits above the selection, or below / beside it
+   * when there is no room above (e.g. a full-frame selection after zooming in).
+   */
+  const placeRotater = () => {
+    if (!transformer.nodes().length || !transformer.rotateEnabled() || transformer.isTransforming())
+      return;
+    const rotater = transformer.findOne('.rotater');
+    if (!rotater) return;
+    const fits = () => {
+      const r = rotater.getClientRect();
+      return r.x >= 0 && r.y >= 0 && r.x + r.width <= box.width && r.y + r.height <= box.height;
+    };
+    for (const angle of [0, 180, 90, 270]) {
+      transformer.rotateAnchorAngle(angle);
+      transformer.forceUpdate();
+      if (fits()) return;
+    }
+    transformer.rotateAnchorAngle(0);
+    transformer.forceUpdate();
+  };
+
   const layerById = (id: string) => input.variant.layers.find((l) => l.id === id);
   const isLocked = (id: string) => layerById(id)?.locked === true;
 
@@ -401,10 +476,21 @@ export async function createEditor(
             'bottom-right',
           ],
     );
+    placeRotater();
     overlay.batchDraw();
   };
 
   // --- nodes
+
+  const attrsOf = (n: Konva.Node, at?: { x: number; y: number; rotation: number }): NodeAttrs => ({
+    x: round(at?.x ?? n.x()),
+    y: round(at?.y ?? n.y()),
+    width: round(n.width()),
+    height: round(n.height()),
+    scaleX: round(n.scaleX(), 4),
+    scaleY: round(n.scaleY(), 4),
+    rotation: round(at?.rotation ?? n.rotation()),
+  });
 
   const makeNode = (l: Layer): Konva.Node => {
     const kind = layerKind(l);
@@ -459,19 +545,12 @@ export async function createEditor(
     });
     node.on('transformend', () => {
       const out: Record<string, NodeAttrs> = {};
-      for (const n of transformer.nodes()) {
-        out[n.id()] = {
-          x: round(n.x()),
-          y: round(n.y()),
-          width: round(n.width()),
-          height: round(n.height()),
-          scaleX: round(n.scaleX(), 4),
-          scaleY: round(n.scaleY(), 4),
-          rotation: round(n.rotation()),
-        };
-      }
+      for (const n of transformer.nodes()) out[n.id()] = attrsOf(n);
       // only once per gesture (every attached node fires transformend)
-      if (transformer.nodes()[0] === node) cb.onTransform(out);
+      if (transformer.nodes()[0] === node) {
+        cb.onTransform(out);
+        placeRotater();
+      }
     });
     return node;
   };
@@ -820,6 +899,7 @@ export async function createEditor(
     drag.dy = dy;
     for (const [id, s] of drag.starts) nodes.get(id)?.position({ x: s.x + dx, y: s.y + dy });
     transformer.forceUpdate();
+    placeRotater();
     stage.batchDraw();
   };
 
@@ -972,6 +1052,19 @@ export async function createEditor(
       for (const id of ids) {
         const r = rectOf(id);
         if (r) out.set(id, r);
+      }
+      return out;
+    },
+    rotated(ids, deg) {
+      const live = ids.filter((id) => !isLocked(id) && nodes.get(id)?.visible());
+      const rects = live.map(rectOf).filter((r): r is Rect => !!r);
+      if (!rects.length) return {};
+      const u = union(rects);
+      const pivot = { x: u.x + u.width / 2, y: u.y + u.height / 2 };
+      const out: Record<string, NodeAttrs> = {};
+      for (const id of live) {
+        const n = nodes.get(id)!;
+        out[id] = attrsOf(n, rotateAbout({ x: n.x(), y: n.y() }, n.rotation(), pivot, deg));
       }
       return out;
     },

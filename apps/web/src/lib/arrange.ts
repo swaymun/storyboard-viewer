@@ -117,3 +117,31 @@ export function distribute(
   }
   return out;
 }
+
+/**
+ * Turning several layers as one: each layer's origin (its unrotated top-left, which Konva rotates
+ * around) is turned by `deg` around `pivot`, and its own rotation grows by `deg`.
+ */
+export function rotateAbout(
+  origin: { x: number; y: number },
+  rotation: number,
+  pivot: { x: number; y: number },
+  deg: number,
+): { x: number; y: number; rotation: number } {
+  const a = (deg * Math.PI) / 180;
+  const dx = origin.x - pivot.x;
+  const dy = origin.y - pivot.y;
+  return {
+    x: pivot.x + dx * Math.cos(a) - dy * Math.sin(a),
+    y: pivot.y + dx * Math.sin(a) + dy * Math.cos(a),
+    rotation: normalizeAngle(rotation + deg),
+  };
+}
+
+/** An angle in (−180, 180]. */
+export function normalizeAngle(deg: number): number {
+  let d = deg % 360;
+  if (d > 180) d -= 360;
+  if (d <= -180) d += 360;
+  return d === 0 ? 0 : d; // no −0
+}

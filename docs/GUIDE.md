@@ -119,8 +119,10 @@ capitals. Corner handles scale the text, side handles change where it wraps.
 
 **Guides.** **Safe area** shows the title-safe (80 %) and action-safe (90 %) frames. On vertical
 storyboards, **TikTok**, **Reels** and **Shorts** shade where those apps put their buttons,
-captions and top bar, so you keep text out of them. These areas are approximate: they follow
-the commonly published guides for 1080 × 1920 and differ by phone and app version.
+captions and top bar, so you keep text out of them. Each app has its own color (shown next to
+its button), and with several on, their labels line up side by side instead of covering one
+another. These areas are approximate: they follow the commonly published guides for
+1080 × 1920 and differ by phone and app version.
 **Snap to guides** pulls what you drag to the frame's edges and center, the guides that are
 shown, other layers and slots, and says what it snapped to. Hold **Cmd/Ctrl** while dragging (or
 **Alt**, pressed after the drag started) to move freely; starting a drag with **Alt** moves a copy.
@@ -135,12 +137,15 @@ shown, other layers and slots, and says what it snapped to. Hold **Cmd/Ctrl** wh
   rotate. Arrow keys nudge (Shift ×10).
 - **Fit**, **Fill** and **Center** fit a picture into the frame (or its slot) or center the
   selection. **X, Y, W, H** and **Rotation** take exact numbers (the lock keeps proportions).
+  With several layers selected, **Rotation** turns them together around the selection's center
+  (it is blank, "Mixed", when their rotations differ; a number then turns them by that much).
 - With several layers selected: align their edges or centers, **to the selection** or **to the
   frame**, and distribute them with equal gaps. **Group** (Cmd/Ctrl+G) keeps layers together;
   clicking one selects the group. **Ungroup**: Shift+Cmd/Ctrl+G.
 - **Layers** on the right: top of the list is in front. Hover a row to hide, lock or delete
-  (**×**) it; drag rows to reorder (or **Alt+↑/↓** on a row); double-click to rename. **Delete**
-  removes the selection, Cmd/Ctrl+D duplicates, and every change can be undone.
+  (**×**) it; drag a row (anywhere on it) to reorder, or **Alt+↑/↓** on a row; double-click to
+  rename. **Delete** removes the selection, Cmd/Ctrl+D duplicates, and every change can be
+  undone.
 
 **Zoom.** **−**, **+**, **100 %** and **Fit** in the toolbar (Cmd/Ctrl+−, Cmd/Ctrl++,
 Shift+0, Cmd/Ctrl+0). Scroll, or hold **Space** and drag, to pan; Cmd/Ctrl+scroll zooms at the
@@ -280,8 +285,9 @@ the agent's `get_viewer_url` tool returns its link. You can also pass a storyboa
 **Help → Guided tours** walks you through the app in a few steps each: **Getting started** (the
 script, making a shot, the shot card, menus, playback, themes), **Script & shots**, **Canvas &
 layouts**, **Assets**, **Audio & soundtrack** and **Working with your AI agent**. The first time
-you open the app it offers Getting started once. Use **→** / **←** (or Next / Back) to move,
-**Esc** to stop. If nothing is open, a tour opens the example storyboard first.
+you open the app it offers Getting started once, in a small card at the top right (never over
+the playback controls; **No thanks** or **Esc** closes it). Use **→** / **←** (or Next / Back)
+to move, **Esc** to stop. If nothing is open, a tour opens the example storyboard first.
 
 ## More questions
 

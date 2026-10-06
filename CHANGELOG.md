@@ -6,6 +6,29 @@ All notable changes are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.5.1] — 2026-10-06
+
+### Fixed
+
+- **Rotate handle at Fit.** Fit now leaves room around the frame for every transform handle, so a
+  full-frame selection can be rotated right away; the rotate handle also moves below or beside the
+  selection when there is no room above it (zoomed or panned), instead of being cut off.
+- **Platform safe zones together.** With TikTok, Reels and Shorts on at once, their labels no
+  longer print over each other: each is a small tag in its platform's color, placed side by side
+  (or down the button column) so they never overlap. Each platform's zones have their own color,
+  shown as a legend next to its toolbar button; readable in every theme.
+- The first-launch tour offer sits at the top right below the header instead of over the Play
+  button; **No thanks** or **Esc** closes it.
+- No faint lines along the frame's edges across the canvas at some zoom levels.
+
+### Changed
+
+- **Rotation for several layers**: the Rotation field works with a multi-selection and turns the
+  layers together around the selection's center (one undo step). It shows the shared value, or
+  stays blank ("Mixed") when the rotations differ; a number then turns them by that much.
+- **Layer list**: drag a row anywhere (not just its grip) to reorder; clicks on the row's hide,
+  lock and delete buttons, double-click to rename and **Alt+↑/↓** work as before.
+
 ## [0.5.0] — 2026-10-06
 
 ### Added

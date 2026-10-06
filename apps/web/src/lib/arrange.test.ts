@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { align, distribute, rectTargets, snapRect, union } from './arrange';
-import { PLATFORMS, guideTargets } from './safe-zones';
+import {
+  align,
+  distribute,
+  normalizeAngle,
+  rectTargets,
+  rotateAbout,
+  snapRect,
+  union,
+} from './arrange';
+import { PLATFORMS, guideTargets, placeZoneLabels, type Box } from './safe-zones';
 
 const r = (x: number, y: number, width: number, height: number) => ({ x, y, width, height });
 
@@ -71,5 +79,82 @@ describe('align and distribute', () => {
     expect(distribute(new Map([...rects].slice(0, 2)), 'x').size).toBe(0);
     const inFrame = distribute(rects, 'y', r(0, 0, 100, 400));
     expect(inFrame.get('a')!.dy).toBe(-10);
+  });
+});
+
+describe('rotating a selection as one', () => {
+  it('turns each origin around the pivot and adds the angle', () => {
+    const p = rotateAbout({ x: 200, y: 100 }, 10, { x: 100, y: 100 }, 90);
+    expect(p.x).toBeCloseTo(100);
+    expect(p.y).toBeCloseTo(200);
+    expect(p.rotation).toBe(100);
+    const q = rotateAbout({ x: 0, y: 0 }, 170, { x: 50, y: 50 }, 30);
+    expect(q.rotation).toBe(-160);
+    // a full turn comes back
+    const back = rotateAbout(
+      rotateAbout({ x: 7, y: 9 }, 0, { x: 1, y: 2 }, 120),
+      0,
+      { x: 1, y: 2 },
+      240,
+    );
+    expect(back.x).toBeCloseTo(7);
+    expect(back.y).toBeCloseTo(9);
+  });
+
+  it('normalizes angles to (−180, 180]', () => {
+    expect(normalizeAngle(180)).toBe(180);
+    expect(normalizeAngle(-180)).toBe(180);
+    expect(normalizeAngle(370)).toBe(10);
+    expect(normalizeAngle(-360)).toBe(0);
+    expect(Object.is(normalizeAngle(-360), -0)).toBe(false);
+  });
+});
+
+describe('zone labels', () => {
+  const hit = (a: Box, b: Box) =>
+    a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+
+  it('never overlap with all three platforms on, at several zooms', () => {
+    for (const zoom of [0.2, 0.3, 0.45, 1]) {
+      const W = 1080 * zoom;
+      const H = 1920 * zoom;
+      // screen px: 11 px type, ~6 px per character, 3 px padding
+      const reqs = PLATFORMS.flatMap((p) =>
+        p.zones.map((z) => {
+          const zone = { x: z.x * W, y: z.y * H, width: z.w * W, height: z.h * H };
+          return {
+            zone,
+            width: z.label.length * 6 + 6,
+            height: 17,
+            vertical: zone.width < 90,
+          };
+        }),
+      );
+      const boxes = placeZoneLabels(reqs, 3);
+      expect(boxes).toHaveLength(9);
+      for (let i = 0; i < boxes.length; i++)
+        for (let j = i + 1; j < boxes.length; j++)
+          expect(hit(boxes[i]!, boxes[j]!), `zoom ${zoom}: ${i} × ${j}`).toBe(false);
+      // each label starts inside (or at the edge of) its own zone's column / row
+      const starts = boxes.map((b, i) => {
+        const q = reqs[i]!;
+        return q.vertical ? b.y - q.zone.y : b.x - q.zone.x;
+      });
+      expect(Math.min(...starts)).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('a single platform keeps its labels in the corners of its zones', () => {
+    const tiktok = PLATFORMS[0]!;
+    const reqs = tiktok.zones.map((z) => ({
+      zone: { x: z.x * 324, y: z.y * 576, width: z.w * 324, height: z.h * 576 },
+      width: 80,
+      height: 17,
+      vertical: z.w * 324 < 90,
+    }));
+    const boxes = placeZoneLabels(reqs, 3);
+    expect(boxes[0]).toMatchObject({ x: 3, y: 3 });
+    expect(boxes[1]!.x + boxes[1]!.width).toBeCloseTo(324 - 3);
+    expect(boxes[1]!.height).toBe(80); // turned: runs down the button column
   });
 });

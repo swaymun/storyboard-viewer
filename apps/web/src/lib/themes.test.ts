@@ -77,6 +77,16 @@ describe('themes', () => {
     });
   }
 
+  it('platform zone tags: white label text is readable on every platform color', () => {
+    const root = /:root\s*\{([^}]*)\}/.exec(css)![1]!;
+    const tok = (name: string) => new RegExp(`${name}:\\s*([^;]+);`).exec(root)?.[1]?.trim();
+    const colors = ['tiktok', 'reels', 'shorts'].map((p) => tok(`--canvas-platform-${p}`)!);
+    expect(new Set(colors).size).toBe(3);
+    for (const t of THEMES)
+      for (const c of colors)
+        expect(contrast(themeTokens(t.id)['--canvas-label-fg']!, c)).toBeGreaterThanOrEqual(AA);
+  });
+
   it('every theme defines the same tokens', () => {
     const keys = Object.keys(themeTokens('paper')).sort();
     for (const t of THEMES) expect(Object.keys(themeTokens(t.id)).sort()).toEqual(keys);

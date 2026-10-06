@@ -73,6 +73,43 @@ test('the first-run offer appears once, opens an example and starts Getting star
   await context.close();
 });
 
+test('the first-run offer sits clear of the playback controls and the header', async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    baseURL: `http://localhost:${HOSTED_PORT}`,
+    storageState: { cookies: [], origins: [] },
+  });
+  const page = await context.newPage();
+  await page.goto('/');
+  await page.locator('[data-example="cat-crimes.sbd"]').click();
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  const offer = page.locator('#tour-offer');
+  await expect(offer).toBeVisible();
+  const box = (await offer.boundingBox())!;
+  const header = (await page.locator('header.top').boundingBox())!;
+  expect(box.y).toBeGreaterThanOrEqual(header.y + header.height);
+  for (const tab of ['Story', 'Canvas']) {
+    await page.getByRole('tab', { name: tab }).click();
+    for (const sel of ['#play-toggle', 'footer[data-tour="player"]']) {
+      const el = page.locator(sel).first();
+      await expect(el).toBeVisible();
+      const b = (await el.boundingBox())!;
+      const overlap =
+        box.x < b.x + b.width &&
+        b.x < box.x + box.width &&
+        box.y < b.y + b.height &&
+        b.y < box.y + box.height;
+      expect(overlap, `${tab}: offer over ${sel}`).toBe(false);
+    }
+  }
+  // still dismissible from the keyboard
+  await page.locator('#tour-offer-dismiss').focus();
+  await page.keyboard.press('Escape');
+  await expect(offer).toHaveCount(0);
+  await context.close();
+});
+
 test('the first-run offer can be dismissed', async ({ browser }) => {
   const context = await browser.newContext({
     baseURL: `http://localhost:${HOSTED_PORT}`,
