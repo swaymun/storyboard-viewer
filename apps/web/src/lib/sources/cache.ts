@@ -45,6 +45,8 @@ export interface RecentEntry {
   /** Packed bytes (packed files: the working copy). */
   blob?: Blob;
   handle?: FileSystemDirectoryHandle;
+  /** Packed files opened through the file picker: reopened (and saved) in place. */
+  fileHandle?: FileSystemFileHandle;
 }
 
 function openDb(): Promise<IDBDatabase> {

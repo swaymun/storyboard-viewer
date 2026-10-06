@@ -151,6 +151,12 @@ export function zipSource(
     get saveMode() {
       return handle || canSaveInPlace ? 'file' : 'download';
     },
+    get fileHandle() {
+      return handle;
+    },
+    get inPlace() {
+      return !!handle;
+    },
     get blob() {
       return blob;
     },
@@ -200,7 +206,12 @@ export function zipSource(
         downloadBlob(out, name.endsWith('.sbd') ? name : `${name}.sbd`);
       }
       blob = out;
-      return { project, message: handle ? `Saved ${name}` : `Downloaded ${name}` };
+      return {
+        project,
+        message: handle
+          ? `Saved ${name}`
+          : `Downloaded ${name}. This browser cannot save into the file you opened, so each Save downloads a new copy (Chrome and Edge save in place).`,
+      };
     },
     async packed() {
       return blob;
@@ -363,3 +374,24 @@ export function folderSource(handle: FileSystemDirectoryHandle): ProjectSource {
 
 export const canPickFolder = typeof window !== 'undefined' && 'showDirectoryPicker' in window;
 export const canPickFile = typeof window !== 'undefined' && 'showOpenFilePicker' in window;
+
+type OpenPicker = (o?: object) => Promise<FileSystemFileHandle[]>;
+
+/**
+ * Asks for a .sbd file with the File System Access API (Chromium), so Save can write back into
+ * it. Returns null when cancelled or not supported.
+ */
+export async function pickSbdFile(): Promise<FileSystemFileHandle | null> {
+  const pick = (window as unknown as { showOpenFilePicker?: OpenPicker }).showOpenFilePicker;
+  if (!pick) return null;
+  try {
+    const [h] = await pick({
+      types: [{ description: 'Storyboard', accept: { [SBD_TYPE]: ['.sbd'] } }],
+      excludeAcceptAllOption: false,
+      multiple: false,
+    });
+    return h ?? null;
+  } catch {
+    return null;
+  }
+}

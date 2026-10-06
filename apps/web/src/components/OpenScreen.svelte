@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tooltip } from '../lib/tooltip';
   import { EXAMPLES } from '../lib/examples';
   import { app } from '../lib/state.svelte';
   import { timeAgo, type RecentEntry } from '../lib/sources/cache';
@@ -14,11 +15,17 @@
   let dragging = $state(false);
   let input = $state<HTMLInputElement>();
 
-  function ondrop(e: DragEvent) {
+  async function ondrop(e: DragEvent) {
     e.preventDefault();
     dragging = false;
+    const item = e.dataTransfer?.items[0] as
+      | (DataTransferItem & { getAsFileSystemHandle?: () => Promise<FileSystemHandle | null> })
+      | undefined;
     const file = e.dataTransfer?.files[0];
-    if (file) void app.openFile(file);
+    // Chromium: a dropped file comes with a handle, so Save writes back into it
+    const handle = await item?.getAsFileSystemHandle?.().catch(() => null);
+    if (file)
+      void app.openFile(file, handle?.kind === 'file' ? (handle as FileSystemFileHandle) : null);
   }
 
   /** Object URLs for the thumbnails, revoked when the list changes. */
@@ -60,7 +67,12 @@
     <h2 id="open-title">Open a storyboard</h2>
     <p class="muted">Drop a <code>.sbd</code> file here, or choose one.</p>
     <div class="actions">
-      <button type="button" id="open-file" class="btn primary" onclick={() => input?.click()}>
+      <button
+        type="button"
+        id="open-file"
+        class="btn primary"
+        onclick={() => void app.pickFile(() => input?.click())}
+      >
         <Icon name="file" /> Open .sbd file
       </button>
       <button type="button" id="new-storyboard" class="btn" onclick={onNew}>
@@ -132,7 +144,7 @@
               type="button"
               class="btn ghost icon remove"
               aria-label="Remove {r.title} from the list"
-              title="Remove from the list"
+              {@attach tooltip('Remove from the list')}
               onclick={() => void app.forgetRecent(r.id)}><Icon name="close" size={12} /></button
             >
           </li>

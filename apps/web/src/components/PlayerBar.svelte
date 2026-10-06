@@ -5,6 +5,8 @@
   import { ui } from '../lib/ui.svelte';
   import Icon from './Icon.svelte';
   import VariantView from './VariantView.svelte';
+  import SoundtrackPanel from './SoundtrackPanel.svelte';
+  import { tooltip } from '../lib/tooltip';
 
   const shotEntry = $derived(app.shots.find((s) => s.ref.id === player.shotId));
   const line = $derived(player.lineId ? app.lines.get(player.lineId) : undefined);
@@ -15,7 +17,7 @@
 
 {#if player.stageOpen}
   <section class="stage" aria-label="Animatic" id="animatic">
-    <div class="frame" style:--ratio={ratio}>
+    <div class="frame" class:short={ui.soundtrackOpen} style:--ratio={ratio}>
       {#if shotEntry}
         <VariantView
           variant={app.shownVariant(shotEntry.shot)}
@@ -29,10 +31,13 @@
       {#if line?.element?.character}<span class="who">{line.element.character}</span>{/if}
       {line ? stripEmphasis(line.text) : ''}
     </p>
+    {#if ui.soundtrackOpen}
+      <SoundtrackPanel docked />
+    {/if}
   </section>
 {/if}
 
-<footer class="bar" aria-label="Playback">
+<footer class="bar" aria-label="Playback" data-tour="player">
   <div class="transport">
     <button
       type="button"
@@ -80,9 +85,14 @@
     type="button"
     class="btn ghost"
     id="soundtrack-toggle"
+    data-tour="soundtrack-toggle"
     aria-pressed={ui.soundtrackOpen}
     aria-controls="soundtrack"
-    title="Music and sounds under the story, tracks (mute, solo, gain)"
+    {@attach tooltip(
+      player.stageOpen
+        ? 'Show the tracks under the animatic: cues, playhead, mute, solo, volume'
+        : 'Music and sounds under the story, tracks (mute, solo, volume)',
+    )}
     onclick={() => (ui.soundtrackOpen = !ui.soundtrackOpen)}
   >
     <Icon name="volume" /> Soundtrack
@@ -91,6 +101,7 @@
     type="button"
     class="btn ghost"
     id="animatic-toggle"
+    data-tour="animatic-toggle"
     aria-label="Animatic view"
     aria-pressed={player.stageOpen}
     aria-controls="animatic"
@@ -149,6 +160,10 @@
   }
   .frame {
     width: min(100%, calc(42vh * var(--ratio, 1.7778)), 900px);
+  }
+  /* the soundtrack sits under the picture: a smaller picture keeps both in view */
+  .frame.short {
+    width: min(100%, calc(30vh * var(--ratio, 1.7778)), 720px);
   }
   .subtitle {
     margin: 0;

@@ -1,6 +1,7 @@
 <script lang="ts">
   // Undo / redo, the save status and (when there is something to save) the Save button. The
   // other file commands are in the menu bar (File).
+  import { tooltip } from '../lib/tooltip';
   import { MOD } from '../lib/menu';
   import { app } from '../lib/state.svelte';
   import Icon from './Icon.svelte';
@@ -21,14 +22,14 @@
   const saveLabel = $derived(
     app.saveMode === 'download'
       ? 'Download .sbd'
-      : app.saveMode === 'file' && app.source?.kind === 'zip'
-        ? 'Save .sbd'
+      : app.saveMode === 'file' && app.source?.kind === 'zip' && !app.source.inPlace
+        ? 'Save .sbd…'
         : 'Save',
   );
 
   function howToEdit() {
     app.toast(
-      `This .sbd is packed, so sbd serve shows it read-only. To edit it live, unpack it: sbd unpack "${app.source?.location ?? 'story.sbd'}" and serve the folder. Or edit a copy here.`,
+      `This storyboard is read-only here. You can edit a copy in the browser and save it as a new .sbd file.`,
       {
         kind: 'info',
         sticky: true,
@@ -38,14 +39,14 @@
   }
 </script>
 
-<div class="save-controls">
+<div class="save-controls" data-tour="save-status">
   {#if app.canEdit}
     <button
       type="button"
       class="btn ghost icon"
       id="undo"
       aria-label={app.undoLabel ? `Undo: ${app.undoLabel}` : 'Undo'}
-      title={app.undoLabel ? `Undo: ${app.undoLabel} (${mod}Z)` : 'Nothing to undo'}
+      {@attach tooltip(app.undoLabel ? `Undo: ${app.undoLabel} (${mod}Z)` : 'Nothing to undo')}
       aria-keyshortcuts="Control+Z Meta+Z"
       disabled={!app.undoLabel}
       onclick={() => app.undo()}><Icon name="undo" /></button
@@ -55,7 +56,9 @@
       class="btn ghost icon"
       id="redo"
       aria-label={app.redoLabel ? `Redo: ${app.redoLabel}` : 'Redo'}
-      title={app.redoLabel ? `Redo: ${app.redoLabel} (Shift+${mod}Z)` : 'Nothing to redo'}
+      {@attach tooltip(
+        app.redoLabel ? `Redo: ${app.redoLabel} (Shift+${mod}Z)` : 'Nothing to redo',
+      )}
       aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z"
       disabled={!app.redoLabel}
       onclick={() => app.redo()}><Icon name="redo" /></button
@@ -79,7 +82,7 @@
       id="save"
       disabled={app.saving}
       aria-keyshortcuts="Control+S Meta+S"
-      title="{saveLabel} ({mod}S)"
+      {@attach tooltip(`${saveLabel} (${mod}S)`)}
       onclick={() => void app.save()}>{saveLabel}</button
     >
   {/if}

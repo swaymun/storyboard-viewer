@@ -76,6 +76,10 @@ export interface ProjectSource {
   location: string;
   /** Folder sources: the directory handle (kept to reopen it from the recent list). */
   handle?: FileSystemDirectoryHandle;
+  /** Packed files: the file handle it was opened from (Save writes back into it). */
+  fileHandle?: FileSystemFileHandle | null;
+  /** Saves go back to where it was opened from without asking (autosave possible). */
+  readonly inPlace?: boolean;
   saveMode: SaveMode;
   load(): Promise<LoadedProject>;
   /** `info.origin` is the client that caused the change, when known. */

@@ -53,6 +53,8 @@ import {
 import {
   CancelledError,
   buildTree,
+  canPickFile,
+  pickSbdFile,
   downloadBlob,
   folderSource,
   writeTree,
@@ -119,7 +121,7 @@ function setPref(key: string, value: unknown): void {
 }
 
 /** A directory inside the origin private file system (OPFS), e.g. made by tests. */
-async function inPrivateFileSystem(h: FileSystemDirectoryHandle): Promise<boolean> {
+async function inPrivateFileSystem(h: FileSystemHandle): Promise<boolean> {
   try {
     const root = await navigator.storage?.getDirectory?.();
     return !!root && (await root.resolve(h)) !== null;
@@ -207,7 +209,19 @@ class AppState {
   unsaved = $derived(this.dirty || this.buffered);
   saveMode = $derived<SaveMode>(this.source?.saveMode ?? 'none');
   canEdit = $derived(!!this.project && !!this.source?.save && this.saveMode !== 'none');
-  canAutosave = $derived(this.saveMode === 'server' || this.saveMode === 'folder');
+  /**
+   * Saving by itself: sbd serve, folders, and packed files opened through a file handle
+   * (Chromium), which are written back in place. (`lastSaved`: the handle may arrive with the
+   * first save.)
+   */
+  canAutosave = $derived.by(() => {
+    void this.lastSaved;
+    return (
+      this.saveMode === 'server' ||
+      this.saveMode === 'folder' ||
+      (this.source?.kind === 'zip' && !!this.source.inPlace)
+    );
+  });
   undoLabel = $derived.by(() => {
     void this.historyVersion;
     return this.history.undoLabel;
@@ -294,6 +308,11 @@ class AppState {
         entry.id = `folder:${src.name}`;
         entry.location = 'Folder';
         entry.handle = src.handle;
+      } else if (src.fileHandle && !(await inPrivateFileSystem(src.fileHandle))) {
+        // reopened through its handle (saves keep going into the same file)
+        entry.id = `zip:${src.name}`;
+        entry.location = '.sbd file';
+        entry.fileHandle = src.fileHandle;
       } else {
         if (!src.packed) return;
         entry.id = `zip:${src.name}`;
@@ -377,6 +396,29 @@ class AppState {
       }
       await this.open(folderSource(entry.handle));
       return;
+    }
+    if (entry.fileHandle) {
+      const h = entry.fileHandle as FileSystemFileHandle & {
+        queryPermission?: (o: object) => Promise<PermissionState>;
+        requestPermission?: (o: object) => Promise<PermissionState>;
+      };
+      try {
+        let state = (await h.queryPermission?.({ mode: 'readwrite' })) ?? 'granted';
+        if (state !== 'granted')
+          state = (await h.requestPermission?.({ mode: 'readwrite' })) ?? state;
+        if (state === 'granted') {
+          await this.openFile(await h.getFile(), h);
+          return;
+        }
+      } catch {
+        /* moved or deleted: fall back to the stored copy below, if any */
+      }
+      if (!entry.blob) {
+        this.toast(`No access to “${entry.name}”. Open it again with Open .sbd file.`, {
+          kind: 'error',
+        });
+        return;
+      }
     }
     if (entry.blob) {
       await this.open(zipSource(entry.blob, entry.name));
@@ -532,8 +574,31 @@ class AppState {
     void this.loadRecents();
   }
 
-  openFile(file: File, handle?: FileSystemFileHandle | null): Promise<void> {
-    return this.open(zipSource(file, file.name, handle));
+  /**
+   * Opens a packed .sbd. With a file handle (File System Access API) Save and autosave write
+   * back into that file; the bytes are copied into memory first, because a File read from a
+   * handle becomes unreadable once the file is written.
+   */
+  async openFile(file: File, handle?: FileSystemFileHandle | null): Promise<void> {
+    const blob = handle
+      ? new Blob([await file.arrayBuffer()], { type: 'application/vnd.sbd+zip' })
+      : file;
+    return this.open(zipSource(blob, file.name, handle));
+  }
+
+  /** File → Open: the system file picker (Chromium: saves in place), else `fallback()`. */
+  async pickFile(fallback: () => void): Promise<void> {
+    if (!canPickFile) {
+      fallback();
+      return;
+    }
+    const handle = await pickSbdFile();
+    if (!handle) return;
+    try {
+      await this.openFile(await handle.getFile(), handle);
+    } catch (e) {
+      this.error = `Could not open ${handle.name}: ${(e as Error).message}`;
+    }
   }
 
   /** Opens a bundled example like a dropped .sbd file (edits stay in the browser until saved). */

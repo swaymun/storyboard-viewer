@@ -53,7 +53,7 @@ export async function detectServer(base = ''): Promise<ProjectSource | null> {
       base,
       health.name ?? 'storyboard',
       health.path ?? '',
-      health.kind === 'packed',
+      false, // since 0.5.0 packed files are saved in place too
     );
   } catch {
     return null;

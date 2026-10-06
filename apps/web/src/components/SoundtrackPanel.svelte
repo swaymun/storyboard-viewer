@@ -3,6 +3,7 @@
   // own sound. Story-wide cues (music under everything, ambience) with the trim editor, and all
   // cues on their tracks in story time with per-track mute (preview), solo (preview), gain and
   // "muted in the storyboard" (saved). Clicking a shot's cue opens it in that shot's card.
+  import { tooltip } from '../lib/tooltip';
   import {
     isGlobalTarget,
     isLineTarget,
@@ -18,6 +19,9 @@
   import AudioTrim from './AudioTrim.svelte';
   import CueDetail from './CueDetail.svelte';
   import Icon from './Icon.svelte';
+
+  /** Shown under the animatic picture (in the stage) instead of above the playback bar. */
+  let { docked = false }: { docked?: boolean } = $props();
 
   const editable = $derived(app.canEdit);
   const inShot = $derived(new Set(app.project?.ids.shots.flatMap((s) => s.lines) ?? []));
@@ -105,7 +109,9 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <section
   class="soundtrack"
+  class:docked
   id="soundtrack"
+  data-tour="soundtrack"
   aria-labelledby="soundtrack-title"
   onkeydown={(e) => {
     if (e.key === 'Escape' && !audio.selectedCue && audio.markIn === null) {
@@ -184,7 +190,7 @@
                 class="ms"
                 aria-pressed={player.muted.has(t.id)}
                 aria-label="Mute {t.label}"
-                title="Mute while previewing (not saved)"
+                {@attach tooltip('Mute while previewing', 'not saved')}
                 onclick={() => player.toggleTrack(t.id)}
                 ><Icon name={player.muted.has(t.id) ? 'mute' : 'volume'} size={12} /></button
               >
@@ -194,7 +200,7 @@
                 class="ms solo"
                 aria-pressed={player.solo.has(t.id)}
                 aria-label="Solo track {t.label}"
-                title="Solo (preview only)"
+                {@attach tooltip('Solo', 'preview only')}
                 onclick={() => player.toggleSolo(t.id)}>S</button
               >
               <button
@@ -202,7 +208,7 @@
                 class="ms save"
                 aria-pressed={!!t.def?.muted}
                 aria-label="Mute track {t.label}"
-                title="Muted in the storyboard (saved)"
+                {@attach tooltip('Muted in the storyboard', 'saved')}
                 disabled={!editable}
                 onclick={() => saveMute(t.id, !!t.def?.muted)}>M</button
               >
@@ -215,7 +221,7 @@
                 style:--fill="{((t.def?.gain ?? 1) / 2) * 100}%"
                 disabled={!editable}
                 aria-label="Gain of track {t.label}"
-                title="Track gain {(t.def?.gain ?? 1).toFixed(2)}"
+                {@attach tooltip(`Track gain ${(t.def?.gain ?? 1).toFixed(2)}`)}
                 oninput={(e) =>
                   app.edit(
                     'Track gain',
@@ -239,7 +245,9 @@
                     0.4,
                     pct(Math.min(c.end, range[1])) - Math.max(0, pct(c.start)),
                   )}%"
-                  title="{full ? cueName(full) : c.id} · {formatTime(c.start)}–{formatTime(c.end)}"
+                  {@attach tooltip(
+                    `${full ? cueName(full) : c.id} · ${formatTime(c.start)}–${formatTime(c.end)}`,
+                  )}
                   onclick={(e) => {
                     e.stopPropagation();
                     openCue(full);
@@ -270,6 +278,21 @@
     max-height: 42vh;
     overflow: auto;
     padding: var(--space-2) var(--space-4) var(--space-3);
+  }
+  /* under the animatic: the tracks first, right below the picture */
+  .soundtrack.docked {
+    width: 100%;
+    max-height: 34vh;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .docked .left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .docked .tracks {
+    order: -1;
   }
   header {
     display: flex;

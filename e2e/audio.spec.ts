@@ -190,6 +190,44 @@ test('Soundtrack panel: story-wide cue, saved track mute, solo, lanes open shot 
   await expect(panel).toHaveCount(0);
 });
 
+test('with the animatic open, the soundtrack shows under its picture', async ({ page }) => {
+  await open(page, '#tab=story');
+  await page.locator('#animatic-toggle').click();
+  const stage = page.locator('#animatic');
+  await expect(stage).toBeVisible();
+  // Soundtrack: the tracks right under the animatic picture, in the same view
+  await page.locator('#soundtrack-toggle').click();
+  const docked = stage.locator('#soundtrack');
+  await expect(docked).toBeVisible();
+  await expect(page.locator('#soundtrack')).toHaveCount(1);
+  const picture = (await stage.locator('.frame').boundingBox())!;
+  const tracks = (await docked.locator('.tracks').boundingBox())!;
+  expect(tracks.y).toBeGreaterThan(picture.y + picture.height);
+  await expect(docked.locator('.lane[data-track="music"]')).toBeVisible();
+  // the playhead follows the player
+  await page.locator('#play-toggle').click();
+  await page.waitForTimeout(600);
+  await page.locator('#play-toggle').click();
+  const left = await docked
+    .locator('.lane .playhead')
+    .first()
+    .evaluate((e) => e.style.left);
+  expect(parseFloat(left)).toBeGreaterThan(0);
+  // track controls work from there
+  await docked.getByRole('button', { name: 'Solo track SFX' }).click();
+  await expect(docked.getByRole('button', { name: 'Solo track SFX' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  // the button hides it again; closing the animatic keeps it as a panel above the bar
+  await page.locator('#soundtrack-toggle').click();
+  await expect(page.locator('#soundtrack')).toHaveCount(0);
+  await page.locator('#soundtrack-toggle').click();
+  await page.locator('#animatic-toggle').click();
+  await expect(stage).toHaveCount(0);
+  await expect(page.locator('#soundtrack')).toBeVisible();
+});
+
 test('attach audio to a line from the script context menu', async ({ page }) => {
   await open(page, '#tab=story');
   const id = lineId('The lamp ROARS');
