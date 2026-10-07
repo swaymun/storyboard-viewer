@@ -73,7 +73,7 @@ test('the first-run offer appears once, opens an example and starts Getting star
   await context.close();
 });
 
-test('the first-run offer sits clear of the playback controls and the header', async ({
+test('the first-run offer covers no toolbar, control or the header on any tab', async ({
   browser,
 }) => {
   const context = await browser.newContext({
@@ -86,14 +86,28 @@ test('the first-run offer sits clear of the playback controls and the header', a
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   const offer = page.locator('#tour-offer');
   await expect(offer).toBeVisible();
-  const box = (await offer.boundingBox())!;
   const header = (await page.locator('header.top').boundingBox())!;
-  expect(box.y).toBeGreaterThanOrEqual(header.y + header.height);
-  for (const tab of ['Story', 'Canvas']) {
+  const toolbars: Record<string, string[]> = {
+    Story: ['.story-top', '#play-toggle', 'footer[data-tour="player"]'],
+    Canvas: [
+      '[data-tour="canvas-toolbar"]',
+      '.variant-tabs',
+      '#play-toggle',
+      'footer[data-tour="player"]',
+    ],
+    Assets: ['[data-tour="assets-filters"]', '#play-toggle', 'footer[data-tour="player"]'],
+  };
+  for (const [tab, sels] of Object.entries(toolbars)) {
     await page.getByRole('tab', { name: tab }).click();
-    for (const sel of ['#play-toggle', 'footer[data-tour="player"]']) {
+    if (tab === 'Canvas')
+      await page.locator('[data-tour="canvas-toolbar"] button').first().waitFor();
+    const box = (await offer.boundingBox())!;
+    expect(box.y, `${tab}: offer below the header`).toBeGreaterThanOrEqual(
+      header.y + header.height - 1,
+    );
+    for (const sel of sels) {
       const el = page.locator(sel).first();
-      await expect(el).toBeVisible();
+      await expect(el, `${tab}: ${sel}`).toBeVisible();
       const b = (await el.boundingBox())!;
       const overlap =
         box.x < b.x + b.width &&
@@ -102,6 +116,22 @@ test('the first-run offer sits clear of the playback controls and the header', a
         b.y < box.y + box.height;
       expect(overlap, `${tab}: offer over ${sel}`).toBe(false);
     }
+    // nothing clickable anywhere under it either (the Flatten / Group buttons on the canvas…)
+    const covered = await page.evaluate(() => {
+      const o = document.getElementById('tour-offer')!.getBoundingClientRect();
+      const hits: string[] = [];
+      for (const el of document.querySelectorAll<HTMLElement>(
+        'button, input, select, textarea, a[href], [role="tab"], [role="toolbar"], canvas',
+      )) {
+        if (el.closest('#tour-offer')) continue;
+        const r = el.getBoundingClientRect();
+        if (!r.width || !r.height) continue;
+        if (r.left < o.right && o.left < r.right && r.top < o.bottom && o.top < r.bottom)
+          hits.push(el.id || el.getAttribute('aria-label') || el.textContent?.trim() || el.tagName);
+      }
+      return hits;
+    });
+    expect(covered, `${tab}: under the offer`).toEqual([]);
   }
   // still dismissible from the keyboard
   await page.locator('#tour-offer-dismiss').focus();

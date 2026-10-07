@@ -72,4 +72,53 @@ test.describe('hosted (static, no sbd serve)', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText("Pip's Kite");
     await context.setOffline(false);
   });
+
+  test('a single-image portrait variant shows whole, inside its frame (Canvas, card, animatic)', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await page.locator('[data-example="cat-crimes.sbd"]').click();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    // shot 1 ("hook"): its "Deadpan" variant is one 9:16 image
+    await page.goto('/#tab=canvas&shot=hook');
+    await page.locator('[data-variant-id="deadpan"]').click();
+
+    /** The picture's box lies inside the frame's, and the frame inside `container`. */
+    async function fits(frame: string, container: string, what: string) {
+      const f = page.locator(frame).first();
+      const img = f.locator('img');
+      await expect(img, what).toBeVisible();
+      await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth)).toBe(720);
+      const fb = (await f.boundingBox())!;
+      const ib = (await img.boundingBox())!;
+      const cb = (await page.locator(container).first().boundingBox())!;
+      const inside = (a: typeof fb, b: typeof fb) =>
+        a.x >= b.x - 1 &&
+        a.y >= b.y - 1 &&
+        a.x + a.width <= b.x + b.width + 1 &&
+        a.y + a.height <= b.y + b.height + 1;
+      expect(inside(ib, fb), `${what}: picture inside the frame`).toBe(true);
+      expect(inside(fb, cb), `${what}: frame inside ${container}`).toBe(true);
+      // 9:16, not stretched or cut
+      expect(fb.width / fb.height, what).toBeCloseTo(9 / 16, 2);
+      expect(ib.width / ib.height, what).toBeCloseTo(9 / 16, 2);
+      return fb;
+    }
+
+    const canvas = await fits('.single .frame', '.stage-host', 'Canvas');
+    // at Fit: as large as the stage allows (not a thumbnail)
+    const stage = (await page.locator('.stage-host').boundingBox())!;
+    expect(canvas.height).toBeGreaterThan(stage.height - 40);
+
+    await page.getByRole('tab', { name: 'Story' }).click();
+    await page.goto('/#tab=story&view=board&shot=hook');
+    await fits('article[data-shot-id="hook"] .frame', 'article[data-shot-id="hook"]', 'Story card');
+
+    await page.locator('#animatic-toggle').click();
+    // play shot 1 and stop on it
+    await page.locator('#play-toggle').click();
+    await expect(page.locator('#animatic img')).toBeVisible();
+    await page.locator('#play-toggle').click();
+    await fits('#animatic .frame .frame', '#animatic', 'Animatic');
+  });
 });

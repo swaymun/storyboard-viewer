@@ -236,6 +236,15 @@ describe('sbd serve', () => {
     expect(index.headers.get('cache-control')).toBe('no-cache');
     const js = await fetch(`${base}/assets/app.js`);
     expect(js.headers.get('content-type')).toMatch(/javascript/);
+    expect(js.headers.get('cache-control')).toContain('immutable');
+    // the shell is never cached without asking: a rebuilt app reaches the browser
+    writeFileSync(join(web, 'sw.js'), 'self.x = 1');
+    writeFileSync(join(web, 'manifest.webmanifest'), '{}');
+    for (const path of ['/index.html', '/sw.js', '/manifest.webmanifest', '/story/shot/1'])
+      expect([path, (await fetch(`${base}${path}`)).headers.get('cache-control')]).toEqual([
+        path,
+        'no-cache',
+      ]);
     expect(await (await fetch(`${base}/story/shot/1`)).text()).toContain('<title>app</title>');
     expect((await fetch(`${base}/missing.js`)).status).toBe(404);
     expect((await fetch(`${base}/api/nope`)).status).toBe(404);

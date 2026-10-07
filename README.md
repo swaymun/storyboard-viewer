@@ -233,7 +233,9 @@ The connection becomes active in a new chat. Start a new session, or check with
 
 **How do I update?**
 Ask your agent "Update Storyboard Viewer", or run `git pull && pnpm install && pnpm build` in the
-project folder. The browser app updates itself.
+project folder. The browser app updates itself: when a new version is out it reloads on its own,
+or, if you have unsaved changes or a file open, shows "A new version is ready" with a **Reload**
+button (which saves first). Hover the logo, or see Help → About, for the version you run.
 
 More answers (packed files, safety) are in the [user guide](docs/GUIDE.md#more-questions).
 Found a bug or have an idea? [Open an issue](https://github.com/swaymun/storyboard-viewer/issues).

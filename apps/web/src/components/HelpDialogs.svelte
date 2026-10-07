@@ -82,7 +82,7 @@
 </Dialog>
 
 <Dialog bind:open={ui.aboutOpen} title="About Storyboard Viewer" id="about-dialog" width={420}>
-  <p><b>Storyboard Viewer</b> <span class="mono">{__APP_VERSION__}</span></p>
+  <p><b>Storyboard Viewer</b> <span class="mono" id="app-version">{__APP_VERSION__}</span></p>
   <p class="muted">
     Offline-first storyboards in the open <code>.sbd</code> format: script, pictures and sound together.
     Agents edit them through MCP while you watch. MIT License.

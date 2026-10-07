@@ -5,13 +5,18 @@ import { defineConfig } from 'vitest/config';
 import pkg from './package.json' with { type: 'json' };
 
 export default defineConfig({
-  define: { __APP_VERSION__: JSON.stringify(pkg.version) },
+  // SBD_APP_VERSION: only for the e2e update test, which builds a second copy as "version B".
+  define: { __APP_VERSION__: JSON.stringify(process.env['SBD_APP_VERSION'] ?? pkg.version) },
   // Resolve workspace packages to their TypeScript sources (see the "source" export condition).
   resolve: { conditions: ['source', ...defaultClientConditions] },
   plugins: [
     svelte(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // "prompt": a new service worker waits until the page tells it to take over, which
+      // src/lib/sw-update.ts does at once when nothing is unsaved, else after "Reload".
+      // (Before 0.5.2 this said autoUpdate, but with injectRegister: false the worker did not
+      // skip waiting while the page waited for it to: new versions never arrived in open tabs.)
+      registerType: 'prompt',
       injectRegister: false,
       includeAssets: ['icon.svg', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
       manifest: {

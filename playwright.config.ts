@@ -9,6 +9,8 @@ process.env['SBD_CONFIG_DIR'] ??= fileURLToPath(new URL('e2e/.tmp/config-misc', 
 export const EDIT_PORT = PORT + 1;
 /** Static copy of the built app without `sbd serve` (like the hosted copy), hosted tests. */
 export const HOSTED_PORT = PORT + 2;
+/** Static server that swaps between two builds of the app (e2e/updates.spec.ts). */
+export const UPDATE_PORT = PORT + 3;
 
 /**
  * Every test starts as a returning user: the first-run tour offer and the canvas hint strip are
@@ -20,7 +22,7 @@ const RETURNING = [
 ];
 export const returningUser = {
   cookies: [],
-  origins: [PORT, EDIT_PORT, HOSTED_PORT].map((p) => ({
+  origins: [PORT, EDIT_PORT, HOSTED_PORT, UPDATE_PORT].map((p) => ({
     origin: `http://localhost:${p}`,
     localStorage: RETURNING,
   })),
@@ -69,6 +71,15 @@ export default defineConfig({
       command: `node e2e/static.mjs ${HOSTED_PORT}`,
       url: `http://localhost:${HOSTED_PORT}/`,
       reuseExistingServer: false,
+      stdout: 'pipe',
+      stderr: 'pipe',
+    },
+    {
+      // builds a second copy of the app first ("version B")
+      command: `node e2e/static.mjs ${UPDATE_PORT} --updates`,
+      url: `http://localhost:${UPDATE_PORT}/`,
+      reuseExistingServer: false,
+      timeout: 120_000,
       stdout: 'pipe',
       stderr: 'pipe',
     },

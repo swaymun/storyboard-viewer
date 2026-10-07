@@ -1379,7 +1379,11 @@
               onblur={() => finishTextEdit(true)}></textarea>
           {/if}
         {:else}
-          <div class="single" style:aspect-ratio={frameAspect(app.project?.manifest)}>
+          <div
+            class="single"
+            style:aspect-ratio={frameAspect(app.project?.manifest)}
+            style:--frame-ratio={frameAspect(app.project?.manifest)}
+          >
             <VariantView {variant} label={shot.title ?? shot.id} />
           </div>
         {/if}
@@ -2331,6 +2335,7 @@
     position: relative;
     flex: 1;
     min-height: 240px;
+    container-type: size;
     display: grid;
     place-items: center;
     background: repeating-conic-gradient(var(--surface-2) 0 25%, var(--bg) 0 50%) 0 0 / 20px 20px;
@@ -2362,10 +2367,11 @@
     transform-origin: 0 0;
     outline: none;
   }
+  /* A single-image variant: the whole frame, as large as fits in the stage with 12 px around
+     (container units: a percentage height here resolved against the picture's own size, so a
+     portrait frame showed at the picture's pixel size, cut off by the stage) */
   .single {
-    height: calc(100% - 24px);
-    max-width: calc(100% - 24px);
-    max-height: 100%;
+    width: min(100cqw - 24px, (100cqh - 24px) * (var(--frame-ratio)));
   }
   .status-line {
     margin: 0;

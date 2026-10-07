@@ -2,11 +2,9 @@
   // The guided tour overlay: a dimmed page with a cut-out around the step's target and a small
   // dialog next to it. Keyboard: → / Enter next, ← back, Esc ends; focus moves into the dialog
   // on every step and back to where it was when the tour ends. No animation when the user
-  // prefers reduced motion. Also the first-run offer ("Take a 1-minute tour?"), a non-modal card
-  // at the top right below the header (clear of the playback controls).
+  // prefers reduced motion. The first-run offer is TourOffer.svelte.
   import { tick } from 'svelte';
   import { tour } from '../lib/tour.svelte';
-  import { TOURS } from '../lib/tours';
   import Icon from './Icon.svelte';
 
   let pop = $state<HTMLDivElement>();
@@ -136,8 +134,6 @@
       tour.prev();
     }
   }
-
-  const gettingStarted = TOURS[0]!;
 </script>
 
 {#if tour.tour && step}
@@ -194,37 +190,6 @@
       </footer>
     </div>
   </div>
-{/if}
-
-{#if tour.offer && !tour.tour}
-  <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-  <section
-    class="offer"
-    id="tour-offer"
-    aria-label="Guided tour"
-    onkeydown={(e) => {
-      if (e.key === 'Escape') tour.dismissOffer();
-    }}
-  >
-    <Icon name="compass" size={18} />
-    <div>
-      <p><b>New here?</b> {gettingStarted.summary}.</p>
-      <div class="actions">
-        <button
-          type="button"
-          class="btn small primary"
-          id="tour-offer-start"
-          onclick={() => void tour.start(gettingStarted.id)}>Take the tour</button
-        >
-        <button
-          type="button"
-          class="btn small ghost"
-          id="tour-offer-dismiss"
-          onclick={() => tour.dismissOffer()}>No thanks</button
-        >
-      </div>
-    </div>
-  </section>
 {/if}
 
 <style>
@@ -312,37 +277,6 @@
     justify-content: flex-end;
     gap: 6px;
     margin-top: 12px;
-  }
-  /* top right, just below the header: never over the playback bar (Play, the scrubber) at the
-     bottom, nor over the menus and tabs in the header */
-  .offer {
-    position: fixed;
-    right: 16px;
-    top: 64px;
-    z-index: 800;
-    display: flex;
-    gap: 10px;
-    max-width: min(320px, calc(100vw - 32px));
-    padding: 12px 14px;
-    color: var(--fg);
-    background: var(--surface);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-lg);
-    box-shadow:
-      0 1px 2px var(--shadow-color),
-      0 10px 28px var(--shadow-color);
-  }
-  .offer :global(svg) {
-    flex: none;
-    color: var(--accent-text);
-    margin-top: 2px;
-  }
-  .offer p {
-    margin: 0 0 8px;
-  }
-  .actions {
-    display: flex;
-    gap: 6px;
   }
   @media (prefers-reduced-motion: reduce) {
     .spot,

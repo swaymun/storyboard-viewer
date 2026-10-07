@@ -1,0 +1,16 @@
+# Cloudflare Workers static assets: response headers (copied to dist/ by the build).
+# The app shell must never be served from a cache without asking the server, or a deploy does
+# not reach users: index.html, the service worker and the manifest are revalidated every time.
+# Everything under /assets/ has a content hash in its name and never changes.
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/sw.js
+  Cache-Control: no-cache
+/registerSW.js
+  Cache-Control: no-cache
+/manifest.webmanifest
+  Cache-Control: no-cache
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

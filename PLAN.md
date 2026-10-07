@@ -685,6 +685,46 @@ pnpm fixture:storyboarder  # regenerate the Storyboarder test fixture (ffmpeg fo
   shared edges showed as faint lines at fractional zooms. `canvas.webp` was refreshed (new zone
   colors and labels).
 
+### 0.5.2 — fix release: updates reach open tabs (2026-10-07)
+
+- **Root cause of the stuck old version.** `registerType: 'autoUpdate'` together with
+  `injectRegister: false`: vite-plugin-pwa only adds `skipWaiting` / `clientsClaim` to the
+  generated worker when it injects the registration itself, so the worker waited for a
+  `SKIP_WAITING` message, while the `autoUpdate` client code never sends one (it waits for the
+  worker to activate on its own). A new worker installed and then waited until every tab and the
+  installed app window were closed; a reload does not activate a waiting worker. Reproduced in
+  e2e (the update test fails with the old setting).
+- **Update flow** (`lib/sw-update.ts`, injected dependencies, unit-tested): `registerType:
+'prompt'`; `registration.update()` on load, window focus, `visibilitychange` → visible, `online`
+  and every 30 min (bursts rate-limited to one check per 3 s). A waiting worker: `updateAction`
+  says `reload` when nothing is unsaved, no save is running and no browser-opened file or folder
+  is open (a reload would close it; `sbd serve` reconnects), then `updateSW(true)` and the page
+  reloads on `controlling` (or after 4 s if it was not controlled, e.g. after a hard reload);
+  otherwise a sticky notice "A new version is ready — Reload" (`update-notice.svelte.ts`, shown
+  in `Toasts.svelte`). Reload saves first (`app.save()`) and switches only if nothing is left
+  unsaved. A worker activated by another tab reloads this tab only when clean. A tab that turns
+  clean switches when it is hidden. Rejected: a worker that skips waiting by itself (would reload
+  tabs with unsaved work through the old client code).
+- **Caching.** `apps/web/public/_headers` (Cloudflare static assets): `no-cache` for `/`,
+  `/index.html`, `/sw.js`, `/registerSW.js`, `/manifest.webmanifest`; `/assets/*` immutable.
+  `sbd serve`: only `assets/` is immutable now, everything else (icons, bundled examples
+  included) `no-cache`.
+- **Version** on the logo's `title` and in Help → About; `window.__sbd.version`.
+- **E2E update test** (`e2e/updates.spec.ts`): `e2e/static.mjs --updates` builds a second real
+  copy of the app with `SBD_APP_VERSION=<version>-b` and switches between the two builds on the
+  same origin (`POST /__e2e/build?use=a|b`). Clean start screen → switches to B by itself; unsaved
+  edit → notice, still A with the edit; undo, Reload → B.
+- **Single image on the Canvas tab**: `.single` had `height: calc(100% - 24px)` inside the
+  stage's grid, whose auto row resolved the percentage against the picture's own height, so a
+  720 × 1280 picture was drawn 1256 px tall and cut off by the stage (16:9 overflowed too at
+  some window sizes). Now `.stage-host` is a size container and `.single` is
+  `min(100cqw − 24px, (100cqh − 24px) × ratio)` wide. Checked every single-image variant of
+  cat-crimes, midnight-snack and salt-and-light at three window sizes (Canvas, Story card,
+  animatic); e2e checks the 9:16 one.
+- **Tour offer** is a slim banner in the page flow below the header (`TourOffer.svelte`) instead
+  of a fixed card; e2e checks that it covers no toolbar, control or canvas on Story, Canvas and
+  Assets.
+
 ## Status
 
-All milestones (M0–M4), the 0.2.0, 0.3.0 and 0.4.0 feedback rounds, the 0.4.1 fix release, 0.5.0 (canvas layouts, captions, tours, save in place) and the 0.5.1 fix release are complete. Being published: GitHub `swaymun/storyboard-viewer` and a hosted copy of the web app on Cloudflare Workers (`pnpm deploy:web`); no npm package. Known gaps: Safari/Firefox untested; Storyboarder multi-board shots not merged and Shot Generator data dropped; animatic export draws canvas-variant video layers as their first frame; no CLI animatic export; PDF grid cells clip very long text; `sbd export-pdf` output is large for image-heavy storyboards; Kokoro voices were not listened to by a person (timings were checked, quality was not); Script view: shot cards are hidden below 860 px width, the editor was only exercised in Chromium; reopening a folder from the recent list was not tested end to end (headless Chromium cannot read stored handles back).
+All milestones (M0–M4), the 0.2.0, 0.3.0 and 0.4.0 feedback rounds, the 0.4.1 fix release, 0.5.0 (canvas layouts, captions, tours, save in place) and the 0.5.1 and 0.5.2 fix releases are complete. Being published: GitHub `swaymun/storyboard-viewer` and a hosted copy of the web app on Cloudflare Workers (`pnpm deploy:web`); no npm package. Known gaps: Safari/Firefox untested; Storyboarder multi-board shots not merged and Shot Generator data dropped; animatic export draws canvas-variant video layers as their first frame; no CLI animatic export; PDF grid cells clip very long text; `sbd export-pdf` output is large for image-heavy storyboards; Kokoro voices were not listened to by a person (timings were checked, quality was not); Script view: shot cards are hidden below 860 px width, the editor was only exercised in Chromium; reopening a folder from the recent list was not tested end to end (headless Chromium cannot read stored handles back).

@@ -285,8 +285,9 @@ the agent's `get_viewer_url` tool returns its link. You can also pass a storyboa
 **Help → Guided tours** walks you through the app in a few steps each: **Getting started** (the
 script, making a shot, the shot card, menus, playback, themes), **Script & shots**, **Canvas &
 layouts**, **Assets**, **Audio & soundtrack** and **Working with your AI agent**. The first time
-you open the app it offers Getting started once, in a small card at the top right (never over
-the playback controls; **No thanks** or **Esc** closes it). Use **→** / **←** (or Next / Back)
+you open the app it offers Getting started once, in a slim bar below the header (it pushes the
+view down, so it never covers a toolbar or the playback controls; **No thanks** or **Esc** closes
+it). Use **→** / **←** (or Next / Back)
 to move, **Esc** to stop. If nothing is open, a tour opens the example storyboard first.
 
 ## More questions

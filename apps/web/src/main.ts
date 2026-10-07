@@ -4,6 +4,8 @@ import App from './App.svelte';
 import { player } from './lib/player.svelte';
 import { folderSource, zipSource } from './lib/sources/local';
 import { app } from './lib/state.svelte';
+import { startUpdater } from './lib/sw-update';
+import { updateNotice } from './lib/update-notice.svelte';
 import '@fontsource/ibm-plex-sans/latin-400.css';
 import '@fontsource/ibm-plex-sans/latin-500.css';
 import '@fontsource/ibm-plex-sans/latin-600.css';
@@ -28,7 +30,24 @@ if (!target) throw new Error('#app element missing');
 
 export default mount(App, { target });
 
-if (import.meta.env.PROD) registerSW({ immediate: true });
+// New versions: reload by themselves when nothing is unsaved, else offer Reload (sw-update.ts).
+if (import.meta.env.PROD && 'serviceWorker' in navigator)
+  updateNotice.updater = startUpdater({
+    registerSW,
+    work: {
+      get unsaved() {
+        return app.unsaved;
+      },
+      get saving() {
+        return app.saving;
+      },
+      get openLocal() {
+        return !!app.project && app.source?.kind !== 'server';
+      },
+      save: () => app.save(),
+    },
+    notify: (show) => (updateNotice.show = show),
+  });
 
 // Installed PWA: open .sbd files passed by the OS ("Open with Storyboard Viewer").
 interface LaunchParams {
@@ -47,5 +66,7 @@ launchQueue?.setConsumer(async (params) => {
   app,
   player,
   theme,
+  updates: updateNotice,
+  version: __APP_VERSION__,
   sources: { folderSource, zipSource },
 };

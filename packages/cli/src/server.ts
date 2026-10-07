@@ -26,7 +26,7 @@ import { tmpdir } from 'node:os';
 import { pipeline } from 'node:stream/promises';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { basename, extname, isAbsolute, join, resolve, sep } from 'node:path';
+import { basename, extname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Readable } from 'node:stream';
 import {
@@ -432,8 +432,10 @@ export async function startServer(
       }
       abs = join(webRoot, 'index.html');
     }
-    const isShell =
-      abs.endsWith('index.html') || abs.endsWith('sw.js') || abs.endsWith('.webmanifest');
+    // Only files with a content hash in their name (assets/) may be cached for good. Everything
+    // else (index.html, sw.js, the manifest, icons, bundled examples) is revalidated each time,
+    // so a rebuilt app reaches the browser and its service worker sees the new version.
+    const hashed = relative(webRoot, abs).split(sep)[0] === 'assets';
     let body = await readFile(abs);
     // Tells the app it is served by `sbd serve`, so it talks to /api; a hosted copy of the app
     // (any other static server) has no marker and never calls /api.
@@ -442,7 +444,7 @@ export async function startServer(
     res.writeHead(200, {
       'content-type': contentType(abs),
       'content-length': body.length,
-      'cache-control': isShell ? 'no-cache' : 'public, max-age=31536000, immutable',
+      'cache-control': hashed ? 'public, max-age=31536000, immutable' : 'no-cache',
     });
     res.end(req.method === 'HEAD' ? undefined : body);
   };

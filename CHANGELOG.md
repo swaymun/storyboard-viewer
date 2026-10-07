@@ -6,6 +6,27 @@ All notable changes are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.5.2] — 2026-10-07
+
+### Fixed
+
+- **New versions reach open tabs.** The browser app could keep showing an old version after an
+  update, for good: the new version was downloaded but waited for every tab to close, and the app
+  never told it to start. Now the app looks for a new version when it opens, when you come back
+  to the window and every 30 minutes. With nothing unsaved it reloads into the new version by
+  itself; with unsaved changes (or a file opened in the browser, which a reload would close) it
+  shows **A new version is ready — Reload**, and Reload saves first. Your work is never thrown
+  away. The hosted copy and `sbd serve` always revalidate the page, the service worker and the
+  manifest, so a deploy or a rebuild is seen at once (hashed files stay cached).
+- **A single image on the Canvas tab fits its frame.** A portrait (9:16) picture showed at its
+  own pixel size, cut off by the canvas area; it is now shown whole and as large as fits.
+- The first-launch tour offer is a slim bar below the header instead of a card that covered the
+  right end of the Canvas toolbar (Flatten, Group).
+
+### Added
+
+- The app's version shows when you hover the logo (and in Help → About).
+
 ## [0.5.1] — 2026-10-06
 
 ### Fixed

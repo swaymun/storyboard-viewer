@@ -1,9 +1,34 @@
 <script lang="ts">
   import { app } from '../lib/state.svelte';
+  import { updateNotice } from '../lib/update-notice.svelte';
   import Icon from './Icon.svelte';
 </script>
 
 <div class="toasts" role="region" aria-label="Notifications" aria-live="polite">
+  {#if updateNotice.show}
+    <!-- a new version of the app is waiting (lib/sw-update.ts); Reload saves first -->
+    <div class="toast update" role="status" id="update-toast" data-toast="update">
+      <Icon name="refresh" size={14} />
+      <span class="msg">A new version is ready</span>
+      <button
+        type="button"
+        class="btn small primary"
+        id="update-reload"
+        disabled={updateNotice.busy}
+        title={app.unsaved
+          ? 'Saves your changes, then loads the new version'
+          : 'Loads the new version'}
+        onclick={() => void updateNotice.reload()}>Reload</button
+      >
+      <button
+        type="button"
+        class="btn ghost icon x"
+        aria-label="Later"
+        title="Later"
+        onclick={() => (updateNotice.show = false)}><Icon name="close" size={14} /></button
+      >
+    </div>
+  {/if}
   {#each app.toasts as t (t.id)}
     <div class="toast {t.kind}" role={t.kind === 'error' ? 'alert' : 'status'} data-toast={t.kind}>
       <span class="msg">{t.message}</span>
@@ -60,6 +85,13 @@
   }
   .toast.error .msg {
     color: var(--danger);
+  }
+  .toast.update {
+    border-color: var(--accent);
+  }
+  .toast.update :global(svg:first-child) {
+    flex: none;
+    color: var(--accent-text);
   }
   .toast.agent {
     border-color: var(--accent);

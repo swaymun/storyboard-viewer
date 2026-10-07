@@ -19,6 +19,7 @@
   import PrintView from './components/PrintView.svelte';
   import Toasts from './components/Toasts.svelte';
   import Tour from './components/Tour.svelte';
+  import TourOffer from './components/TourOffer.svelte';
   import { tour } from './lib/tour.svelte';
   import VideoExportDialog from './components/VideoExportDialog.svelte';
   import { player } from './lib/player.svelte';
@@ -145,12 +146,15 @@
   <div class="shell">
     <header class="top">
       <div class="brand">
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-          <rect x="3" y="5" width="18" height="14" rx="2.5" fill="var(--accent)" />
-          <rect x="6" y="8" width="5" height="4" rx="1" fill="var(--surface)" />
-          <rect x="13" y="8" width="5" height="4" rx="1" fill="var(--surface)" opacity=".7" />
-          <rect x="6" y="13.5" width="12" height="2" rx="1" fill="var(--surface)" opacity=".7" />
-        </svg>
+        <!-- the version on hover (also Help → About), to tell which build is running -->
+        <span class="logo" id="app-logo" title="Storyboard Viewer {__APP_VERSION__}">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <rect x="3" y="5" width="18" height="14" rx="2.5" fill="var(--accent)" />
+            <rect x="6" y="8" width="5" height="4" rx="1" fill="var(--surface)" />
+            <rect x="13" y="8" width="5" height="4" rx="1" fill="var(--surface)" opacity=".7" />
+            <rect x="6" y="13.5" width="12" height="2" rx="1" fill="var(--surface)" opacity=".7" />
+          </svg>
+        </span>
         {#if app.project}
           <h1 id="project-title" title={app.source?.location}>{app.project.manifest.title}</h1>
           <span class="source" data-tour="source" title={app.source?.location}>{sourceLabel}</span>
@@ -184,6 +188,7 @@
         </div>
       {/if}
     </header>
+    <TourOffer />
 
     <div class="body">
       {#if ui.guideOpen && app.project}
@@ -281,6 +286,10 @@
     align-items: center;
     gap: var(--space-2);
     min-width: 0;
+  }
+  .logo {
+    display: grid;
+    flex: none;
   }
   .brand :global(.menubar) {
     margin-left: var(--space-2);
